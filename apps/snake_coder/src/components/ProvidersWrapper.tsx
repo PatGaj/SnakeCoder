@@ -3,20 +3,24 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { SessionProvider } from "next-auth/react";
-import type { ReactNode } from "react";
+import { NextIntlClientProvider } from "next-intl";
 
-type ProviderWrapperProps = {
-  children: ReactNode;
+type ProvidersWrapperProps = {
+  children: React.ReactNode;
+  locale: string;
 };
 
-export const ProviderWrapper: React.FC<ProviderWrapperProps> = ({ children }) => {
-  const queryClient = new QueryClient();
+const queryClient = new QueryClient();
+
+export const ProviderWrapper: React.FC<ProvidersWrapperProps> = ({ children, locale }) => {
   return (
     <SessionProvider>
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
+      <NextIntlClientProvider locale={locale}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </NextIntlClientProvider>
     </SessionProvider>
   );
 };

@@ -1,8 +1,125 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0f1f3a;
+  --foreground: #ffffff;
+  /* Colors */
+  /* primary */
+  --primary-blue-50: #eef4fc;
+  --primary-blue-100: #d9e4f7;
+  --primary-blue-200: #bcd0ef;
+  --primary-blue-300: #90b2e2;
+  --primary-blue-400: #6691cf;
+  --primary-blue-500: #1e4b9b;
+  --primary-blue-600: #1a428a;
+  --primary-blue-700: #153674;
+  --primary-blue-800: #0f2a5b;
+  --primary-blue-900: #0b2147;
+  --primary-blue-950: #071634;
+
+  /* secondary */
+  --secondary-yellow-50: #fff9e8;
+  --secondary-yellow-100: #fff3c9;
+  --secondary-yellow-200: #ffe89a;
+  --secondary-yellow-300: #ffdb63;
+  --secondary-yellow-400: #ffce39;
+  --secondary-yellow-500: #ffd43b;
+  --secondary-yellow-600: #e6b52c;
+  --secondary-yellow-700: #c7931f;
+  --secondary-yellow-800: #a37317;
+  --secondary-yellow-900: #7b5210;
+  --secondary-yellow-950: #4f340a;
+
+  /* jadeGreen */
+  --jadeGreen-50: #edf8f2;
+  --jadeGreen-100: #d4f0e0;
+  --jadeGreen-200: #a9e1c1;
+  --jadeGreen-300: #79cfa0;
+  --jadeGreen-400: #4dbb81;
+  --jadeGreen-500: #2f9e61;
+  --jadeGreen-600: #248252;
+  --jadeGreen-700: #1c6441;
+  --jadeGreen-800: #134b31;
+  --jadeGreen-900: #0c3725;
+  --jadeGreen-950: #062118;
+
+  /* mangoYellow */
+  --mangoYellow-50: #fff8e5;
+  --mangoYellow-100: #fdeec2;
+  --mangoYellow-200: #fbe290;
+  --mangoYellow-300: #f7d25e;
+  --mangoYellow-400: #f4c43a;
+  --mangoYellow-500: #f6c343;
+  --mangoYellow-600: #dca228;
+  --mangoYellow-700: #b57e1f;
+  --mangoYellow-800: #8f5f18;
+  --mangoYellow-900: #6a4510;
+  --mangoYellow-950: #42290a;
+
+  /* chiliRed */
+  --chiliRed-50: #ffecec;
+  --chiliRed-100: #ffd3ce;
+  --chiliRed-200: #f9afa5;
+  --chiliRed-300: #f2827a;
+  --chiliRed-400: #e95e56;
+  --chiliRed-500: #e34d3f;
+  --chiliRed-600: #cd3d32;
+  --chiliRed-700: #ad2f27;
+  --chiliRed-800: #8c231e;
+  --chiliRed-900: #6c1b17;
+  --chiliRed-950: #43100d;
+
+  /* stoneGray */
+  --stoneGray-50: #f8fafc;
+  --stoneGray-100: #eef2f6;
+  --stoneGray-200: #dce3ed;
+  --stoneGray-300: #c0c8d5;
+  --stoneGray-400: #9aa4b5;
+  --stoneGray-500: #7d8494;
+  --stoneGray-600: #5f6675;
+  --stoneGray-700: #454c59;
+  --stoneGray-800: #2f343f;
+  --stoneGray-900: #1d202b;
+  --stoneGray-950: #11131a;
+
+  /* aquaBlue */
+  --aquaBlue-50: #e7f0ff;
+  --aquaBlue-100: #d4e2ff;
+  --aquaBlue-200: #aac4ff;
+  --aquaBlue-300: #7ea5fa;
+  --aquaBlue-400: #5687ee;
+  --aquaBlue-500: #3a6ed8;
+  --aquaBlue-600: #2c58b9;
+  --aquaBlue-700: #234693;
+  --aquaBlue-800: #1c3673;
+  --aquaBlue-900: #15295a;
+  --aquaBlue-950: #0d193d;
+
+  /* nightBlack */
+  --nightBlack-50: #d9dce3;
+  --nightBlack-100: #b2b6c4;
+  --nightBlack-200: #888f9e;
+  --nightBlack-300: #5c6370;
+  --nightBlack-400: #3a3f4a;
+  --nightBlack-500: #1a1d23;
+  --nightBlack-600: #14171d;
+  --nightBlack-700: #0f1116;
+  --nightBlack-800: #0a0c11;
+  --nightBlack-900: #05060a;
+  --nightBlack-950: #020205;
+
+  /* snowWhite */
+  --snowWhite-50: #ffffff;
+  --snowWhite-100: #fdfdff;
+  --snowWhite-200: #f7f8fb;
+  --snowWhite-300: #f1f3f7;
+  --snowWhite-400: #e7eaf0;
+  --snowWhite-500: #d9dde6;
+  --snowWhite-600: #c7cdd9;
+  --snowWhite-700: #b1b8c5;
+  --snowWhite-800: #9299a8;
+  --snowWhite-900: #6f7586;
+  --snowWhite-950: #4a5261;
 }
 
 @theme inline {
@@ -12,12 +129,12 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   background: var(--background);

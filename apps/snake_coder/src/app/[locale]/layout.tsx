@@ -28,7 +28,10 @@ const RootLayout: React.FC<RootLayoutProps> = async ({ children, params }) => {
   return (
     <html lang={locale}>
       <body>
-        <ProviderWrapper locale={locale}>{children}</ProviderWrapper>
+        <ProviderWrapper locale={locale}>
+          <div className="bg-linear-to-br from-primary-950 via-primary-800 to-primary-900">{children}</div>
+          <div className="pointer-events-none absolute -left-10 -top-10 h-64 w-64 rounded-full bg-secondary-500/15 blur-3xl" />
+        </ProviderWrapper>
       </body>
     </html>
   )

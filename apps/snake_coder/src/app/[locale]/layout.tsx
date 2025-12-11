@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { ProviderWrapper } from '@/context/ProvidersWrapper'
 
 import './globals.css'
+import SignOutLayout from '@/features/signOutLayout/SignOutLayout'
 
 type Locale = (typeof locales)[number]
 type RootLayoutProps = {
@@ -28,7 +29,9 @@ const RootLayout: React.FC<RootLayoutProps> = async ({ children, params }) => {
   return (
     <html lang={locale}>
       <body>
-        <ProviderWrapper locale={locale}>{children}</ProviderWrapper>
+        <ProviderWrapper locale={locale}>
+          <SignOutLayout>{children}</SignOutLayout>
+        </ProviderWrapper>
       </body>
     </html>
   )

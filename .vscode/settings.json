@@ -13,5 +13,11 @@
 
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
-  }
+  },
+
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "tailwindCSS.experimental.classRegex": [["tv\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"]]
 }

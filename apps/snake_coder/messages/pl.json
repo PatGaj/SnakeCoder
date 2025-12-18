@@ -1,5 +1,8 @@
 {
-  "HomePage": {
-    "title": "Witaj Świecie!"
+  "topBar": {
+    "login": "Zaloguj się"
+  },
+  "logo": {
+    "banerText": "Szybciej opanuj Pythona"
   }
 }

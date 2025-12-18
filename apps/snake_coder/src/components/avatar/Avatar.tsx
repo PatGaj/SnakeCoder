@@ -49,7 +49,6 @@ type AvatarProps = VariantProps<typeof avatarStyles> & {
 const Avatar: React.FC<AvatarProps> = ({ src, alt = 'avatar', userName, size, tone, className, onClick }) => {
   const styles = avatarStyles({ size, tone })
   const firstName = userName?.split(' ')[0][0].toUpperCase()
-  const lastName = userName?.split(' ')[1][0].toUpperCase()
 
   return (
     <span className={cn(styles.root(), className)} onClick={onClick}>
@@ -58,7 +57,6 @@ const Avatar: React.FC<AvatarProps> = ({ src, alt = 'avatar', userName, size, to
       ) : (
         <span className={styles.icon()}>
           {firstName}
-          {lastName}
         </span>
       )}
     </span>

@@ -10,7 +10,7 @@ import { normalizeUrlPath } from '@/lib/normalize'
 const TopBar = () => {
   const router = useRouter()
   const pathname = usePathname()
-  const t = useTranslations('topBar')
+  const t = useTranslations('signOutLayout')
 
   const normalizedPath = normalizeUrlPath(pathname || '/')
   const isLoginPage = normalizedPath === '/login'

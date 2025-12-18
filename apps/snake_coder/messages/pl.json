@@ -1,6 +1,9 @@
 {
-  "topBar": {
-    "login": "Zaloguj się"
+  "signOutLayout": {
+    "login": "Zaloguj się",
+    "missions": "Misje Python",
+    "feedback": "Feedback w sekundę",
+    "noLongCourses": "Bez długich kursów"
   },
   "logo": {
     "banerText": "Szybciej opanuj Pythona"

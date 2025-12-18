@@ -1,6 +1,9 @@
 import { Link } from '@/i18n/navigation'
+import { useTranslations } from 'next-intl'
 
 const Logo = () => {
+  const t = useTranslations('logo')
+
   return (
     <div>
       <Link href="/landing" className="group flex items-center gap-3 transition-transform hover:-translate-y-0.5">
@@ -10,7 +13,7 @@ const Logo = () => {
         <div className="flex flex-col leading-tight">
           <span className="text-[10px] font-semibold uppercase tracking-[0.32em] text-secondary-300">SnakeCoder</span>
           <span className="text-base font-semibold text-snowWhite-50 transition-colors group-hover:text-secondary-100">
-            Szybciej opanuj Pythona
+            {t('banerText')}
           </span>
         </div>
       </Link>

@@ -7,5 +7,57 @@
   },
   "logo": {
     "banerText": "Szybciej opanuj Pythona"
+  },
+  "register": {
+    "badge": "Rejestracja",
+    "hint": "Załóż konto i zapisz swój progres.",
+    "title": "Utwórz konto",
+    "subtitle": "Wpisz dane, a po chwili możesz wracać do misji i testów.",
+    "nickName": {
+      "label": "Nick",
+      "placeholder": "np. julia_dev"
+    },
+    "firstName": {
+      "label": "Imię (opcjonalnie)",
+      "placeholder": "np. Julia"
+    },
+    "lastName": {
+      "label": "Nazwisko (opcjonalnie)",
+      "placeholder": "np. Kowalska"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "np. dev@snakecoder.com"
+    },
+    "password": {
+      "label": "Hasło",
+      "placeholder": "••••••••"
+    },
+    "confirmPassword": {
+      "label": "Powtórz hasło",
+      "placeholder": "••••••••"
+    },
+    "terms": {
+      "label": "Akceptuję regulamin aplikacji."
+    },
+    "submit": "Zarejestruj się",
+    "haveAccount": "Masz już konto?",
+    "goLogin": "Wróć do logowania",
+    "toast": {
+      "success": "Konto utworzone. Witamy!"
+    },
+    "errors": {
+      "nickNameRequired": "Podaj nick.",
+      "nickNameInvalid": "Nick może zawierać tylko litery i cyfry (bez spacji i znaków specjalnych).",
+      "nickNameTaken": "Taki nick jest już zajęty.",
+      "email": "Podaj poprawny adres email.",
+      "passwordRequired": "Podaj hasło.",
+      "passwordComplex": "Hasło musi mieć min. 8 znaków, małą i dużą literę, cyfrę oraz znak specjalny.",
+      "confirmPasswordRequired": "Powtórz hasło.",
+      "termsRequired": "Musisz zaakceptować regulamin.",
+      "passwordsMismatch": "Hasła muszą się zgadzać.",
+      "emailTaken": "Taki email jest już zajęty.",
+      "generic": "Coś poszło nie tak. Spróbuj ponownie."
+    }
   }
 }

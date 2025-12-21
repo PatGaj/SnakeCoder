@@ -110,8 +110,10 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             </span>
           )}
         </span>
-        {destructiveText && (
-          <span className={clsx('text-xs text-red-600', { invisible: !destructive })}>{destructiveText}</span>
+        {destructiveText !== undefined && (
+          <span className={clsx('min-h-4 text-xs text-red-600', { invisible: !destructive })}>
+            {destructiveText || '\u00A0'}
+          </span>
         )}
       </label>
     )

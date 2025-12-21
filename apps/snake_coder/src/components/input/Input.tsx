@@ -1,6 +1,9 @@
+'use client'
+
 import React from 'react'
 import clsx from 'clsx'
 import { tv, type VariantProps } from 'tailwind-variants'
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri'
 
 import { cn } from '@/lib/utils'
 
@@ -57,10 +60,34 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement> &
     title?: React.ReactNode
     destructive?: boolean
     destructiveText?: React.ReactNode
+    showPasswordToggle?: boolean
+    passwordToggleLabelShow?: string
+    passwordToggleLabelHide?: string
   }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, variant, size, round, destructive = false, title, destructiveText, disabled, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      round,
+      destructive = false,
+      title,
+      destructiveText,
+      disabled,
+      type,
+      showPasswordToggle = true,
+      passwordToggleLabelShow = 'Show password',
+      passwordToggleLabelHide = 'Hide password',
+      ...props
+    },
+    ref
+  ) => {
+    const [passwordVisible, setPasswordVisible] = React.useState(false)
+    const canTogglePassword = type === 'password' && showPasswordToggle
+    const resolvedType = canTogglePassword ? (passwordVisible ? 'text' : 'password') : type
+
     return (
       <label className="flex flex-col select-none">
         {title && (
@@ -73,14 +100,38 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {title}
           </span>
         )}
-        <input
-          ref={ref}
-          disabled={disabled}
-          className={cn(inputStyles({ variant, size, round, destructive }), className)}
-          {...props}
-        />
-        {destructiveText && (
-          <span className={clsx('text-xs pl-2 pt-1 text-red-500', { invisible: !destructive })}>{destructiveText}</span>
+        <div className="relative">
+          <input
+            ref={ref}
+            type={resolvedType}
+            disabled={disabled}
+            className={cn(
+              inputStyles({ variant, size, round, destructive }),
+              clsx({ 'pr-10': canTogglePassword }),
+              className
+            )}
+            {...props}
+          />
+          {canTogglePassword && (
+            <button
+              type="button"
+              disabled={disabled}
+              aria-label={passwordVisible ? passwordToggleLabelHide : passwordToggleLabelShow}
+              className={clsx(
+                'absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer',
+                'text-snowWhite-200 hover:text-snowWhite-50',
+                { 'opacity-60': disabled }
+              )}
+              onClick={() => setPasswordVisible((prev) => !prev)}
+            >
+              {passwordVisible ? <RiEyeLine size={18} /> : <RiEyeOffLine size={18} />}
+            </button>
+          )}
+        </div>
+        {destructiveText !== undefined && (
+          <span className={clsx('min-h-4 pl-2 pt-1 text-xs text-red-500', { invisible: !destructive })}>
+            {destructiveText || '\u00A0'}
+          </span>
         )}
       </label>
     )

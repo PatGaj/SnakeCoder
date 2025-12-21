@@ -5,6 +5,150 @@
     "feedback": "Feedback w sekundę",
     "noLongCourses": "Bez długich kursów"
   },
+  "landing": {
+    "hero": {
+      "badge2": "Grywalizacja + ocena AI",
+      "title": "Ucz się <highlight>Pythona</highlight> przez misje — od zera do PCAP",
+      "subtitle": "Krótkie zadania z testami, punkty doświadczenia i ocena kodu przez LLM. Uczysz się praktycznie — bez długich kursów.",
+      "primaryCta": "Zacznij za darmo",
+      "secondaryCta": "Zobacz jak to działa",
+      "points": {
+        "missions": {
+          "title": "Misje 6–10 minut",
+          "desc": "Małe kroki, szybkie zwycięstwa, realny progres."
+        },
+        "gamification": {
+          "title": "Poziomy, streaki, odznaki",
+          "desc": "Motywacja bez presji — grasz i uczysz się jednocześnie."
+        },
+        "llm": {
+          "title": "Ocena kodu przez LLM + testy",
+          "desc": "Dostajesz wskazówki: styl, czytelność, złożoność i błędy logiczne."
+        }
+      },
+      "preview": {
+        "badge": "Przykładowa misja",
+        "level": "PCEP • Podstawy",
+        "timer": "~8 min",
+        "desc": "Napisz funkcję, uruchom testy i zobacz feedback: co działa, co poprawić i jak ulepszyć rozwiązanie.",
+        "snippetTitle": "main.py",
+        "tags": {
+          "tests": "Testy",
+          "testsDesc": "Sprawdzamy poprawność.",
+          "style": "Styl",
+          "styleDesc": "Czytelny, pythonowy kod.",
+          "ai": "AI",
+          "aiDesc": "Wskazówki i kierunek."
+        }
+      }
+    },
+    "features": {
+      "title": "Dlaczego SnakeCoder?",
+      "subtitle": "Od zera, przez PCEP, aż do PCAP: misje, grywalizacja i szybki feedback do Twojego kodu.",
+      "items": {
+        "missions": {
+          "title": "Misje zamiast wykładów",
+          "desc": "Krótkie zadania prowadzą krok po kroku. Uczysz się, pisząc kod."
+        },
+        "llm": {
+          "title": "Feedback od AI (LLM)",
+          "desc": "Komentarze do jakości rozwiązania: czytelność, edge-case’y i sugestie refaktoru."
+        },
+        "tests": {
+          "title": "Sprawdzanie testami",
+          "desc": "Od razu wiesz, czy rozwiązanie przechodzi przypadki testowe."
+        },
+        "gamification": {
+          "title": "Grywalizacja, która wspiera",
+          "desc": "XP, poziomy i odznaki pomagają utrzymać regularność bez presji."
+        },
+        "pcepPcap": {
+          "title": "Zakres PCEP oraz PCAP",
+          "desc": "Misje mapują się na wymagania egzaminów i budują solidne fundamenty."
+        },
+        "projects": {
+          "title": "Mini-projekty i automatyzacje",
+          "desc": "Ćwiczysz na realnych przykładach: pliki, CLI, proste integracje."
+        }
+      }
+    },
+    "how": {
+      "title": "Jak to działa",
+      "subtitle": "Trzy proste kroki: misja, kod i feedback.",
+      "steps": {
+        "pick": {
+          "title": "Wybierz misję",
+          "desc": "Dobierz temat i poziom — od podstaw do PCAP."
+        },
+        "solve": {
+          "title": "Napisz kod",
+          "desc": "Skupiasz się na rozwiązaniu, a platforma prowadzi Cię krokami."
+        },
+        "feedback": {
+          "title": "Odbierz ocenę",
+          "desc": "Testy + komentarz LLM: co działa, co poprawić i co warto przerobić."
+        }
+      }
+    },
+    "paths": {
+      "title": "Ścieżki nauki",
+      "subtitle": "Zaczynasz od zera, robisz fundament pod PCEP, a potem wchodzisz w tematy PCAP.",
+      "pcep": {
+        "tag": "Start od zera",
+        "title": "PCEP: fundamenty Pythona",
+        "desc": "Składnia, typy, przepływ sterowania i podstawowe struktury danych.",
+        "topics": {
+          "syntax": "Składnia i zmienne",
+          "types": "Typy i operatory",
+          "flow": "Warunki i pętle",
+          "functions": "Funkcje",
+          "collections": "Listy, krotki, słowniki"
+        }
+      },
+      "pcap": {
+        "tag": "Poziom wyżej",
+        "title": "PCAP: kod produkcyjny",
+        "desc": "OOP, moduły, wyjątki, pliki i testowanie — pod realne projekty.",
+        "topics": {
+          "oop": "Programowanie obiektowe",
+          "modules": "Moduły i pakiety",
+          "exceptions": "Wyjątki i debugowanie",
+          "files": "Pliki i formaty danych",
+          "testing": "Testy i dobre praktyki"
+        }
+      }
+    },
+    "faq": {
+      "title": "FAQ",
+      "subtitle": "Najczęstsze pytania na start.",
+      "items": {
+        "ai": {
+          "q": "Czy AI pisze kod za mnie?",
+          "a": "Nie. AI ocenia i podpowiada — Ty rozwiązujesz misję. Chodzi o naukę, nie o kopiowanie."
+        },
+        "pcepPcap": {
+          "q": "Czy to jest pod PCEP/PCAP?",
+          "a": "Tak — misje pokrywają wymagania PCEP i prowadzą do tematów PCAP."
+        },
+        "time": {
+          "q": "Ile czasu dziennie potrzebuję?",
+          "a": "Wystarczy kilkanaście minut. Misje są krótkie i zaprojektowane na szybki feedback."
+        },
+        "level": {
+          "q": "Dla kogo jest SnakeCoder?",
+          "a": "Dla początkujących i średniozaawansowanych, którzy chcą praktyki i rytmu, a nie długich wykładów."
+        }
+      }
+    },
+    "cta": {
+      "badge": "Zacznij dziś",
+      "title": "Wejdź w misję i ucz się praktycznie",
+      "subtitle": "Załóż konto i zacznij od pierwszej misji. Postęp i odznaki zostają z Tobą.",
+      "primaryCta": "Utwórz konto",
+      "secondaryCta": "Mam już konto — zaloguj",
+      "note": "Wersja demo w przygotowaniu — na razie pełny start przez konto."
+    }
+  },
   "logo": {
     "banerText": "Szybciej opanuj Pythona"
   }

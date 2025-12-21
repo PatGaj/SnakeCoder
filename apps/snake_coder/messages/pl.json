@@ -7,5 +7,37 @@
   },
   "logo": {
     "banerText": "Szybciej opanuj Pythona"
+  },
+  "login": {
+    "badge": "Logowanie",
+    "hint": "Wróć do misji i kontynuuj progres.",
+    "title": "Zaloguj się do SnakeCoder",
+    "subtitle": "Podaj email i hasło, aby wrócić do swoich zadań i wyników testów.",
+    "email": {
+      "label": "Email",
+      "placeholder": "np. dev@snakecoder.com"
+    },
+    "password": {
+      "label": "Hasło",
+      "placeholder": "••••••••"
+    },
+    "submit": "Zaloguj się",
+    "noAccount": "Nie masz konta?",
+    "goRegister": "Przejdź do rejestracji",
+    "toast": {
+      "success": "Zalogowano pomyślnie."
+    },
+    "oauth": {
+      "or": "lub",
+      "github": "Zaloguj przez GitHub",
+      "google": "Zaloguj przez Google"
+    },
+    "errors": {
+      "email": "Podaj poprawny adres email.",
+      "passwordRequired": "Podaj hasło.",
+      "invalidCredentials": "Nieprawidłowy email lub hasło.",
+      "oauth": "Nie udało się zalogować przez dostawcę. Spróbuj ponownie.",
+      "generic": "Coś poszło nie tak. Spróbuj ponownie."
+    }
   }
 }

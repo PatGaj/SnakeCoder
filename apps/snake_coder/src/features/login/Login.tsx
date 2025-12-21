@@ -138,7 +138,8 @@ const Login = () => {
             leftIcon={<RiGithubFill size={18} />}
             onClick={() => handleOAuth('github')}
             loading={oauthLoading === 'github'}
-            disabled={isSubmitting || oauthLoading !== null}
+            // disabled={isSubmitting || oauthLoading !== null}
+            disabled={true}
           >
             {t('oauth.github')}
           </Button>
@@ -151,7 +152,8 @@ const Login = () => {
             leftIcon={<RiGoogleFill size={18} />}
             onClick={() => handleOAuth('google')}
             loading={oauthLoading === 'google'}
-            disabled={isSubmitting || oauthLoading !== null}
+            // disabled={isSubmitting || oauthLoading !== null}
+            disabled={true}
           >
             {t('oauth.google')}
           </Button>

@@ -152,6 +152,18 @@
   "logo": {
     "banerText": "Szybciej opanuj Pythona"
   },
+  "sidebar": {
+    "collapse": "Zwiń",
+    "close": "Zamknij menu",
+    "expand": "Rozwiń",
+    "open": "Otwórz menu",
+    "nav": {
+      "dashboard": "Dashboard",
+      "missions": "Misje"
+    },
+    "profile": "Profil",
+    "logout": "Wyloguj się"
+  },
   "login": {
     "badge": "Logowanie",
     "hint": "Wróć do misji i kontynuuj progres.",

@@ -43,13 +43,18 @@ const tooltipStyles = tv({
 type TooltipProps = VariantProps<typeof tooltipStyles> & {
   content: React.ReactNode
   children: React.ReactNode
+  disabled?: boolean
   className?: string
   contentClassName?: string
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ content, children, side, variant, className, contentClassName }) => {
+const Tooltip: React.FC<TooltipProps> = ({ content, children, disabled, side, variant, className, contentClassName }) => {
   const styles = tooltipStyles({ side, variant })
   const [open, setOpen] = useState(false)
+
+  if (disabled) {
+    return <span className={cn(styles.wrapper(), className)}>{children}</span>
+  }
 
   return (
     <span

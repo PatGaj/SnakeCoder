@@ -13,10 +13,10 @@ const avatarStyles = tv({
   },
   variants: {
     size: {
-      xs: { root: 'h-8 w-8 text-xs', icon: 'text-[11px]' },
-      sm: { root: 'h-10 w-10 text-sm', icon: 'text-xs' },
-      md: { root: 'h-12 w-12 text-base', icon: 'text-sm' },
-      lg: { root: 'h-14 w-14 text-lg', icon: 'text-base' },
+      xs: { root: 'min-w-8 h-8 w-8 text-xs', icon: 'text-[11px]' },
+      sm: { root: 'min-w-10 h-10 w-10 text-sm', icon: 'text-xs' },
+      md: { root: 'min-w-12 h-12 w-12 text-base', icon: 'text-sm' },
+      lg: { root: 'min-w-14 h-14 w-14 text-lg', icon: 'text-base' },
     },
     tone: {
       primary: {

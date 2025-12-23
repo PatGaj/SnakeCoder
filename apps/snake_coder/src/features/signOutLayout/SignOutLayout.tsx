@@ -11,8 +11,8 @@ const SignOutLayout: React.FC<SignOutLayoutProps> = ({ children }) => {
       <TopBar />
       <main className="flex-1 overflow-y-scroll scrollbar-thumb-secondary-500 scrollbar-track-primary-500 scrollbar-thin">
         {children}
-      <Footer />
       </main>
+      <Footer />
     </div>
   )
 }

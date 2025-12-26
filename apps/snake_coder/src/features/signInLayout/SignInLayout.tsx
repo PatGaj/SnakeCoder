@@ -1,4 +1,5 @@
-import { SideBar } from '../sidebar'
+import { SideBar } from './sidebar'
+import { StatTopBar } from './statTopBar'
 
 type SignInLayoutProps = {
   children: React.ReactNode
@@ -6,9 +7,10 @@ type SignInLayoutProps = {
 
 const SignInLayout: React.FC<SignInLayoutProps> = ({ children }) => {
   return (
-    <div className="flex h-screen">
+    <div className="relative flex min-h-screen">
+      <StatTopBar />
       <SideBar />
-      <div className="min-w-0 flex-1 h-full overflow-y-scroll scrollbar-thumb-secondary-500 scrollbar-track-primary-500 scrollbar-thin">
+      <div className="min-w-0 flex-1 h-screen overflow-y-auto scrollbar-thumb-secondary-500 scrollbar-track-primary-500 scrollbar-thin">
         {children}
       </div>
     </div>

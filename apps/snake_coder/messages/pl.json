@@ -170,7 +170,25 @@
     "profile": "Profil",
     "logout": "Wyloguj się"
   },
-  "login": {
+  "statTopBar": {
+    "streak": {
+      "label": "Streak",
+      "tooltip": "Uczysz się regularnie i utrzymaj serię.",
+	  "days": "{days} dni"
+    },
+    "xp": {
+      "tooltip": "XP zdobyte w tym miesiącu."
+    },
+    "league": {
+      "label": "Liga",
+      "tooltip": "Pozycja w tym miesiącu."
+    },
+    "ai": {
+      "label": "Ocena",
+      "tooltip": "Średnia ocen od AI"
+    }
+  },
+"login": {
     "badge": "Logowanie",
     "hint": "Wróć do misji i kontynuuj progres.",
     "title": "Zaloguj się do SnakeCoder",

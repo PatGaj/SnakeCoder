@@ -18,7 +18,7 @@ const SideBarNavItem: React.FC<SideBarNavItemProps> = ({ href, icon, label, coll
       <Link
         href={href}
         className={clsx(
-          'group flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-sm font-semibold transition',
+          'relative group flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-sm font-semibold transition',
           'border-transparent text-snowWhite-200 hover:bg-snowWhite-50/5',
           { 'justify-center': collapsed },
           {

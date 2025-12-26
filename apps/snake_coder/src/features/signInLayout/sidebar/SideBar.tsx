@@ -4,7 +4,17 @@ import React from 'react'
 import { signOut, useSession } from 'next-auth/react'
 import { useLocale, useTranslations } from 'next-intl'
 import clsx from 'clsx'
-import { RiArrowRightSLine, RiFlagLine, RiHome4Line, RiLogoutBoxLine } from 'react-icons/ri'
+import {
+  RiArrowRightSLine,
+  RiCodeBoxLine,
+  RiFlagLine,
+  RiHome4Line,
+  RiLogoutBoxLine,
+  RiRobot2Line,
+  RiRoadMapLine,
+  RiStarSmileLine,
+  RiTrophyLine,
+} from 'react-icons/ri'
 
 import { Avatar, Button, Separator, Tooltip, Logo } from '@/components'
 import { usePathname, useRouter } from '@/i18n/navigation'
@@ -61,11 +71,46 @@ const SideBar = () => {
             active={pathname === '/dashboard' || pathname.startsWith('/dashboard/')}
           />
           <SideBarNavItem
+            href="/modules"
+            icon={<RiRoadMapLine size={20} />}
+            label={t('nav.modules')}
+            collapsed={collapsed}
+            active={pathname === '/modules' || pathname.startsWith('/modules/')}
+          />
+          <SideBarNavItem
             href="/missions"
             icon={<RiFlagLine size={20} />}
             label={t('nav.missions')}
             collapsed={collapsed}
             active={pathname === '/missions' || pathname.startsWith('/missions/')}
+          />
+          <SideBarNavItem
+            href="/daily"
+            icon={<RiStarSmileLine size={20} />}
+            label={t('nav.daily')}
+            collapsed={collapsed}
+            active={pathname === '/daily' || pathname.startsWith('/daily/')}
+          />
+          <SideBarNavItem
+            href="/editor"
+            icon={<RiCodeBoxLine size={20} />}
+            label={t('nav.editor')}
+            collapsed={collapsed}
+            active={pathname === '/editor' || pathname.startsWith('/editor/')}
+          />
+          <SideBarNavItem
+            href="/generator"
+            icon={<RiRobot2Line size={20} />}
+            label={t('nav.generator')}
+            collapsed={collapsed}
+            active={pathname === '/generator' || pathname.startsWith('/generator/')}
+          />
+          <SideBarNavItem
+            href="/ranking"
+            icon={<RiTrophyLine size={20} />}
+            label={t('nav.ranking')}
+            collapsed={collapsed}
+            active={pathname === '/ranking' || pathname.startsWith('/ranking/')}
           />
         </nav>
         <div className="mt-auto">

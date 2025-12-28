@@ -174,7 +174,7 @@
     "streak": {
       "label": "Streak",
       "tooltip": "Uczysz się regularnie i utrzymaj serię.",
-	  "days": "{days} dni"
+      "days": "{days} dni"
     },
     "xp": {
       "tooltip": "XP zdobyte w tym miesiącu."
@@ -188,7 +188,188 @@
       "tooltip": "Średnia ocen od AI"
     }
   },
-"login": {
+  "dashboard": {
+    "badge": "Dashboard",
+    "hint": "Najbliższe kroki i szybki podgląd postępu.",
+    "title": "Cześć, {name}!",
+    "subtitle": "Kontynuuj sprint, zrób daily i utrzymaj streak — reszta jest kliknięcie dalej.",
+    "fallbackUser": "Użytkowniku",
+    "actions": {
+      "continueSprint": "Kontynuuj sprint",
+      "daily": "Daily",
+      "freeEditor": "Wolny edytor",
+      "editor": "Edytor",
+      "missions": "Misje"
+    },
+    "sections": {
+      "sprint": "Twój sprint",
+      "today": "Dzisiaj",
+      "plan": "Plan na dziś",
+      "stats": "Statystyki",
+      "lastRun": "Ostatni wynik"
+    },
+    "today": {
+      "streak": "Streak: {days} dni"
+    },
+    "common": {
+      "done": "✓",
+      "todo": "—",
+      "locked": "Zablokowany",
+      "unlocked": "Odblokowany"
+    },
+    "sprint": {
+      "eta": "~{minutes} min",
+      "title": "Funkcje: argumenty i zwracanie",
+      "nextStep": "Następny krok: zadanie 3/6 — walidacja danych wejściowych.",
+      "nextTaskLabel": "Następne zadanie",
+      "currentTaskLabel": "Aktualne zadanie",
+      "goToSprint": "Przejdź do sprintu",
+      "nextTaskTitle": "Walidacja danych wejściowych",
+      "nextTaskDesc": "Dodaj sprawdzanie typu i zakresu argumentów oraz upewnij się, że rozwiązanie przechodzi testy.",
+      "cta": "Kontynuuj",
+      "ctaStartTask": "Rozpocznij zadanie",
+      "ctaContinueTask": "Kontynuuj zadanie",
+      "testCta": "Test sprintu",
+      "progressTitle": "Postęp sprintu",
+      "progressDesc": "Zrobione: {tasksDone}/{tasksTotal} zadań + quiz + artykuł.",
+      "items": {
+        "tasks": "Zadania",
+        "article": "Artykuł",
+        "quiz": "Quiz",
+        "test": "Test sprintu"
+      }
+    },
+    "daily": {
+      "badge": "Wyzwanie dnia",
+      "title": "Daily: krótkie zadanie",
+      "shortDesc": "Napisz funkcję zgodnie z opisem i przejdź testy.",
+      "desc": "Szybki trening z aktualnego zakresu. Wynik: testy + feedback AI.",
+      "types": {
+        "code": "Napisz Kod",
+        "bugfix": "Napraw Błąd",
+        "quiz": "Rozwiąż Quiz"
+      },
+      "statusLabel": "Status:",
+      "status": {
+        "new": "Nowe",
+        "done": "Zrobione",
+        "inProgress": "W toku"
+      },
+      "cta": "Zacznij daily"
+    },
+    "plan": {
+      "desc": "Trzy małe kroki na dziś — utrzymaj rytm i progres.",
+      "bonusHint": "Ukończ wszystkie 3 kroki, aby zgarnąć bonus XP.",
+      "bonusReady": "Gratulacje! Bonus XP za dziś jest Twój!",
+      "items": {
+        "daily": "Zrób daily",
+        "quiz": "Zalicz quiz na min. 80%",
+        "task": "Otrzymaj ocenę min. B z daily"
+      }
+    },
+    "unlock": {
+      "title": "Odblokuj test sprintu",
+      "desc": "Dokończ sprint, żeby odblokować test. Zostało zadań: {tasksLeft}.",
+      "items": {
+        "tasks": "Zadania",
+        "quiz": "Quiz"
+      }
+    },
+    "skillTest": {
+      "title": "Test umiejętności",
+      "desc": "Zalicza sprint i odblokowuje kolejny — najpierw spełnij wymagania.",
+      "requirementsTitle": "Wymagania",
+      "requirements": {
+        "tasks": "Ukończ zadania sprintu",
+        "article": "Przeczytaj artykuł",
+        "quiz": "Zalicz quiz"
+      },
+      "cta": "Przejdź do testu"
+    },
+    "level": {
+      "label": "Mid Pythonista"
+    },
+    "nextMission": {
+      "badge": "Następna misja",
+      "title": "Parser plików CSV z walidacją danych",
+      "objective": "Wczytaj plik, przefiltruj rekordy i przygotuj wynik. Uruchom testy i sprawdź feedback.",
+      "eta": "~{minutes} min",
+      "cta": "Otwórz misję",
+      "pickDifferent": "Wybierz inną"
+    },
+    "weeklyGoal": {
+      "title": "Cel tygodnia",
+      "desc": "Ukończone: {done}/{goal} misji."
+    },
+    "quality": {
+      "title": "Jakość kodu",
+      "desc": "Testy + feedback AI budują dobre nawyki."
+    },
+    "focus": {
+      "title": "Skupienie na dziś",
+      "value": "Wyjątki i debugowanie",
+      "hint": "Dokończ temat i od razu przećwicz go w misjach."
+    },
+    "xp": {
+      "title": "XP w tym tygodniu",
+      "value": "{xp} XP",
+      "tip": "Zrób 1 krótką misję dziennie.",
+      "tip2": "Uruchamiaj testy zanim klikniesz „Wyślij”.",
+      "tip3": "Zbieraj odznaki za regularność."
+    },
+    "milestones": {
+      "title": "Kamienie milowe",
+      "subtitle": "Ścieżki nauki",
+      "desc": "Od 0 przez PCEP do PCAP — krok po kroku.",
+      "badge": "Progres",
+      "pcep": {
+        "title": "PCEP",
+        "desc": "Podstawy składni, typów, warunków i pętli."
+      },
+      "pcap": {
+        "title": "PCAP",
+        "desc": "OOP, moduły, wyjątki, pliki i testowanie."
+      }
+    },
+    "recent": {
+      "title": "Ostatnia aktywność",
+      "subtitle": "Co robiłeś ostatnio",
+      "desc": "Wróć do rozpoczętych tematów i domknij zadania.",
+      "meta": {
+        "pcep": "PCEP • podstawy",
+        "pcap": "PCAP • poziom wyżej"
+      },
+      "items": {
+        "files": "Praca z plikami: odczyt i zapis",
+        "functions": "Funkcje: argumenty i zwracanie wartości",
+        "exceptions": "Wyjątki: try/except i komunikaty błędów"
+      },
+      "status": {
+        "done": "Zrobione",
+        "inProgress": "W toku"
+      }
+    },
+    "generator": {
+      "badge": "Generator AI",
+      "title": "Wygeneruj dodatkowe zadanie",
+      "desc": "Dobierz zakres (moduł/sprint/temat) i ćwicz dokładnie to, czego potrzebujesz.",
+      "cta": "Generuj"
+    },
+    "lastRun": {
+      "subtitle": "Szybki podgląd z ostatniego dnia i tempa rozwiązywania.",
+      "yesterdayXp": "Wczoraj zdobyte XP",
+      "yesterdayHint": "Za zadania i quizy.",
+      "xpToday": "XP dzisiaj",
+      "xpTodayHint": "Wczoraj: +{yesterdayXp} XP",
+      "lastGrade": "Ostatnia ocena",
+      "gradeHint": "Ocena jakości rozwiązania.",
+      "speed": "Tempo",
+      "speedHint": "Wskaźnik prędkości rozwiązywania zadań.",
+      "cta": "Historia",
+      "rankingCta": "Ranking"
+    }
+  },
+  "login": {
     "badge": "Logowanie",
     "hint": "Wróć do misji i kontynuuj progres.",
     "title": "Zaloguj się do SnakeCoder",

@@ -369,6 +369,45 @@
       "rankingCta": "Ranking"
     }
   },
+  "modules": {
+    "badge": "Moduły",
+    "title": "Wybierz moduł",
+    "subtitle": "Ucz się Pythona modułowo: fundamenty, certyfikacje i biblioteki, krok po kroku.",
+    "sections": {
+      "certifications": {
+        "title": "Certyfikacje",
+        "subtitle": "Sprinty pod fundamenty egzaminów i solidną bazę do dalszej nauki."
+      },
+      "libraries": {
+        "title": "Biblioteki i frameworki",
+        "subtitle": "Nauka narzędzi do pracy z danymi i webem — moduły w przygotowaniu."
+      }
+    },
+    "card": {
+      "imageAlt": "Python",
+      "available": "Dostępny",
+      "completed": "Ukończono",
+      "locked": "Zablokowany",
+      "noAccess": "Brak dostępu",
+      "building": "W budowie",
+      "requirementsTitle": "Tego potrzebujesz",
+      "difficultyLabel": "Trudność",
+      "difficulty": {
+        "beginner": "Początkujący",
+        "intermediate": "Średni",
+        "advanced": "Zaawansowany"
+      },
+      "sprints": "Sprinty: {done}/{total}",
+      "progress": "Postęp: {percent}%",
+      "startCta": "Rozpocznij moduł",
+      "continueCta": "Kontynuuj moduł",
+      "completedCta": "Zobacz moduł",
+      "getAccessCta": "Uzyskaj dostęp",
+      "buildingCta": "W budowie",
+      "lockedCta": "Zablokowane",
+      "cta": "{state, select, building{W budowie} locked{Uzyskaj dostęp} completed{Zobacz moduł} continue{Kontynuuj moduł} start{Rozpocznij moduł} other{Rozpocznij moduł}}"
+    }
+  },
   "login": {
     "badge": "Logowanie",
     "hint": "Wróć do misji i kontynuuj progres.",

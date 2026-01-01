@@ -440,6 +440,29 @@
       "desc": "Nie znaleziono modułu — sprawdź listę modułów."
     }
   },
+  "sprint": {
+    "badge": "Sprint",
+    "empty": "Brak zadań dla tego sprintu — wkrótce uzupełnimy.",
+    "columns": {
+      "todo": "Do zrobienia",
+      "inProgress": "W trakcie",
+      "done": "Gotowe"
+    },
+    "task": {
+      "eta": "~{minutes} min",
+      "type": "{type, select, code {Kod} bugfix {Bugfix} quiz {Quiz} other {Kod}}",
+      "status": "{status, select, todo {Do zrobienia} inProgress {W trakcie} done {Gotowe} other {Do zrobienia}}",
+      "modal": {
+        "title": "Zadanie",
+        "goal": "Cel",
+        "requirements": "Wymagania",
+        "noRequirements": "Brak wymagań.",
+        "hints": "Wskazówki",
+        "noHints": "Brak wskazówek.",
+        "goToTask": "Przejdź do zadania"
+      }
+    }
+  },
   "login": {
     "badge": "Logowanie",
     "hint": "Wróć do misji i kontynuuj progres.",

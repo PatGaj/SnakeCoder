@@ -4,11 +4,12 @@ import React from 'react'
 import { tv } from 'tailwind-variants'
 import { usePathname } from 'next/navigation'
 
+import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
 const breadcrumbStyles = tv({
   slots: {
-    nav: 'flex items-center gap-2 text-sm text-snowWhite-200',
+    nav: 'flex items-center gap-2 text-sm text-snowWhite-200 pb-4',
     item: 'inline-flex items-center gap-2',
     link: 'text-primary-100 hover:text-secondary-400 transition-colors',
     current: 'text-snowWhite-50 font-semibold',
@@ -18,21 +19,29 @@ const breadcrumbStyles = tv({
 
 type BreadcrumbProps = {
   className?: string
+  items?: Array<{
+    href?: string
+    label: React.ReactNode
+  }>
 }
 
-const Breadcrumb: React.FC<BreadcrumbProps> = ({ className }) => {
+const Breadcrumb: React.FC<BreadcrumbProps> = ({ className, items: customItems }) => {
   const styles = breadcrumbStyles()
   const pathname = usePathname() || '/'
 
   const cleanPath = pathname.split('?')[0].split('#')[0]
   const segments = cleanPath.split('/').filter(Boolean)
 
-  const items = segments.map((segment, index) => {
+  const pathItems = segments.map((segment, index) => {
     const href = '/' + segments.slice(0, index + 1).join('/')
     const label = decodeURIComponent(segment)
 
     return { href, label }
   })
+
+  const items = customItems ?? pathItems
+  const useIntlLink = customItems != null
+  if (items.length === 0) return null
 
   const lastIndex = items.length - 1
 
@@ -41,15 +50,23 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ className }) => {
       {items.map((item, index) => {
         const isLast = index === lastIndex
         return (
-          <span key={item.href} className={styles.item()}>
+          <span key={item.href ?? `${index}`} className={styles.item()}>
             {isLast ? (
               <span className={styles.current()} aria-current="page">
                 {item.label}
               </span>
+            ) : item.href ? (
+              useIntlLink ? (
+                <Link className={styles.link()} href={item.href}>
+                  {item.label}
+                </Link>
+              ) : (
+                <a className={styles.link()} href={item.href}>
+                  {item.label}
+                </a>
+              )
             ) : (
-              <a className={styles.link()} href={item.href}>
-                {item.label}
-              </a>
+              <span className={styles.link()}>{item.label}</span>
             )}
             {!isLast && <span className={styles.separator()}>/</span>}
           </span>

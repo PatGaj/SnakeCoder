@@ -369,6 +369,77 @@
       "rankingCta": "Ranking"
     }
   },
+  "modules": {
+    "badge": "Moduły",
+    "title": "Wybierz moduł",
+    "subtitle": "Ucz się Pythona modułowo: fundamenty, certyfikacje i biblioteki, krok po kroku.",
+    "sections": {
+      "certifications": {
+        "title": "Certyfikacje",
+        "subtitle": "Sprinty pod fundamenty egzaminów i solidną bazę do dalszej nauki."
+      },
+      "libraries": {
+        "title": "Biblioteki i frameworki",
+        "subtitle": "Nauka narzędzi do pracy z danymi i webem — moduły w przygotowaniu."
+      }
+    },
+    "card": {
+      "imageAlt": "Python",
+      "available": "Dostępny",
+      "completed": "Ukończono",
+      "locked": "Zablokowany",
+      "noAccess": "Brak dostępu",
+      "building": "W budowie",
+      "requirementsTitle": "Tego potrzebujesz",
+      "difficultyLabel": "Trudność",
+      "difficulty": {
+        "beginner": "Początkujący",
+        "intermediate": "Średni",
+        "advanced": "Zaawansowany"
+      },
+      "sprints": "Sprinty: {done}/{total}",
+      "progress": "Postęp: {percent}%",
+      "startCta": "Rozpocznij moduł",
+      "continueCta": "Kontynuuj moduł",
+      "completedCta": "Zobacz moduł",
+      "getAccessCta": "Uzyskaj dostęp",
+      "buildingCta": "W budowie",
+      "lockedCta": "Zablokowane",
+      "cta": "{state, select, building{W budowie} locked{Uzyskaj dostęp} completed{Zobacz moduł} continue{Kontynuuj moduł} start{Rozpocznij moduł} other{Rozpocznij moduł}}"
+    }
+  },
+  "module": {
+    "sections": {
+      "sprints": "Sprinty modułu"
+    },
+    "header": {
+      "progress": "Ukończone sprinty: {done}/{total}"
+    },
+    "sprints": {
+      "empty": "Ten moduł jest w przygotowaniu — sprinty pojawią się wkrótce.",
+      "eta": "~{minutes} min",
+      "sprintNo": "Sprint {no}",
+      "progress": "Postęp sprintu",
+      "status": "{status, select, done {Ukończony} inProgress {W toku} available {Dostępny} locked {Zablokowany} other {Dostępny}}",
+      "cta": "{status, select, done {Podgląd} inProgress {Kontynuuj} available {Rozpocznij} locked {Zablokowane} other {Rozpocznij}}",
+      "meta": {
+        "tasks": "Zadania {done}/{total}",
+        "article": "Artykuł {done}/{total}",
+        "quiz": "Quiz {score}/{total}"
+      },
+      "fallbackTitle": "Sprint",
+      "fallbackDesc": "Opis sprintu — w przygotowaniu.",
+      "unlockHint": "Ukończ test sprintu {no}, by odblokować możliwość rozpoczęcia."
+    },
+    "common": {
+      "done": "✓",
+      "todo": "—"
+    },
+    "fallback": {
+      "title": "Moduł",
+      "desc": "Nie znaleziono modułu — sprawdź listę modułów."
+    }
+  },
   "login": {
     "badge": "Logowanie",
     "hint": "Wróć do misji i kontynuuj progres.",

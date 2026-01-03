@@ -8,12 +8,12 @@ import { cn } from '@/lib/utils'
 
 const tableStyles = tv({
   slots: {
-    wrapper: 'overflow-hidden rounded-lg border border-primary-800/80 shadow-[0_18px_42px_#00000084]',
+    wrapper: 'overflow-x-auto overflow-y-hidden rounded-lg border border-primary-800/80 shadow-[0_18px_42px_#00000084]',
     table: 'min-w-full divide-y divide-primary-800/70 bg-primary-950/80 text-sm text-snowWhite-50',
     head: 'bg-primary-900/60',
-    headerCell: 'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-snowWhite-300',
+    headerCell: 'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap',
     row: 'border-b border-primary-900/70 transition-colors hover:bg-primary-900/50',
-    cell: 'px-4 py-3 text-snowWhite-100',
+    cell: 'px-4 py-3 text-snowWhite-100 whitespace-nowrap',
     empty: 'px-4 py-6 text-center text-snowWhite-300',
   },
   variants: {
@@ -45,7 +45,7 @@ type RowAction<T> = {
   className?: string
 }
 
-type TableProps<T extends Record<string, any>> = VariantProps<typeof tableStyles> & {
+type TableProps<T extends Record<string, unknown>> = VariantProps<typeof tableStyles> & {
   columns: Column<T>[]
   data: T[]
   emptyLabel?: React.ReactNode
@@ -55,7 +55,7 @@ type TableProps<T extends Record<string, any>> = VariantProps<typeof tableStyles
   actionsAlign?: 'left' | 'right' | 'center'
 }
 
-function Table<T extends Record<string, any>>({
+function Table<T extends Record<string, unknown>>({
   columns,
   data,
   emptyLabel = 'Brak danych',

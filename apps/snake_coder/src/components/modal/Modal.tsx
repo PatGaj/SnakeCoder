@@ -18,10 +18,10 @@ const modalStyles = tv({
   },
   variants: {
     size: {
-      sm: { dialog: 'w-[340px]' },
-      md: { dialog: 'w-[520px]' },
-      lg: { dialog: 'w-[720px]' },
-      xl: { dialog: 'w-[900px]' },
+      sm: { dialog: 'w-85' },
+      md: { dialog: 'w-130' },
+      lg: { dialog: 'w-180' },
+      xl: { dialog: 'w-225' },
     },
   },
   defaultVariants: {

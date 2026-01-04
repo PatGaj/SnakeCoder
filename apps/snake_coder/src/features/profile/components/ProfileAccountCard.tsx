@@ -1,0 +1,150 @@
+import React from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { RiRefreshLine, RiSave2Line, RiUserSmileLine } from 'react-icons/ri'
+
+import { Badge, Box, Button, Input, Separator } from '@/components'
+
+export type ProfileAccountData = {
+  userName: string
+  nickName: string
+  firstName?: string | null
+  lastName?: string | null
+}
+
+type ProfileAccountFormValues = {
+  nickName: string
+  firstName?: string
+  lastName?: string
+}
+
+export type ProfileAccountCardProps = {
+  account: ProfileAccountData
+  onSave: (values: ProfileAccountFormValues) => void
+}
+
+const NICKNAME_REGEX = /^[A-Za-z0-9]+$/
+
+const ProfileAccountCard: React.FC<ProfileAccountCardProps> = ({ account, onSave }) => {
+  const t = useTranslations('profile')
+
+  const schema = React.useMemo(
+    () =>
+      z.object({
+        nickName: z
+          .string()
+          .trim()
+          .min(1, t('errors.nickNameRequired'))
+          .regex(NICKNAME_REGEX, t('errors.nickNameInvalid')),
+        firstName: z.string().trim().optional(),
+        lastName: z.string().trim().optional(),
+      }),
+    [t]
+  )
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm<ProfileAccountFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      nickName: account.nickName,
+      firstName: account.firstName ?? '',
+      lastName: account.lastName ?? '',
+    },
+    mode: 'onTouched',
+  })
+
+  return (
+    <Box variant="glass" size="lg" round="2xl" className="relative w-full overflow-hidden border-primary-800/70">
+      <div className="pointer-events-none absolute -left-12 -top-16 h-56 w-56 rounded-full bg-secondary-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-10 -bottom-16 h-56 w-56 rounded-full bg-aquaBlue-500/10 blur-3xl" />
+
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="truncate text-lg font-semibold text-snowWhite-50">{account.userName}</p>
+            <p className="mt-1 text-sm text-snowWhite-300">{t('account.subtitle')}</p>
+          </div>
+          <Badge variant="muted" size="sm" className="px-3 py-1">
+            @{account.nickName}
+          </Badge>
+        </div>
+
+        <Separator className="bg-primary-800/70" />
+
+        <form onSubmit={handleSubmit(onSave)} className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Input
+                title={t('fields.nickName')}
+                placeholder={t('placeholders.nickName')}
+                disabled={isSubmitting}
+                destructive={Boolean(errors.nickName)}
+                destructiveText={errors.nickName?.message ?? ''}
+                autoComplete="nickname"
+                {...register('nickName')}
+              />
+            </div>
+            <Input
+              title={t('fields.firstName')}
+              placeholder={t('placeholders.firstName')}
+              disabled={isSubmitting}
+              destructive={Boolean(errors.firstName)}
+              destructiveText={errors.firstName?.message ?? ''}
+              autoComplete="given-name"
+              {...register('firstName')}
+            />
+            <Input
+              title={t('fields.lastName')}
+              placeholder={t('placeholders.lastName')}
+              disabled={isSubmitting}
+              destructive={Boolean(errors.lastName)}
+              destructiveText={errors.lastName?.message ?? ''}
+              autoComplete="family-name"
+              {...register('lastName')}
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <p className="inline-flex items-center gap-2 text-xs text-snowWhite-300">
+              <RiUserSmileLine size={16} className="text-secondary-300" />
+              {t('hint')}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="md"
+                round="lg"
+                className="border border-primary-800/70"
+                leftIcon={<RiRefreshLine size={16} />}
+                onClick={() => reset()}
+                disabled={!isDirty || isSubmitting}
+              >
+                {t('actions.reset')}
+              </Button>
+              <Button
+                type="submit"
+                variant="gradient"
+                size="md"
+                round="lg"
+                leftIcon={<RiSave2Line size={16} />}
+                loading={isSubmitting}
+                disabled={!isDirty}
+              >
+                {t('actions.save')}
+              </Button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </Box>
+  )
+}
+
+export default ProfileAccountCard

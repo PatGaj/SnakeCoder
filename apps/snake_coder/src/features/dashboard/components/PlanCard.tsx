@@ -1,18 +1,16 @@
 import { useTranslations } from 'next-intl'
-import { RiRobot2Line, RiStarSmileLine, RiTestTubeLine } from 'react-icons/ri'
+import { RiBookOpenLine, RiFlagLine, RiTestTubeLine } from 'react-icons/ri'
 
 import { Badge, Box, ItemRow, Separator } from '@/components'
-
-import type { DailyCardStatus } from './DailyCard'
 
 export type PlanCardData = {
   bonusXp: number
   complete: boolean
-  dailyStatus: DailyCardStatus
+  tasksDone: number
+  tasksTotal: number
+  articleDone: boolean
   quizPercent: number
   quizOk: boolean
-  dailyGrade: string
-  dailyGradeOk: boolean
 }
 
 export type PlanCardProps = {
@@ -38,11 +36,24 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
 
       <div className="grid gap-2">
         <ItemRow
-          icon={<RiStarSmileLine className="text-secondary-400" size={18} />}
-          label={t('plan.items.daily')}
+          icon={<RiFlagLine className="text-secondary-400" size={18} />}
+          label={t('plan.items.tasks')}
           right={
-            <Badge variant={plan.dailyStatus === 'done' ? 'success' : 'muted'} className="px-2 py-0.5">
-              {t(`daily.status.${plan.dailyStatus}`)}
+            <Badge
+              variant={plan.tasksDone >= plan.tasksTotal ? 'success' : 'muted'}
+              className="px-2 py-0.5 whitespace-nowrap"
+            >
+              {plan.tasksDone}/{plan.tasksTotal}
+            </Badge>
+          }
+        />
+
+        <ItemRow
+          icon={<RiBookOpenLine className="text-secondary-400" size={18} />}
+          label={t('plan.items.article')}
+          right={
+            <Badge variant={plan.articleDone ? 'success' : 'muted'} className="px-2 py-0.5 whitespace-nowrap">
+              {plan.articleDone ? t('common.done') : t('common.todo')}
             </Badge>
           }
         />
@@ -51,18 +62,8 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
           icon={<RiTestTubeLine className="text-secondary-400" size={18} />}
           label={t('plan.items.quiz')}
           right={
-            <Badge variant={plan.quizOk ? 'success' : 'muted'} className="px-2 py-0.5">
+            <Badge variant={plan.quizOk ? 'success' : 'muted'} className="px-2 py-0.5 whitespace-nowrap">
               {plan.quizPercent}%
-            </Badge>
-          }
-        />
-
-        <ItemRow
-          icon={<RiRobot2Line className="text-secondary-400" size={18} />}
-          label={t('plan.items.task')}
-          right={
-            <Badge variant={plan.dailyGradeOk ? 'success' : 'muted'} className="px-2 py-0.5">
-              {plan.dailyGrade}
             </Badge>
           }
         />

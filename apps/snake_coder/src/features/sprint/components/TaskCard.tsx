@@ -1,15 +1,16 @@
 import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
-import { RiBugLine, RiCodeLine, RiQuestionAnswerLine, RiTimerLine } from 'react-icons/ri'
+import { RiBookOpenLine, RiBugLine, RiCodeLine, RiQuestionAnswerLine, RiTimerLine } from 'react-icons/ri'
 
 import { Badge, Box } from '@/components'
 
-export type SprintTaskType = 'code' | 'bugfix' | 'quiz'
+export type SprintTaskType = 'code' | 'bugfix' | 'quiz' | 'article'
 
 export const ICON_BY_TASK_TYPE = {
   code: RiCodeLine,
   bugfix: RiBugLine,
   quiz: RiQuestionAnswerLine,
+  article: RiBookOpenLine,
 }
 
 export type TaskCardData = {

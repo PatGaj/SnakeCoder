@@ -4,9 +4,6 @@ import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 
 import type {
-  DailyCardData,
-  DailyCardStatus,
-  DailyCardType,
   LastResultBadgeVariant,
   LastResultCardData,
   PlanCardData,
@@ -19,7 +16,6 @@ export type UseDashboardData = {
   plan: PlanCardData
   lastResult: LastResultCardData
   sprint: SprintBannerData
-  daily: DailyCardData
   skillTest: SkillTestCardData
 }
 
@@ -28,20 +24,6 @@ const useDashboard = (): UseDashboardData => {
   const { data: session } = useSession()
 
   const name = session?.user?.name || t('fallbackUser')
-
-  const gradeRank = (grade: string) => {
-    const normalized = grade.trim().toUpperCase()
-    const order = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'] as const
-    const idx = order.indexOf(normalized as (typeof order)[number])
-    return idx === -1 ? null : idx
-  }
-
-  const isAtLeastGrade = (grade: string, minimum: string) => {
-    const current = gradeRank(grade)
-    const min = gradeRank(minimum)
-    if (current === null || min === null) return false
-    return current <= min
-  }
 
   const hardData = {
     sprint: {
@@ -59,18 +41,8 @@ const useDashboard = (): UseDashboardData => {
       desc: 'Krótkie ćwiczenia z funkcji: argumenty, return i walidacja.',
       nextTaskTitle: 'Walidacja danych wejściowych',
       nextTaskDesc: 'Dodaj sprawdzanie typu i zakresu argumentów oraz upewnij się, że rozwiązanie przechodzi testy.',
-      taskRoute: '/missions',
-      sprintRoute: '/missions?sprint=3',
-    },
-    daily: {
-      type: 'code' as DailyCardType,
-      etaMinutes: 8,
-      rewardXp: 60,
-      status: 'new' as DailyCardStatus,
-      title: 'krótkie zadanie',
-      shortDesc: 'Napisz funkcję zgodnie z opisem i przejdź testy.',
-      desc: 'Szybki trening z aktualnego zakresu. Wynik: testy + feedback AI.',
-      grade: 'B+',
+      taskRoute: '/missions/task/pcep-3-task-1',
+      sprintRoute: '/modules/pcep/pcep-3',
     },
     lastResult: {
       todayXp: 40,
@@ -92,9 +64,10 @@ const useDashboard = (): UseDashboardData => {
 
   const quizPercent = Math.round((hardData.sprint.quizScore / Math.max(hardData.sprint.quizTotal, 1)) * 100)
   const quizOk = quizPercent >= 80
-  const dailyGradeOk = isAtLeastGrade(hardData.daily.grade, 'B')
 
-  const planComplete = hardData.daily.status === 'done' && quizOk && dailyGradeOk
+  const tasksDoneOk = hardData.sprint.tasksDone >= hardData.sprint.tasksTotal
+  const articleOk = hardData.sprint.articleDone
+  const planComplete = tasksDoneOk && quizOk && articleOk
 
   const skillTestReady =
     hardData.sprint.tasksDone >= hardData.sprint.tasksTotal &&
@@ -126,11 +99,11 @@ const useDashboard = (): UseDashboardData => {
     plan: {
       bonusXp: hardData.plan.bonusXp,
       complete: planComplete,
-      dailyStatus: hardData.daily.status,
+      tasksDone: hardData.sprint.tasksDone,
+      tasksTotal: hardData.sprint.tasksTotal,
+      articleDone: hardData.sprint.articleDone,
       quizPercent,
       quizOk,
-      dailyGrade: hardData.daily.grade,
-      dailyGradeOk,
     },
     lastResult: {
       todayXp: hardData.lastResult.todayXp,
@@ -157,16 +130,6 @@ const useDashboard = (): UseDashboardData => {
       nextTaskDesc: hardData.sprint.nextTaskDesc,
       taskRoute: hardData.sprint.taskRoute,
       route: hardData.sprint.sprintRoute,
-    },
-    daily: {
-      title: hardData.daily.title,
-      shortDesc: hardData.daily.shortDesc,
-      desc: hardData.daily.desc,
-      type: hardData.daily.type,
-      etaMinutes: hardData.daily.etaMinutes,
-      rewardXp: hardData.daily.rewardXp,
-      status: hardData.daily.status,
-      route: '/daily',
     },
     skillTest: {
       ready: skillTestReady,

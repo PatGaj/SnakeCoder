@@ -8,8 +8,8 @@
   "landing": {
     "hero": {
       "badge2": "Grywalizacja + ocena AI",
-      "title": "Ucz się <highlight>Pythona</highlight> przez misje — od zera do PCAP",
-      "subtitle": "Krótkie zadania z testami, punkty doświadczenia i ocena kodu przez LLM. Uczysz się praktycznie — bez długich kursów.",
+      "title": "Ucz się <highlight>Pythona</highlight> przez misje — od zera do praktycznego kodu",
+      "subtitle": "Krótkie zadania z testami, punkty doświadczenia i ocena kodu przez LLM. Uczysz się praktycznie, z modułami i sprintami.",
       "primaryCta": "Zacznij za darmo",
       "secondaryCta": "Zobacz jak to działa",
       "points": {
@@ -28,7 +28,7 @@
       },
       "preview": {
         "badge": "Przykładowa misja",
-        "level": "PCEP • Podstawy",
+        "level": "Start • Podstawy",
         "timer": "~8 min",
         "desc": "Zadanie: napisz funkcję `is_even(n)`, która zwraca `True` dla liczb parzystych i `False` dla nieparzystych.",
         "snippetTitle": "main.py",
@@ -44,7 +44,7 @@
     },
     "features": {
       "title": "Dlaczego SnakeCoder?",
-      "subtitle": "Od zera, przez PCEP, aż do PCAP: misje, grywalizacja i szybki feedback do Twojego kodu.",
+      "subtitle": "Od zera do praktyki: misje, grywalizacja i szybki feedback do Twojego kodu.",
       "items": {
         "missions": {
           "title": "Misje zamiast wykładów",
@@ -60,15 +60,15 @@
         },
         "gamification": {
           "title": "Grywalizacja, która wspiera",
-          "desc": "XP, poziomy i odznaki pomagają utrzymać regularność bez presji."
+          "desc": "XP i poziomy w rankingu pomagają utrzymać regularność bez presji."
         },
         "pcepPcap": {
-          "title": "Zakres PCEP oraz PCAP",
-          "desc": "Misje mapują się na wymagania egzaminów i budują solidne fundamenty."
+          "title": "Ścieżki i moduły",
+          "desc": "Tematy są ułożone modułowo. Zaczynasz od podstaw, a potem przechodzisz do trudniejszych zagadnień."
         },
         "projects": {
           "title": "Mini-projekty i automatyzacje",
-          "desc": "Ćwiczysz na realnych przykładach: pliki, CLI, proste integracje."
+          "desc": "Ćwiczysz na realnych zadaniach."
         }
       }
     },
@@ -78,11 +78,11 @@
       "steps": {
         "pick": {
           "title": "Wybierz misję",
-          "desc": "Dobierz temat i poziom — od podstaw do PCAP."
+          "desc": "Dobierz moduł. Od podstaw do tematów zaawansowanych."
         },
         "solve": {
           "title": "Napisz kod",
-          "desc": "Skupiasz się na rozwiązaniu, a platforma prowadzi Cię krokami."
+          "desc": "Skupiasz się na rozwiązaniu. Uruchamiasz testy na bieżąco."
         },
         "feedback": {
           "title": "Odbierz ocenę",
@@ -92,10 +92,10 @@
     },
     "paths": {
       "title": "Ścieżki nauki",
-      "subtitle": "Zaczynasz od zera, robisz fundament pod PCEP, a potem wchodzisz w tematy PCAP.",
+      "subtitle": "Zaczynasz od zera, budujesz solidne podstawy, a potem wybierasz moduły i sprinty.",
       "pcep": {
         "tag": "Start od zera",
-        "title": "PCEP: fundamenty Pythona",
+        "title": "Fundamenty Pythona (zakres PCEP)",
         "desc": "Składnia, typy, przepływ sterowania i podstawowe struktury danych.",
         "topics": {
           "syntax": "Składnia i zmienne",
@@ -103,18 +103,6 @@
           "flow": "Warunki i pętle",
           "functions": "Funkcje",
           "collections": "Listy, krotki, słowniki"
-        }
-      },
-      "pcap": {
-        "tag": "Poziom wyżej",
-        "title": "PCAP: kod produkcyjny",
-        "desc": "OOP, moduły, wyjątki, pliki i testowanie — pod realne projekty.",
-        "topics": {
-          "oop": "Programowanie obiektowe",
-          "modules": "Moduły i pakiety",
-          "exceptions": "Wyjątki i debugowanie",
-          "files": "Pliki i formaty danych",
-          "testing": "Testy i dobre praktyki"
         }
       }
     },
@@ -124,11 +112,11 @@
       "items": {
         "ai": {
           "q": "Czy AI pisze kod za mnie?",
-          "a": "Nie. AI ocenia i podpowiada — Ty rozwiązujesz misję. Chodzi o naukę, nie o kopiowanie."
+          "a": "Nie. AI ocenia i podpowiada, ty rozwiązujesz misję. Chodzi o naukę, nie o kopiowanie."
         },
         "pcepPcap": {
-          "q": "Czy to jest pod PCEP/PCAP?",
-          "a": "Tak — misje pokrywają wymagania PCEP i prowadzą do tematów PCAP."
+          "q": "Jak wyglądają ścieżki i moduły nauki?",
+          "a": "Uczysz się Pythona od zera przez krótkie misje. Tematy są podzielone w moduły oraz sprinty, od podstaw po zagadnienia zaawansowane."
         },
         "time": {
           "q": "Ile czasu dziennie potrzebuję?",
@@ -145,8 +133,8 @@
       "title": "Wejdź w misję i ucz się praktycznie",
       "subtitle": "Załóż konto i zacznij od pierwszej misji. Postęp i odznaki zostają z Tobą.",
       "primaryCta": "Utwórz konto",
-      "secondaryCta": "Mam już konto — zaloguj",
-      "note": "Wersja demo w przygotowaniu — na razie pełny start przez konto."
+      "secondaryCta": "Masz już konto?  Zaloguj się",
+      "note": "Założenie konta jest darmowe i zajmuje tylko chwilę."
     }
   },
   "logo": {

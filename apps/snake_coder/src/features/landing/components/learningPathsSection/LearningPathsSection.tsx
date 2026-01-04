@@ -25,20 +25,6 @@ const LearningPathsSection = () => {
           <TopicChip>{t('paths.pcep.topics.functions')}</TopicChip>
           <TopicChip>{t('paths.pcep.topics.collections')}</TopicChip>
         </PathCard>
-
-        <PathCard
-          badgeText="PCAP"
-          tagText={t('paths.pcap.tag')}
-          title={t('paths.pcap.title')}
-          desc={t('paths.pcap.desc')}
-          icon={<RiGraduationCapLine className="text-secondary-400" size={20} />}
-        >
-          <TopicChip>{t('paths.pcap.topics.oop')}</TopicChip>
-          <TopicChip>{t('paths.pcap.topics.modules')}</TopicChip>
-          <TopicChip>{t('paths.pcap.topics.exceptions')}</TopicChip>
-          <TopicChip>{t('paths.pcap.topics.files')}</TopicChip>
-          <TopicChip>{t('paths.pcap.topics.testing')}</TopicChip>
-        </PathCard>
       </div>
     </section>
   )

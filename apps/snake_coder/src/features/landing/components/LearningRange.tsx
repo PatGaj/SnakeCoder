@@ -1,6 +1,7 @@
 import React from 'react'
 import clsx from 'clsx'
 import { RiArrowRightSLine } from 'react-icons/ri'
+import { useLocale } from 'next-intl'
 
 type LearningRangeProps = {
   size?: 'sm' | 'md'
@@ -8,6 +9,13 @@ type LearningRangeProps = {
 }
 
 const LearningRange: React.FC<LearningRangeProps> = ({ size = 'sm', className }) => {
+  const locale = useLocale()
+
+  const labels =
+    locale === 'pl'
+      ? { start: 'od zera', middle: 'podstawy', end: 'zaawansowane' }
+      : { start: 'from zero', middle: 'basics', end: 'advanced' }
+
   return (
     <span
       className={clsx(
@@ -19,14 +27,13 @@ const LearningRange: React.FC<LearningRangeProps> = ({ size = 'sm', className })
         className
       )}
     >
-      <span>od zera</span>
+      <span>{labels.start}</span>
       <RiArrowRightSLine aria-hidden className="text-current/80" size={16} />
-      <span>PCEP</span>
+      <span>{labels.middle}</span>
       <RiArrowRightSLine aria-hidden className="text-current/80" size={16} />
-      <span>PCAP</span>
+      <span>{labels.end}</span>
     </span>
   )
 }
 
 export default LearningRange
-

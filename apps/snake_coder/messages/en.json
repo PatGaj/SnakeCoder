@@ -8,8 +8,8 @@
   "landing": {
     "hero": {
       "badge2": "Gamification + AI grading",
-      "title": "Learn <highlight>Python</highlight> through missions — from zero to PCAP",
-      "subtitle": "Short tasks with tests, XP, and code reviews by an LLM. Learn by doing — without long courses.",
+      "title": "Learn <highlight>Python</highlight> through missions — from zero to practical coding",
+      "subtitle": "Short tasks with tests, XP, and code reviews by an LLM. Learn by doing, with modules and learning paths.",
       "primaryCta": "Start for free",
       "secondaryCta": "See how it works",
       "points": {
@@ -28,7 +28,7 @@
       },
       "preview": {
         "badge": "Sample mission",
-        "level": "PCEP • Basics",
+        "level": "Starter • Basics",
         "timer": "~8 min",
         "desc": "Task: write a function `is_even(n)` that returns `True` for even numbers and `False` for odd numbers.",
         "snippetTitle": "main.py",
@@ -44,7 +44,7 @@
     },
     "features": {
       "title": "Why SnakeCoder?",
-      "subtitle": "From zero, through PCEP, all the way to PCAP: missions, gamification, and fast feedback for your code.",
+      "subtitle": "From zero to practical skills: missions, gamification, and fast feedback for your code.",
       "items": {
         "missions": {
           "title": "Missions instead of lectures",
@@ -60,15 +60,15 @@
         },
         "gamification": {
           "title": "Gamification that supports you",
-          "desc": "XP, levels, and badges help you stay consistent without pressure."
+          "desc": "XP and levels in the ranking help you stay consistent without pressure."
         },
         "pcepPcap": {
-          "title": "PCEP & PCAP coverage",
-          "desc": "Missions map to exam requirements and build solid foundations."
+          "title": "Paths and modules",
+          "desc": "Topics are organized into modules. Start with fundamentals, then move into more advanced areas."
         },
         "projects": {
           "title": "Mini-projects and automations",
-          "desc": "Practice on real examples: files, CLI, simple integrations."
+          "desc": "Practice on real tasks."
         }
       }
     },
@@ -78,11 +78,11 @@
       "steps": {
         "pick": {
           "title": "Pick a mission",
-          "desc": "Choose a topic and level — from basics to PCAP."
+          "desc": "Choose a module. From basics to advanced topics."
         },
         "solve": {
           "title": "Write code",
-          "desc": "Focus on solving, and the platform guides you through the steps."
+          "desc": "Focus on solving. Run tests on the go."
         },
         "feedback": {
           "title": "Get reviewed",
@@ -92,10 +92,10 @@
     },
     "paths": {
       "title": "Learning paths",
-      "subtitle": "Start from zero, build a PCEP foundation, then move into PCAP topics.",
+      "subtitle": "Start from zero, build solid foundations, then pick modules and paths.",
       "pcep": {
         "tag": "Start from zero",
-        "title": "PCEP: Python foundations",
+        "title": "Python foundations (PCEP scope)",
         "desc": "Syntax, types, control flow, and basic data structures.",
         "topics": {
           "syntax": "Syntax and variables",
@@ -103,18 +103,6 @@
           "flow": "Conditions and loops",
           "functions": "Functions",
           "collections": "Lists, tuples, dictionaries"
-        }
-      },
-      "pcap": {
-        "tag": "Next level",
-        "title": "PCAP: production-ready code",
-        "desc": "OOP, modules, exceptions, files, and testing — for real projects.",
-        "topics": {
-          "oop": "Object-oriented programming",
-          "modules": "Modules and packages",
-          "exceptions": "Exceptions and debugging",
-          "files": "Files and data formats",
-          "testing": "Tests and best practices"
         }
       }
     },
@@ -124,11 +112,11 @@
       "items": {
         "ai": {
           "q": "Does AI write code for me?",
-          "a": "No. AI reviews and hints — you solve the mission. It’s about learning, not copying."
+          "a": "No. AI reviews and hints, you solve the mission. It’s about learning, not copying."
         },
         "pcepPcap": {
-          "q": "Is this for PCEP/PCAP?",
-          "a": "Yes — missions cover PCEP requirements and lead into PCAP topics."
+          "q": "How are the learning paths and modules structured?",
+          "a": "You learn Python from scratch through short missions. Topics are divided into modules and sprints, from basics to advanced concepts."
         },
         "time": {
           "q": "How much time do I need per day?",
@@ -143,10 +131,10 @@
     "cta": {
       "badge": "Start today",
       "title": "Jump into a mission and learn by doing",
-      "subtitle": "Create an account and start with your first mission. Progress and badges stay with you.",
+      "subtitle": "Create an account and start with your first mission. Progress stay with you.",
       "primaryCta": "Create an account",
-      "secondaryCta": "I already have an account — log in",
-      "note": "Demo version in the works — for now, full access starts with an account."
+      "secondaryCta": "Already have an account? Log in",
+      "note": "Creating an account is free and takes just a moment."
     }
   },
   "logo": {

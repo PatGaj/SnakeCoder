@@ -50,7 +50,7 @@ const useSprint = ({ moduleId, sprintId }: UseSprintArgs): UseSprintData => {
         xp: 60,
         type: 'code',
         status: 'inProgress',
-        route: '/missions',
+        route: '/missions/task/pcep-3-task-1',
         details: {
           goal: 'Napisz funkcję zgodnie z opisem, dodaj walidację wejścia i przejdź wszystkie testy.',
           requirements: [
@@ -65,14 +65,14 @@ const useSprint = ({ moduleId, sprintId }: UseSprintArgs): UseSprintData => {
         },
       },
       {
-        id: 'pcep-3-task-2',
+        id: 'pcep-3-bugfix-1',
         title: 'Popraw błąd w warunku',
         shortDesc: 'Napraw błąd logiczny w warunku, który powoduje zły wynik dla edge-case’ów.',
         etaMinutes: 6,
         xp: 45,
         type: 'bugfix',
         status: 'todo',
-        route: '/missions',
+        route: '/missions/task/pcep-3-bugfix-1',
         details: {
           goal: 'Znajdź problem w kodzie i popraw go tak, aby testy przechodziły.',
           requirements: [
@@ -90,7 +90,7 @@ const useSprint = ({ moduleId, sprintId }: UseSprintArgs): UseSprintData => {
         xp: 30,
         type: 'quiz',
         status: 'todo',
-        route: '/missions',
+        route: '/missions/quiz/pcep-3-quiz-1',
         details: {
           goal: 'Odpowiedz na pytania i zobacz wynik od razu.',
           requirements: [],
@@ -98,14 +98,29 @@ const useSprint = ({ moduleId, sprintId }: UseSprintArgs): UseSprintData => {
         },
       },
       {
-        id: 'pcep-3-task-3',
+        id: 'pcep-3-article-1',
+        title: 'Artykuł: funkcje i walidacja',
+        shortDesc: 'Argumenty, return i walidacja danych wejściowych w praktyce.',
+        etaMinutes: 7,
+        xp: 20,
+        type: 'article',
+        status: 'done',
+        route: '/missions/article/pcep-3-article-1',
+        details: {
+          goal: 'Przeczytaj artykuł i zapamiętaj najważniejsze zasady.',
+          requirements: [],
+          hints: ['Zwróć uwagę na return, walidację i wyjątki.'],
+        },
+      },
+      {
+        id: 'pcep-3-task-2',
         title: 'Refaktor czytelności',
         shortDesc: 'Uprość kod: lepsze nazwy, mniejsze zagnieżdżenia, lepsze warunki.',
         etaMinutes: 7,
         xp: 40,
         type: 'code',
         status: 'done',
-        route: '/missions',
+        route: '/missions/task/pcep-3-task-2',
         details: {
           goal: 'Popraw czytelność rozwiązania bez zmiany zachowania.',
           requirements: [

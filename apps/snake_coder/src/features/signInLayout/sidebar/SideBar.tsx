@@ -6,13 +6,10 @@ import { useLocale, useTranslations } from 'next-intl'
 import clsx from 'clsx'
 import {
   RiArrowRightSLine,
-  RiCodeBoxLine,
   RiFlagLine,
   RiHome4Line,
   RiLogoutBoxLine,
-  RiRobot2Line,
   RiRoadMapLine,
-  RiStarSmileLine,
   RiTrophyLine,
 } from 'react-icons/ri'
 
@@ -83,27 +80,6 @@ const SideBar = () => {
             label={t('nav.missions')}
             collapsed={collapsed}
             active={pathname === '/missions' || pathname.startsWith('/missions/')}
-          />
-          <SideBarNavItem
-            href="/daily"
-            icon={<RiStarSmileLine size={20} />}
-            label={t('nav.daily')}
-            collapsed={collapsed}
-            active={pathname === '/daily' || pathname.startsWith('/daily/')}
-          />
-          <SideBarNavItem
-            href="/editor"
-            icon={<RiCodeBoxLine size={20} />}
-            label={t('nav.editor')}
-            collapsed={collapsed}
-            active={pathname === '/editor' || pathname.startsWith('/editor/')}
-          />
-          <SideBarNavItem
-            href="/generator"
-            icon={<RiRobot2Line size={20} />}
-            label={t('nav.generator')}
-            collapsed={collapsed}
-            active={pathname === '/generator' || pathname.startsWith('/generator/')}
           />
           <SideBarNavItem
             href="/ranking"

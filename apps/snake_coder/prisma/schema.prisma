@@ -13,9 +13,42 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ModuleCategory {
+  CERTIFICATIONS
+  LIBRARIES
+  FRAMEWORKS
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum MissionType {
+  TASK
+  BUGFIX
+  QUIZ
+  ARTICLE
+  SKILL_TEST
+}
+
+enum MissionProgressStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum TaskSubmissionStatus {
+  PENDING
+  PASSED
+  FAILED
+  ERROR
+}
+
 model User {
   id            String    @id @default(cuid())
-  nickName      String?    @unique
+  nickName      String    @unique
   name          String?
   firstName     String?
   lastName      String?
@@ -27,6 +60,18 @@ model User {
 
   accounts      Account[]
   sessions      Session[]
+
+  xpTotal       Int       @default(0)
+  xpMonth       Int       @default(0)
+  xpToday       Int       @default(0)
+  streakCurrent Int       @default(0)
+  streakBest    Int       @default(0)
+  gradeAvg      Float?
+
+  moduleAccess  UserModuleAccess[]
+  missionProgress UserMissionProgress[]
+  taskSubmissions TaskSubmission[]
+  quizAttempts  QuizAttempt[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -78,4 +123,231 @@ model Opinion {
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model Module {
+  id          String         @id
+  code        String         @unique
+  title       String
+  description String
+  requirements String[]
+  category    ModuleCategory
+  difficulty  Difficulty
+  imagePath   String?
+  isBuilding  Boolean        @default(false)
+
+  sprints     Sprint[]
+  missions    Mission[]
+  access      UserModuleAccess[]
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model Sprint {
+  id          String   @id
+  moduleId    String
+  order       Int
+  title       String
+  description String
+  etaMinutes  Int
+
+  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  missions    Mission[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([moduleId, order])
+  @@index([moduleId])
+}
+
+model Mission {
+  id              String                @id
+  moduleId        String
+  sprintId        String?
+  type            MissionType
+  difficulty      Difficulty
+  title           String
+  shortDesc       String
+  description     String
+  requirements    String[]
+  hints           String[]
+  etaMinutes      Int
+  xp              Int
+  timeLimitSeconds Int?
+  passPercent     Int?
+
+  module          Module                @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  sprint          Sprint?               @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+
+  task            Task?
+  quiz            Quiz?
+  article         Article?
+
+  progress        UserMissionProgress[]
+
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([moduleId])
+  @@index([sprintId])
+  @@index([type])
+}
+
+model Task {
+  missionId  String   @id
+  starterCode String
+  language   String   @default("python")
+
+  mission    Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  tests      TaskTestCase[]
+  submissions TaskSubmission[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TaskTestCase {
+  id             String   @id @default(cuid())
+  taskId         String
+  order          Int
+  input          String
+  expectedOutput String
+  isPublic       Boolean  @default(true)
+
+  task           Task     @relation(fields: [taskId], references: [missionId], onDelete: Cascade)
+
+  createdAt      DateTime @default(now())
+
+  @@unique([taskId, order])
+  @@index([taskId, isPublic])
+}
+
+model TaskSubmission {
+  id              String              @id @default(cuid())
+  userId          String
+  taskId          String
+  code            String
+  status          TaskSubmissionStatus @default(PENDING)
+  passedCount     Int                 @default(0)
+  totalCount      Int                 @default(0)
+  stdout          String?
+  aiGrade         String?
+  aiFeedback      String?
+  timeSpentSeconds Int?
+
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task            Task                @relation(fields: [taskId], references: [missionId], onDelete: Cascade)
+
+  createdAt       DateTime            @default(now())
+
+  @@index([userId, createdAt])
+  @@index([taskId, createdAt])
+}
+
+model Quiz {
+  missionId  String   @id
+
+  mission    Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  questions  QuizQuestion[]
+  attempts   QuizAttempt[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model QuizQuestion {
+  id        String   @id @default(cuid())
+  quizId    String
+  order     Int
+  title     String
+  prompt    String
+
+  quiz      Quiz     @relation(fields: [quizId], references: [missionId], onDelete: Cascade)
+  options   QuizOption[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([quizId, order])
+  @@index([quizId])
+}
+
+model QuizOption {
+  id         String   @id @default(cuid())
+  questionId String
+  order      Int
+  label      String
+  isCorrect  Boolean  @default(false)
+
+  question   QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, order])
+  @@index([questionId])
+}
+
+model QuizAttempt {
+  id              String   @id @default(cuid())
+  userId          String
+  quizId          String
+  answers         Json
+  score           Int
+  total           Int
+  percent         Int
+  passed          Boolean
+  timeSpentSeconds Int?
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz            Quiz      @relation(fields: [quizId], references: [missionId], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([quizId, createdAt])
+}
+
+model Article {
+  missionId  String   @id
+  tags       String[]
+  blocks     Json
+  summary    String[]
+
+  mission    Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model UserMissionProgress {
+  userId          String
+  missionId       String
+  status          MissionProgressStatus @default(TODO)
+  startedAt       DateTime?
+  completedAt     DateTime?
+  lastOpenedAt    DateTime?
+  xpEarned        Int?
+  grade           String?
+  timeSpentSeconds Int?
+
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mission         Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, missionId])
+  @@index([userId, status])
+  @@index([missionId])
+}
+
+model UserModuleAccess {
+  userId    String
+  moduleId  String
+  hasAccess Boolean @default(false)
+  startedAt DateTime?
+  completedAt DateTime?
+
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module    Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, moduleId])
+  @@index([moduleId])
 }

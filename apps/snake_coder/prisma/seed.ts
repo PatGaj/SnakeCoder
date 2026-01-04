@@ -22,19 +22,85 @@ const seedUsers = async () => {
       nickName: 'demo',
       name: 'Demo User',
       passwordHash,
+      xpTotal: 420,
+      xpMonth: 180,
+      xpToday: 40,
+      streakCurrent: 6,
+      streakBest: 14,
+      gradeAvg: 4.1,
     },
     create: {
       nickName: 'demo',
       name: 'Demo User',
       email: 'demo@snakecoder.com',
       passwordHash,
+      xpTotal: 420,
+      xpMonth: 180,
+      xpToday: 40,
+      streakCurrent: 6,
+      streakBest: 14,
+      gradeAvg: 4.1,
     },
   })
 
-  return { demoUserId: demo.id }
+  const test = await prisma.user.upsert({
+    where: { email: 'test@test.com' },
+    update: {
+      nickName: 'test',
+      name: 'Test User',
+      passwordHash,
+      xpTotal: 150,
+      xpMonth: 90,
+      xpToday: 20,
+      streakCurrent: 2,
+      streakBest: 5,
+      gradeAvg: 3.4,
+    },
+    create: {
+      nickName: 'test',
+      name: 'Test User',
+      email: 'test@test.com',
+      passwordHash,
+      xpTotal: 150,
+      xpMonth: 90,
+      xpToday: 20,
+      streakCurrent: 2,
+      streakBest: 5,
+      gradeAvg: 3.4,
+    },
+  })
+
+  const bob = await prisma.user.upsert({
+    where: { email: 'bob@gmail.com' },
+    update: {
+      nickName: 'bob',
+      name: 'Bob',
+      passwordHash,
+      xpTotal: 780,
+      xpMonth: 320,
+      xpToday: 60,
+      streakCurrent: 9,
+      streakBest: 18,
+      gradeAvg: 4.6,
+    },
+    create: {
+      nickName: 'bob',
+      name: 'Bob',
+      email: 'bob@gmail.com',
+      passwordHash,
+      xpTotal: 780,
+      xpMonth: 320,
+      xpToday: 60,
+      streakCurrent: 9,
+      streakBest: 18,
+      gradeAvg: 4.6,
+    },
+  })
+
+  return { demoUserId: demo.id, testUserId: test.id, bobUserId: bob.id }
 }
 
-const seedPcepModule = async (demoUserId: string) => {
+const seedPcepModule = async (userIds: string[]) => {
   await prisma.module.upsert({
     where: { id: 'pcep' },
     update: {
@@ -62,11 +128,13 @@ const seedPcepModule = async (demoUserId: string) => {
     },
   })
 
-  await prisma.userModuleAccess.upsert({
-    where: { userId_moduleId: { userId: demoUserId, moduleId: 'pcep' } },
-    update: { hasAccess: true },
-    create: { userId: demoUserId, moduleId: 'pcep', hasAccess: true },
-  })
+  for (const userId of userIds) {
+    await prisma.userModuleAccess.upsert({
+      where: { userId_moduleId: { userId, moduleId: 'pcep' } },
+      update: { hasAccess: true },
+      create: { userId, moduleId: 'pcep', hasAccess: true },
+    })
+  }
 
   const sprints = [
     {
@@ -382,11 +450,206 @@ if __name__ == "__main__":
       })),
     })
   }
+
+  const quizMissionId = 'pcep-1-quiz-1'
+  await prisma.mission.upsert({
+    where: { id: quizMissionId },
+    update: {
+      moduleId: 'pcep',
+      sprintId: 'pcep-1',
+      type: 'QUIZ',
+      difficulty: 'BEGINNER',
+      title: 'Quiz: podstawy składni',
+      shortDesc: 'Krótki quiz: komentarze, typy i proste operatory.',
+      description: 'Odpowiedz na pytania ABCD. Wynik poznasz od razu po zakończeniu.',
+      requirements: [],
+      hints: [],
+      etaMinutes: 6,
+      xp: 30,
+      timeLimitSeconds: 6 * 60,
+      passPercent: 80,
+    },
+    create: {
+      id: quizMissionId,
+      moduleId: 'pcep',
+      sprintId: 'pcep-1',
+      type: 'QUIZ',
+      difficulty: 'BEGINNER',
+      title: 'Quiz: podstawy składni',
+      shortDesc: 'Krótki quiz: komentarze, typy i proste operatory.',
+      description: 'Odpowiedz na pytania ABCD. Wynik poznasz od razu po zakończeniu.',
+      requirements: [],
+      hints: [],
+      etaMinutes: 6,
+      xp: 30,
+      timeLimitSeconds: 6 * 60,
+      passPercent: 80,
+    },
+  })
+
+  await prisma.quiz.upsert({
+    where: { missionId: quizMissionId },
+    update: {},
+    create: { missionId: quizMissionId },
+  })
+
+  await prisma.quizOption.deleteMany({
+    where: { question: { quizId: quizMissionId } },
+  })
+  await prisma.quizQuestion.deleteMany({ where: { quizId: quizMissionId } })
+
+  const q1 = await prisma.quizQuestion.create({
+    data: {
+      quizId: quizMissionId,
+      order: 1,
+      title: 'Pytanie 1',
+      prompt: 'Który zapis jest poprawnym komentarzem w Pythonie?',
+    },
+  })
+  await prisma.quizOption.createMany({
+    data: [
+      { questionId: q1.id, order: 1, label: '// komentarz', isCorrect: false },
+      { questionId: q1.id, order: 2, label: '# komentarz', isCorrect: true },
+      { questionId: q1.id, order: 3, label: '/* komentarz */', isCorrect: false },
+      { questionId: q1.id, order: 4, label: '<!-- komentarz -->', isCorrect: false },
+    ],
+  })
+
+  const q2 = await prisma.quizQuestion.create({
+    data: {
+      quizId: quizMissionId,
+      order: 2,
+      title: 'Pytanie 2',
+      prompt: 'Jaki będzie wynik wyrażenia: 3 * "ab" ?',
+    },
+  })
+  await prisma.quizOption.createMany({
+    data: [
+      { questionId: q2.id, order: 1, label: '"ababab"', isCorrect: true },
+      { questionId: q2.id, order: 2, label: '"ab3"', isCorrect: false },
+      { questionId: q2.id, order: 3, label: 'błąd typu', isCorrect: false },
+      { questionId: q2.id, order: 4, label: '"ab ab ab"', isCorrect: false },
+    ],
+  })
+
+  const q3 = await prisma.quizQuestion.create({
+    data: {
+      quizId: quizMissionId,
+      order: 3,
+      title: 'Pytanie 3',
+      prompt: 'Która wartość jest typu bool w Pythonie?',
+    },
+  })
+  await prisma.quizOption.createMany({
+    data: [
+      { questionId: q3.id, order: 1, label: '"True"', isCorrect: false },
+      { questionId: q3.id, order: 2, label: '1', isCorrect: false },
+      { questionId: q3.id, order: 3, label: 'True', isCorrect: true },
+      { questionId: q3.id, order: 4, label: 'None', isCorrect: false },
+    ],
+  })
+
+  const articleMissionId = 'pcep-1-article-1'
+  await prisma.mission.upsert({
+    where: { id: articleMissionId },
+    update: {
+      moduleId: 'pcep',
+      sprintId: 'pcep-1',
+      type: 'ARTICLE',
+      difficulty: 'BEGINNER',
+      title: 'Artykuł: pierwsze kroki i składnia',
+      shortDesc: 'Zmienne, typy i podstawowe wejście/wyjście — szybki wstęp.',
+      description: 'Przeczytaj artykuł i zapamiętaj najważniejsze zasady. Przyda się w kolejnych zadaniach.',
+      requirements: [],
+      hints: [],
+      etaMinutes: 7,
+      xp: 20,
+    },
+    create: {
+      id: articleMissionId,
+      moduleId: 'pcep',
+      sprintId: 'pcep-1',
+      type: 'ARTICLE',
+      difficulty: 'BEGINNER',
+      title: 'Artykuł: pierwsze kroki i składnia',
+      shortDesc: 'Zmienne, typy i podstawowe wejście/wyjście — szybki wstęp.',
+      description: 'Przeczytaj artykuł i zapamiętaj najważniejsze zasady. Przyda się w kolejnych zadaniach.',
+      requirements: [],
+      hints: [],
+      etaMinutes: 7,
+      xp: 20,
+    },
+  })
+
+  await prisma.article.upsert({
+    where: { missionId: articleMissionId },
+    update: {
+      tags: ['PCEP', 'składnia', 'zmienne', 'wejście/wyjście'],
+      blocks: [
+        { type: 'heading', id: 'wstep', level: 2, text: 'Wstęp' },
+        {
+          type: 'paragraph',
+          text: 'Python to język, w którym czytelność jest bardzo ważna. Zacznij od podstaw: zmienne, typy danych oraz proste operacje na wartościach.',
+        },
+        { type: 'heading', id: 'zmienne', level: 2, text: 'Zmienne i typy' },
+        {
+          type: 'paragraph',
+          text: 'Zmienne w Pythonie nie wymagają deklarowania typu. Typ wynika z przypisanej wartości. To ułatwia start, ale wymaga uważności.',
+        },
+        { type: 'code', language: 'python', title: 'Przykład', code: 'name = \"Julia\"\\nage = 18\\nactive = True' },
+        {
+          type: 'callout',
+          tone: 'tip',
+          title: 'Tip',
+          text: 'Nazwy zmiennych powinny być czytelne. Unikaj skrótów typu x1, z2, tmp.',
+        },
+        { type: 'heading', id: 'io', level: 2, text: 'Wejście i wyjście' },
+        {
+          type: 'paragraph',
+          text: 'Do pobierania danych używasz input(), a do wypisywania print(). Pamiętaj, że input() zawsze zwraca string — liczby musisz zrzutować.',
+        },
+        { type: 'code', language: 'python', title: 'input / print', code: 'x = int(input())\\nprint(x * 2)' },
+        { type: 'list', items: ['input() zwraca string', 'int()/float() do konwersji', 'print() do outputu'] },
+      ],
+      summary: ['Zmienne nie wymagają deklaracji typu.', 'input() zwraca string.', 'Dbaj o czytelne nazwy i proste kroki.'],
+    },
+    create: {
+      missionId: articleMissionId,
+      tags: ['PCEP', 'składnia', 'zmienne', 'wejście/wyjście'],
+      blocks: [
+        { type: 'heading', id: 'wstep', level: 2, text: 'Wstęp' },
+        {
+          type: 'paragraph',
+          text: 'Python to język, w którym czytelność jest bardzo ważna. Zacznij od podstaw: zmienne, typy danych oraz proste operacje na wartościach.',
+        },
+        { type: 'heading', id: 'zmienne', level: 2, text: 'Zmienne i typy' },
+        {
+          type: 'paragraph',
+          text: 'Zmienne w Pythonie nie wymagają deklarowania typu. Typ wynika z przypisanej wartości. To ułatwia start, ale wymaga uważności.',
+        },
+        { type: 'code', language: 'python', title: 'Przykład', code: 'name = \"Julia\"\\nage = 18\\nactive = True' },
+        {
+          type: 'callout',
+          tone: 'tip',
+          title: 'Tip',
+          text: 'Nazwy zmiennych powinny być czytelne. Unikaj skrótów typu x1, z2, tmp.',
+        },
+        { type: 'heading', id: 'io', level: 2, text: 'Wejście i wyjście' },
+        {
+          type: 'paragraph',
+          text: 'Do pobierania danych używasz input(), a do wypisywania print(). Pamiętaj, że input() zawsze zwraca string — liczby musisz zrzutować.',
+        },
+        { type: 'code', language: 'python', title: 'input / print', code: 'x = int(input())\\nprint(x * 2)' },
+        { type: 'list', items: ['input() zwraca string', 'int()/float() do konwersji', 'print() do outputu'] },
+      ],
+      summary: ['Zmienne nie wymagają deklaracji typu.', 'input() zwraca string.', 'Dbaj o czytelne nazwy i proste kroki.'],
+    },
+  })
 }
 
 export async function main() {
-  const { demoUserId } = await seedUsers()
-  await seedPcepModule(demoUserId)
+  const { demoUserId, testUserId, bobUserId } = await seedUsers()
+  await seedPcepModule([demoUserId, testUserId, bobUserId])
 }
 
 main()

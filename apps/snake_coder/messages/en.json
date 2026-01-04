@@ -1,5 +1,749 @@
 {
-  "HomePage": {
-    "title": "Hello world!"
+  "signOutLayout": {
+    "login": "Log in",
+    "missions": "Python missions",
+    "feedback": "Feedback in seconds",
+    "noLongCourses": "No long courses"
+  },
+  "landing": {
+    "hero": {
+      "badge2": "Gamification + AI grading",
+      "title": "Learn <highlight>Python</highlight> through missions — from zero to PCAP",
+      "subtitle": "Short tasks with tests, XP, and code reviews by an LLM. Learn by doing — without long courses.",
+      "primaryCta": "Start for free",
+      "secondaryCta": "See how it works",
+      "points": {
+        "missions": {
+          "title": "Missions in 6–10 minutes",
+          "desc": "Small steps, quick wins, real progress."
+        },
+        "gamification": {
+          "title": "Levels, streaks, badges",
+          "desc": "Motivation without pressure — you play and learn at the same time."
+        },
+        "llm": {
+          "title": "LLM code review + tests",
+          "desc": "You get tips: style, readability, complexity, and logic bugs."
+        }
+      },
+      "preview": {
+        "badge": "Sample mission",
+        "level": "PCEP • Basics",
+        "timer": "~8 min",
+        "desc": "Task: write a function `is_even(n)` that returns `True` for even numbers and `False` for odd numbers.",
+        "snippetTitle": "main.py",
+        "tags": {
+          "tests": "Tests",
+          "testsDesc": "We check correctness.",
+          "style": "Style",
+          "styleDesc": "Readable, Pythonic code.",
+          "ai": "AI",
+          "aiDesc": "Hints and guidance."
+        }
+      }
+    },
+    "features": {
+      "title": "Why SnakeCoder?",
+      "subtitle": "From zero, through PCEP, all the way to PCAP: missions, gamification, and fast feedback for your code.",
+      "items": {
+        "missions": {
+          "title": "Missions instead of lectures",
+          "desc": "Short tasks guide you step by step. You learn by writing code."
+        },
+        "llm": {
+          "title": "Feedback from AI (LLM)",
+          "desc": "Comments on solution quality: readability, edge cases, and refactor suggestions."
+        },
+        "tests": {
+          "title": "Checked with tests",
+          "desc": "You immediately know whether your solution passes the test cases."
+        },
+        "gamification": {
+          "title": "Gamification that supports you",
+          "desc": "XP, levels, and badges help you stay consistent without pressure."
+        },
+        "pcepPcap": {
+          "title": "PCEP & PCAP coverage",
+          "desc": "Missions map to exam requirements and build solid foundations."
+        },
+        "projects": {
+          "title": "Mini-projects and automations",
+          "desc": "Practice on real examples: files, CLI, simple integrations."
+        }
+      }
+    },
+    "how": {
+      "title": "How it works",
+      "subtitle": "Three simple steps: mission, code, and feedback.",
+      "steps": {
+        "pick": {
+          "title": "Pick a mission",
+          "desc": "Choose a topic and level — from basics to PCAP."
+        },
+        "solve": {
+          "title": "Write code",
+          "desc": "Focus on solving, and the platform guides you through the steps."
+        },
+        "feedback": {
+          "title": "Get reviewed",
+          "desc": "Tests + LLM feedback: what works, what to improve, and what to revisit."
+        }
+      }
+    },
+    "paths": {
+      "title": "Learning paths",
+      "subtitle": "Start from zero, build a PCEP foundation, then move into PCAP topics.",
+      "pcep": {
+        "tag": "Start from zero",
+        "title": "PCEP: Python foundations",
+        "desc": "Syntax, types, control flow, and basic data structures.",
+        "topics": {
+          "syntax": "Syntax and variables",
+          "types": "Types and operators",
+          "flow": "Conditions and loops",
+          "functions": "Functions",
+          "collections": "Lists, tuples, dictionaries"
+        }
+      },
+      "pcap": {
+        "tag": "Next level",
+        "title": "PCAP: production-ready code",
+        "desc": "OOP, modules, exceptions, files, and testing — for real projects.",
+        "topics": {
+          "oop": "Object-oriented programming",
+          "modules": "Modules and packages",
+          "exceptions": "Exceptions and debugging",
+          "files": "Files and data formats",
+          "testing": "Tests and best practices"
+        }
+      }
+    },
+    "faq": {
+      "title": "FAQ",
+      "subtitle": "Most common getting-started questions.",
+      "items": {
+        "ai": {
+          "q": "Does AI write code for me?",
+          "a": "No. AI reviews and hints — you solve the mission. It’s about learning, not copying."
+        },
+        "pcepPcap": {
+          "q": "Is this for PCEP/PCAP?",
+          "a": "Yes — missions cover PCEP requirements and lead into PCAP topics."
+        },
+        "time": {
+          "q": "How much time do I need per day?",
+          "a": "Just 10–15 minutes. Missions are short and designed for fast feedback."
+        },
+        "level": {
+          "q": "Who is SnakeCoder for?",
+          "a": "For beginners and intermediates who want practice and rhythm, not long lectures."
+        }
+      }
+    },
+    "cta": {
+      "badge": "Start today",
+      "title": "Jump into a mission and learn by doing",
+      "subtitle": "Create an account and start with your first mission. Progress and badges stay with you.",
+      "primaryCta": "Create an account",
+      "secondaryCta": "I already have an account — log in",
+      "note": "Demo version in the works — for now, full access starts with an account."
+    }
+  },
+  "logo": {
+    "banerText": "Master Python faster"
+  },
+  "sidebar": {
+    "collapse": "Collapse",
+    "close": "Close menu",
+    "expand": "Expand",
+    "open": "Open menu",
+    "nav": {
+      "dashboard": "Dashboard",
+      "modules": "Modules",
+      "missions": "Missions",
+      "daily": "Daily",
+      "editor": "Editor",
+      "generator": "AI Generator",
+      "ranking": "Ranking",
+      "profile": "Profile"
+    },
+    "profile": "Profile",
+    "logout": "Log out"
+  },
+  "statTopBar": {
+    "streak": {
+      "label": "Streak",
+      "tooltip": "You’re learning consistently — keep the streak going.",
+      "days": "{days} days"
+    },
+    "xp": {
+      "tooltip": "XP earned this month."
+    },
+    "league": {
+      "label": "League",
+      "tooltip": "Your position this month."
+    },
+    "ai": {
+      "label": "Rating",
+      "tooltip": "Average AI rating"
+    }
+  },
+  "dashboard": {
+    "badge": "Dashboard",
+    "hint": "Next steps and a quick progress overview.",
+    "title": "Hi, {name}!",
+    "subtitle": "Continue your sprint and keep your streak — the rest is one click away.",
+    "fallbackUser": "there",
+    "actions": {
+      "continueSprint": "Continue sprint",
+      "daily": "Daily",
+      "freeEditor": "Free editor",
+      "editor": "Editor",
+      "missions": "Missions"
+    },
+    "sections": {
+      "sprint": "Your sprint",
+      "today": "Today",
+      "plan": "Today’s plan",
+      "stats": "Statistics",
+      "lastRun": "Last run"
+    },
+    "today": {
+      "streak": "Streak: {days} days"
+    },
+    "common": {
+      "done": "✓",
+      "todo": "—",
+      "locked": "Locked",
+      "unlocked": "Unlocked"
+    },
+    "sprint": {
+      "eta": "~{minutes} min",
+      "title": "Functions: arguments and returns",
+      "nextStep": "Next step: task 3/6 — input validation.",
+      "nextTaskLabel": "Next task",
+      "currentTaskLabel": "Current task",
+      "goToSprint": "Go to sprint",
+      "nextTaskTitle": "Input validation",
+      "nextTaskDesc": "Add type and range checks for arguments and make sure the solution passes the tests.",
+      "cta": "Continue",
+      "ctaStartTask": "Start task",
+      "ctaContinueTask": "Continue task",
+      "testCta": "Sprint test",
+      "progressTitle": "Sprint progress",
+      "progressDesc": "Done: {tasksDone}/{tasksTotal} tasks + quiz + article.",
+      "items": {
+        "tasks": "Tasks",
+        "article": "Article",
+        "quiz": "Quiz",
+        "test": "Sprint test"
+      }
+    },
+    "plan": {
+      "desc": "Three small steps for today — keep the rhythm and progress.",
+      "bonusHint": "Complete all 3 steps to claim bonus XP.",
+      "bonusReady": "Congratulations! Today’s bonus XP is yours!",
+      "items": {
+        "tasks": "Complete sprint tasks",
+        "article": "Read the article",
+        "quiz": "Pass the quiz with at least 80%"
+      }
+    },
+    "unlock": {
+      "title": "Unlock the sprint test",
+      "desc": "Finish the sprint to unlock the test. Tasks left: {tasksLeft}.",
+      "items": {
+        "tasks": "Tasks",
+        "quiz": "Quiz"
+      }
+    },
+    "skillTest": {
+      "title": "Skill test",
+      "desc": "Passes the sprint and unlocks the next one — meet the requirements first.",
+      "requirementsTitle": "Requirements",
+      "requirements": {
+        "tasks": "Complete sprint tasks",
+        "article": "Read the article",
+        "quiz": "Pass the quiz"
+      },
+      "cta": "Go to test"
+    },
+    "level": {
+      "label": "Mid Pythonista"
+    },
+    "nextMission": {
+      "badge": "Next mission",
+      "title": "CSV file parser with data validation",
+      "objective": "Load the file, filter records, and prepare the output. Run tests and check the feedback.",
+      "eta": "~{minutes} min",
+      "cta": "Open mission",
+      "pickDifferent": "Choose another"
+    },
+    "weeklyGoal": {
+      "title": "Weekly goal",
+      "desc": "Completed: {done}/{goal} missions."
+    },
+    "quality": {
+      "title": "Code quality",
+      "desc": "Tests + AI feedback build good habits."
+    },
+    "focus": {
+      "title": "Today’s focus",
+      "value": "Exceptions and debugging",
+      "hint": "Finish the topic and practice it right away in missions."
+    },
+    "xp": {
+      "title": "XP this week",
+      "value": "{xp} XP",
+      "tip": "Do 1 short mission per day.",
+      "tip2": "Run tests before you click “Submit”.",
+      "tip3": "Earn badges for consistency."
+    },
+    "milestones": {
+      "title": "Milestones",
+      "subtitle": "Learning paths",
+      "desc": "From 0 through PCEP to PCAP — step by step.",
+      "badge": "Progress",
+      "pcep": {
+        "title": "PCEP",
+        "desc": "Basics of syntax, types, conditions, and loops."
+      },
+      "pcap": {
+        "title": "PCAP",
+        "desc": "OOP, modules, exceptions, files, and testing."
+      }
+    },
+    "recent": {
+      "title": "Recent activity",
+      "subtitle": "What you did recently",
+      "desc": "Return to started topics and finish tasks.",
+      "meta": {
+        "pcep": "PCEP • basics",
+        "pcap": "PCAP • next level"
+      },
+      "items": {
+        "files": "Working with files: reading and writing",
+        "functions": "Functions: arguments and return values",
+        "exceptions": "Exceptions: try/except and error messages"
+      },
+      "status": {
+        "done": "Done",
+        "inProgress": "In progress"
+      }
+    },
+    "generator": {
+      "badge": "AI Generator",
+      "title": "Generate an extra task",
+      "desc": "Choose a scope (module/sprint/topic) and practice exactly what you need.",
+      "cta": "Generate"
+    },
+    "lastRun": {
+      "subtitle": "A quick snapshot from the last day and your solving pace.",
+      "yesterdayXp": "XP earned yesterday",
+      "yesterdayHint": "From tasks and quizzes.",
+      "xpToday": "XP today",
+      "xpTodayHint": "Yesterday: +{yesterdayXp} XP",
+      "lastGrade": "Last rating",
+      "gradeHint": "Solution quality rating.",
+      "speed": "Pace",
+      "speedHint": "Task-solving speed indicator.",
+      "cta": "History",
+      "rankingCta": "Ranking"
+    }
+  },
+  "modules": {
+    "badge": "Modules",
+    "title": "Choose a module",
+    "subtitle": "Learn Python in modules: foundations, certifications, and libraries, step by step.",
+    "sections": {
+      "certifications": {
+        "title": "Certifications",
+        "subtitle": "Sprints for exam foundations and a solid base for further learning."
+      },
+      "libraries": {
+        "title": "Libraries and frameworks",
+        "subtitle": "Learn tools for data and web work — modules coming soon."
+      }
+    },
+    "card": {
+      "imageAlt": "Python",
+      "available": "Available",
+      "completed": "Completed",
+      "locked": "Locked",
+      "noAccess": "No access",
+      "building": "Under construction",
+      "requirementsTitle": "What you need",
+      "difficultyLabel": "Difficulty",
+      "difficulty": {
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+      },
+      "sprints": "Sprints: {done}/{total}",
+      "progress": "Progress: {percent}%",
+      "startCta": "Start module",
+      "continueCta": "Continue module",
+      "completedCta": "View module",
+      "getAccessCta": "Get access",
+      "buildingCta": "Under construction",
+      "lockedCta": "Locked",
+      "cta": "{state, select, building{Under construction} locked{Get access} completed{View module} continue{Continue module} start{Start module} other{Start module}}"
+    }
+  },
+  "module": {
+    "sections": {
+      "sprints": "Module sprints"
+    },
+    "header": {
+      "progress": "Completed sprints: {done}/{total}"
+    },
+    "sprints": {
+      "empty": "This module is being prepared — sprints will appear soon.",
+      "eta": "~{minutes} min",
+      "sprintNo": "Sprint {no}",
+      "progress": "Sprint progress",
+      "status": "{status, select, done {Completed} inProgress {In progress} available {Available} locked {Locked} other {Available}}",
+      "cta": "{status, select, done {Preview} inProgress {Continue} available {Start} locked {Locked} other {Start}}",
+      "meta": {
+        "tasks": "Tasks {done}/{total}",
+        "article": "Article {done}/{total}",
+        "quiz": "Quiz {score}/{total}"
+      },
+      "fallbackTitle": "Sprint",
+      "fallbackDesc": "Sprint description — coming soon.",
+      "unlockHint": "Complete sprint test {no} to unlock the ability to start."
+    },
+    "common": {
+      "done": "✓",
+      "todo": "—"
+    },
+    "fallback": {
+      "title": "Module",
+      "desc": "Module not found — check the module list."
+    }
+  },
+  "sprint": {
+    "badge": "Sprint",
+    "empty": "No tasks for this sprint — we’ll add them soon.",
+    "columns": {
+      "todo": "To do",
+      "inProgress": "In progress",
+      "done": "Done"
+    },
+    "task": {
+      "eta": "~{minutes} min",
+      "type": "{type, select, code {Code} bugfix {Bugfix} quiz {Quiz} article {Article} other {Code}}",
+      "status": "{status, select, todo {To do} inProgress {In progress} done {Done} other {To do}}",
+      "modal": {
+        "title": "Task",
+        "goal": "Goal",
+        "requirements": "Requirements",
+        "noRequirements": "No requirements.",
+        "hints": "Hints",
+        "noHints": "No hints.",
+        "goToTask": "Go to task"
+      }
+    }
+  },
+  "missions": {
+    "badge": "Missions",
+    "title": "Missions",
+    "subtitle": "Choose a task, set filters, and start solving.",
+    "filters": {
+      "difficulty": "Difficulty",
+      "modules": "Modules",
+      "type": "Task type",
+      "progress": "Progress",
+      "all": "All",
+      "clear": "Clear filters"
+    },
+    "pagination": {
+      "perPage": "Per page"
+    },
+    "table": {
+      "title": "Task",
+      "module": "Module",
+      "difficulty": "Difficulty",
+      "type": "Type",
+      "status": "Status",
+      "eta": "Time",
+      "xp": "XP",
+      "action": "Action",
+      "cta": "{status, select, todo {Start} inProgress {Continue} done {Completed} other {Start}}",
+      "empty": "No tasks for the selected filters."
+    },
+    "eta": "~{minutes} min",
+    "difficulty": "{difficulty, select, beginner {Beginner} intermediate {Intermediate} advanced {Advanced} other {Beginner}}",
+    "type": "{type, select, task {Task} bugfix {Bugfix} quiz {Quiz} article {Article} other {Task}}",
+    "status": "{status, select, todo {To do} inProgress {In progress} done {Completed} other {To do}}"
+  },
+  "task": {
+    "badge": "Mission",
+    "title": "Task: {id}",
+    "subtitle": "Write the code, run it, and check the tests.",
+    "meta": {
+      "time": "Remaining: {time}"
+    },
+    "sections": {
+      "description": "Task description",
+      "requirements": "Requirements",
+      "hint": "Hint",
+      "publicTests": "Test cases",
+      "results": "Test results",
+      "editor": "Code editor",
+      "console": "Console"
+    },
+    "description": "Write a function `solve(text)` that returns text where each character is duplicated.",
+    "requirements": {
+      "noFor": "Don’t use a for loop.",
+      "noExternalLibs": "Don’t use external libraries."
+    },
+    "tests": {
+      "input": "input",
+      "expectedOutput": "expected-output"
+    },
+    "actions": {
+      "test": "Run tests",
+      "run": "Run code",
+      "save": "Save",
+      "submit": "Submit solution",
+      "aiReview": "Review code with AI",
+      "clearConsole": "Clear"
+    },
+    "results": {
+      "status": "{status, select, pending {Not run} passed {Passed} failed {Failed} other {Not run}}",
+      "fields": {
+        "input": "Input",
+        "expected": "Expected",
+        "output": "Your output"
+      },
+      "emptyOutput": "None"
+    },
+    "console": {
+      "empty": "No logs.",
+      "running": "Running…",
+      "testing": "Testing…",
+      "aiReviewing": "Reviewing code with AI…",
+      "saving": "Saving…",
+      "submitting": "Submitting solution…",
+      "done": "Done.",
+      "error": "Error: {message}"
+    },
+    "toast": {
+      "saveSuccess": "Code saved.",
+      "saveFailed": "Couldn’t save code.",
+      "submitSuccess": "Solution submitted.",
+      "submitFailed": "Fix the tests first."
+    },
+    "submitModal": {
+      "message": "{status, select, passed {Congratulations!} failed {Sorry — try again.} other {}}"
+    }
+  },
+  "article": {
+    "badge": "Article",
+    "toc": "Table of contents",
+    "tocEmpty": "No sections in the table of contents.",
+    "content": "Content",
+    "contentHint": "Read and mark the article as completed.",
+    "summary": "Summary",
+    "meta": {
+      "readTime": "~{minutes} min"
+    },
+    "actions": {
+      "back": "Back to mission",
+      "markRead": "Mark as read"
+    },
+    "callout": {
+      "info": "Info",
+      "tip": "Tip",
+      "highlight": "Important"
+    },
+    "toasts": {
+      "markRead": "Article marked as read (mock)."
+    }
+  },
+  "quiz": {
+    "badge": "Quiz",
+    "empty": "No questions for this quiz.",
+    "progress": "Question {current}/{total}",
+    "meta": {
+      "answered": "Answers: {answered}/{total}",
+      "pass": "Threshold: {percent}%",
+      "time": "Remaining: {time}",
+      "xp": "+{xp} XP"
+    },
+    "question": {
+      "select": "Select one answer"
+    },
+    "actions": {
+      "prev": "Back",
+      "next": "Next",
+      "finish": "Finish quiz",
+      "close": "Close",
+      "restart": "Try again"
+    },
+    "results": {
+      "title": "Quiz results",
+      "details": "Details",
+      "score": "Score: {score}/{total}",
+      "percent": "{percent}% correct",
+      "passed": "Passed",
+      "failed": "Failed",
+      "yourAnswer": "Your answer",
+      "correctAnswer": "Correct answer",
+      "noAnswer": "No answer"
+    }
+  },
+  "profile": {
+    "badge": "Profile",
+    "title": "Your profile",
+    "subtitle": "Set your nickname, fill in details, and see your stats.",
+    "fallbackUser": "User",
+    "hint": "Profile editing is a mockup (for now).",
+    "account": {
+      "subtitle": "Your details"
+    },
+    "sections": {
+      "stats": "Statistics"
+    },
+    "fields": {
+      "nickName": "Nickname",
+      "firstName": "First name (optional)",
+      "lastName": "Last name (optional)"
+    },
+    "placeholders": {
+      "nickName": "e.g. julia_dev",
+      "firstName": "e.g. Julia",
+      "lastName": "e.g. Smith"
+    },
+    "actions": {
+      "save": "Save changes",
+      "reset": "Reset"
+    },
+    "errors": {
+      "nickNameRequired": "Enter a nickname.",
+      "nickNameInvalid": "Nickname can contain only letters and numbers (no spaces or special characters)."
+    },
+    "stats": {
+      "subtitle": "A quick overview of your progress.",
+      "bestStreak": "Best streak",
+      "bestStreakHint": "Longest streak ever.",
+      "totalXp": "Total XP",
+      "totalXpHint": "Sum of all earned points.",
+      "gradeAvg": "Average rating",
+      "gradeAvgHint": "Average AI ratings across all tasks."
+    },
+    "toasts": {
+      "saved": "Changes saved (mock)."
+    }
+  },
+  "ranking": {
+    "badge": "Ranking",
+    "title": "Ranking",
+    "subtitle": "See the best this month and who’s earning the most XP.",
+    "tiers": {
+      "champions": "Champions",
+      "gold": "Gold",
+      "silver": "Silver",
+      "bronze": "Bronze"
+    },
+    "columns": {
+      "rank": "Rank",
+      "user": "User",
+      "xp": "XP",
+      "streak": "Streak"
+    },
+    "row": {
+      "xp": "{xp} XP",
+      "streak": "{days} days",
+      "grade": "Rating: {grade}"
+    },
+    "meta": {
+      "count": "{count} people"
+    }
+  },
+  "login": {
+    "badge": "Login",
+    "hint": "Get back to missions and keep progressing.",
+    "title": "Log in to SnakeCoder",
+    "subtitle": "Enter your email and password to return to your tasks and test results.",
+    "email": {
+      "label": "Email",
+      "placeholder": "e.g. dev@snakecoder.com"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "••••••••"
+    },
+    "submit": "Log in",
+    "noAccount": "Don’t have an account?",
+    "goRegister": "Go to registration",
+    "toast": {
+      "success": "Logged in successfully."
+    },
+    "oauth": {
+      "or": "or",
+      "github": "Log in with GitHub",
+      "google": "Log in with Google"
+    },
+    "errors": {
+      "email": "Enter a valid email address.",
+      "passwordRequired": "Enter your password.",
+      "invalidCredentials": "Invalid email or password.",
+      "oauth": "Couldn’t log in with the provider. Try again.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "register": {
+    "badge": "Register",
+    "hint": "Create an account and save your progress.",
+    "title": "Create an account",
+    "subtitle": "Enter your details and you’ll be back to missions and tests in no time.",
+    "nickName": {
+      "label": "Nickname",
+      "placeholder": "e.g. julia_dev"
+    },
+    "firstName": {
+      "label": "First name (optional)",
+      "placeholder": "e.g. Julia"
+    },
+    "lastName": {
+      "label": "Last name (optional)",
+      "placeholder": "e.g. Smith"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "e.g. dev@snakecoder.com"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "••••••••"
+    },
+    "confirmPassword": {
+      "label": "Confirm password",
+      "placeholder": "••••••••"
+    },
+    "terms": {
+      "label": "I accept the app’s terms."
+    },
+    "submit": "Sign up",
+    "haveAccount": "Already have an account?",
+    "goLogin": "Back to login",
+    "toast": {
+      "success": "Account created. Welcome!"
+    },
+    "errors": {
+      "nickNameRequired": "Enter a nickname.",
+      "nickNameInvalid": "Nickname can contain only letters and numbers (no spaces or special characters).",
+      "nickNameTaken": "That nickname is already taken.",
+      "email": "Enter a valid email address.",
+      "passwordRequired": "Enter a password.",
+      "passwordComplex": "Password must be at least 8 characters and include a lowercase letter, uppercase letter, number, and special character.",
+      "confirmPasswordRequired": "Confirm your password.",
+      "termsRequired": "You must accept the terms.",
+      "passwordsMismatch": "Passwords must match.",
+      "emailTaken": "That email is already taken.",
+      "generic": "Something went wrong. Try again."
+    }
   }
 }

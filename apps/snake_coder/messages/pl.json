@@ -152,6 +152,516 @@
   "logo": {
     "banerText": "Szybciej opanuj Pythona"
   },
+  "sidebar": {
+    "collapse": "Zwiń",
+    "close": "Zamknij menu",
+    "expand": "Rozwiń",
+    "open": "Otwórz menu",
+    "nav": {
+      "dashboard": "Dashboard",
+      "modules": "Moduły",
+      "missions": "Zadania",
+      "daily": "Daily",
+      "editor": "Edytor",
+      "generator": "Generator AI",
+      "ranking": "Ranking",
+      "profile": "Profil"
+    },
+    "profile": "Profil",
+    "logout": "Wyloguj się"
+  },
+  "statTopBar": {
+    "streak": {
+      "label": "Streak",
+      "tooltip": "Uczysz się regularnie i utrzymaj serię.",
+      "days": "{days} dni"
+    },
+    "xp": {
+      "tooltip": "XP zdobyte w tym miesiącu."
+    },
+    "league": {
+      "label": "Liga",
+      "tooltip": "Pozycja w tym miesiącu."
+    },
+    "ai": {
+      "label": "Ocena",
+      "tooltip": "Średnia ocen od AI"
+    }
+  },
+  "dashboard": {
+    "badge": "Dashboard",
+    "hint": "Najbliższe kroki i szybki podgląd postępu.",
+    "title": "Cześć, {name}!",
+    "subtitle": "Kontynuuj sprint i utrzymaj streak — reszta jest kliknięcie dalej.",
+    "fallbackUser": "Użytkowniku",
+    "actions": {
+      "continueSprint": "Kontynuuj sprint",
+      "daily": "Daily",
+      "freeEditor": "Wolny edytor",
+      "editor": "Edytor",
+      "missions": "Misje"
+    },
+    "sections": {
+      "sprint": "Twój sprint",
+      "today": "Dzisiaj",
+      "plan": "Plan na dziś",
+      "stats": "Statystyki",
+      "lastRun": "Ostatni wynik"
+    },
+    "today": {
+      "streak": "Streak: {days} dni"
+    },
+    "common": {
+      "done": "✓",
+      "todo": "—",
+      "locked": "Zablokowany",
+      "unlocked": "Odblokowany"
+    },
+    "sprint": {
+      "eta": "~{minutes} min",
+      "title": "Funkcje: argumenty i zwracanie",
+      "nextStep": "Następny krok: zadanie 3/6 — walidacja danych wejściowych.",
+      "nextTaskLabel": "Następne zadanie",
+      "currentTaskLabel": "Aktualne zadanie",
+      "goToSprint": "Przejdź do sprintu",
+      "nextTaskTitle": "Walidacja danych wejściowych",
+      "nextTaskDesc": "Dodaj sprawdzanie typu i zakresu argumentów oraz upewnij się, że rozwiązanie przechodzi testy.",
+      "cta": "Kontynuuj",
+      "ctaStartTask": "Rozpocznij zadanie",
+      "ctaContinueTask": "Kontynuuj zadanie",
+      "testCta": "Test sprintu",
+      "progressTitle": "Postęp sprintu",
+      "progressDesc": "Zrobione: {tasksDone}/{tasksTotal} zadań + quiz + artykuł.",
+      "items": {
+        "tasks": "Zadania",
+        "article": "Artykuł",
+        "quiz": "Quiz",
+        "test": "Test sprintu"
+      }
+    },
+    "plan": {
+      "desc": "Trzy małe kroki na dziś — utrzymaj rytm i progres.",
+      "bonusHint": "Ukończ wszystkie 3 kroki, aby zgarnąć bonus XP.",
+      "bonusReady": "Gratulacje! Bonus XP za dziś jest Twój!",
+      "items": {
+        "tasks": "Ukończ zadania sprintu",
+        "article": "Przeczytaj artykuł",
+        "quiz": "Zalicz quiz na min. 80%"
+      }
+    },
+    "unlock": {
+      "title": "Odblokuj test sprintu",
+      "desc": "Dokończ sprint, żeby odblokować test. Zostało zadań: {tasksLeft}.",
+      "items": {
+        "tasks": "Zadania",
+        "quiz": "Quiz"
+      }
+    },
+    "skillTest": {
+      "title": "Test umiejętności",
+      "desc": "Zalicza sprint i odblokowuje kolejny — najpierw spełnij wymagania.",
+      "requirementsTitle": "Wymagania",
+      "requirements": {
+        "tasks": "Ukończ zadania sprintu",
+        "article": "Przeczytaj artykuł",
+        "quiz": "Zalicz quiz"
+      },
+      "cta": "Przejdź do testu"
+    },
+    "level": {
+      "label": "Mid Pythonista"
+    },
+    "nextMission": {
+      "badge": "Następna misja",
+      "title": "Parser plików CSV z walidacją danych",
+      "objective": "Wczytaj plik, przefiltruj rekordy i przygotuj wynik. Uruchom testy i sprawdź feedback.",
+      "eta": "~{minutes} min",
+      "cta": "Otwórz misję",
+      "pickDifferent": "Wybierz inną"
+    },
+    "weeklyGoal": {
+      "title": "Cel tygodnia",
+      "desc": "Ukończone: {done}/{goal} misji."
+    },
+    "quality": {
+      "title": "Jakość kodu",
+      "desc": "Testy + feedback AI budują dobre nawyki."
+    },
+    "focus": {
+      "title": "Skupienie na dziś",
+      "value": "Wyjątki i debugowanie",
+      "hint": "Dokończ temat i od razu przećwicz go w misjach."
+    },
+    "xp": {
+      "title": "XP w tym tygodniu",
+      "value": "{xp} XP",
+      "tip": "Zrób 1 krótką misję dziennie.",
+      "tip2": "Uruchamiaj testy zanim klikniesz „Wyślij”.",
+      "tip3": "Zbieraj odznaki za regularność."
+    },
+    "milestones": {
+      "title": "Kamienie milowe",
+      "subtitle": "Ścieżki nauki",
+      "desc": "Od 0 przez PCEP do PCAP — krok po kroku.",
+      "badge": "Progres",
+      "pcep": {
+        "title": "PCEP",
+        "desc": "Podstawy składni, typów, warunków i pętli."
+      },
+      "pcap": {
+        "title": "PCAP",
+        "desc": "OOP, moduły, wyjątki, pliki i testowanie."
+      }
+    },
+    "recent": {
+      "title": "Ostatnia aktywność",
+      "subtitle": "Co robiłeś ostatnio",
+      "desc": "Wróć do rozpoczętych tematów i domknij zadania.",
+      "meta": {
+        "pcep": "PCEP • podstawy",
+        "pcap": "PCAP • poziom wyżej"
+      },
+      "items": {
+        "files": "Praca z plikami: odczyt i zapis",
+        "functions": "Funkcje: argumenty i zwracanie wartości",
+        "exceptions": "Wyjątki: try/except i komunikaty błędów"
+      },
+      "status": {
+        "done": "Zrobione",
+        "inProgress": "W toku"
+      }
+    },
+    "generator": {
+      "badge": "Generator AI",
+      "title": "Wygeneruj dodatkowe zadanie",
+      "desc": "Dobierz zakres (moduł/sprint/temat) i ćwicz dokładnie to, czego potrzebujesz.",
+      "cta": "Generuj"
+    },
+    "lastRun": {
+      "subtitle": "Szybki podgląd z ostatniego dnia i tempa rozwiązywania.",
+      "yesterdayXp": "Wczoraj zdobyte XP",
+      "yesterdayHint": "Za zadania i quizy.",
+      "xpToday": "XP dzisiaj",
+      "xpTodayHint": "Wczoraj: +{yesterdayXp} XP",
+      "lastGrade": "Ostatnia ocena",
+      "gradeHint": "Ocena jakości rozwiązania.",
+      "speed": "Tempo",
+      "speedHint": "Wskaźnik prędkości rozwiązywania zadań.",
+      "cta": "Historia",
+      "rankingCta": "Ranking"
+    }
+  },
+  "modules": {
+    "badge": "Moduły",
+    "title": "Wybierz moduł",
+    "subtitle": "Ucz się Pythona modułowo: fundamenty, certyfikacje i biblioteki, krok po kroku.",
+    "sections": {
+      "certifications": {
+        "title": "Certyfikacje",
+        "subtitle": "Sprinty pod fundamenty egzaminów i solidną bazę do dalszej nauki."
+      },
+      "libraries": {
+        "title": "Biblioteki i frameworki",
+        "subtitle": "Nauka narzędzi do pracy z danymi i webem — moduły w przygotowaniu."
+      }
+    },
+    "card": {
+      "imageAlt": "Python",
+      "available": "Dostępny",
+      "completed": "Ukończono",
+      "locked": "Zablokowany",
+      "noAccess": "Brak dostępu",
+      "building": "W budowie",
+      "requirementsTitle": "Tego potrzebujesz",
+      "difficultyLabel": "Trudność",
+      "difficulty": {
+        "beginner": "Początkujący",
+        "intermediate": "Średni",
+        "advanced": "Zaawansowany"
+      },
+      "sprints": "Sprinty: {done}/{total}",
+      "progress": "Postęp: {percent}%",
+      "startCta": "Rozpocznij moduł",
+      "continueCta": "Kontynuuj moduł",
+      "completedCta": "Zobacz moduł",
+      "getAccessCta": "Uzyskaj dostęp",
+      "buildingCta": "W budowie",
+      "lockedCta": "Zablokowane",
+      "cta": "{state, select, building{W budowie} locked{Uzyskaj dostęp} completed{Zobacz moduł} continue{Kontynuuj moduł} start{Rozpocznij moduł} other{Rozpocznij moduł}}"
+    }
+  },
+  "module": {
+    "sections": {
+      "sprints": "Sprinty modułu"
+    },
+    "header": {
+      "progress": "Ukończone sprinty: {done}/{total}"
+    },
+    "sprints": {
+      "empty": "Ten moduł jest w przygotowaniu — sprinty pojawią się wkrótce.",
+      "eta": "~{minutes} min",
+      "sprintNo": "Sprint {no}",
+      "progress": "Postęp sprintu",
+      "status": "{status, select, done {Ukończony} inProgress {W toku} available {Dostępny} locked {Zablokowany} other {Dostępny}}",
+      "cta": "{status, select, done {Podgląd} inProgress {Kontynuuj} available {Rozpocznij} locked {Zablokowane} other {Rozpocznij}}",
+      "meta": {
+        "tasks": "Zadania {done}/{total}",
+        "article": "Artykuł {done}/{total}",
+        "quiz": "Quiz {score}/{total}"
+      },
+      "fallbackTitle": "Sprint",
+      "fallbackDesc": "Opis sprintu — w przygotowaniu.",
+      "unlockHint": "Ukończ test sprintu {no}, by odblokować możliwość rozpoczęcia."
+    },
+    "common": {
+      "done": "✓",
+      "todo": "—"
+    },
+    "fallback": {
+      "title": "Moduł",
+      "desc": "Nie znaleziono modułu — sprawdź listę modułów."
+    }
+  },
+  "sprint": {
+    "badge": "Sprint",
+    "empty": "Brak zadań dla tego sprintu — wkrótce uzupełnimy.",
+    "columns": {
+      "todo": "Do zrobienia",
+      "inProgress": "W trakcie",
+      "done": "Gotowe"
+    },
+    "task": {
+      "eta": "~{minutes} min",
+      "type": "{type, select, code {Kod} bugfix {Bugfix} quiz {Quiz} article {Artykuł} other {Kod}}",
+      "status": "{status, select, todo {Do zrobienia} inProgress {W trakcie} done {Gotowe} other {Do zrobienia}}",
+      "modal": {
+        "title": "Zadanie",
+        "goal": "Cel",
+        "requirements": "Wymagania",
+        "noRequirements": "Brak wymagań.",
+        "hints": "Wskazówki",
+        "noHints": "Brak wskazówek.",
+        "goToTask": "Przejdź do zadania"
+      }
+    }
+  },
+  "missions": {
+    "badge": "Misje",
+    "title": "Misje",
+    "subtitle": "Wybierz zadanie, ustaw filtry i zacznij rozwiązywać.",
+    "filters": {
+      "difficulty": "Trudność",
+      "modules": "Moduły",
+      "type": "Typ zadania",
+      "progress": "Progres",
+      "all": "Wszystkie",
+      "clear": "Wyczyść filtry"
+    },
+    "pagination": {
+      "perPage": "Na stronę"
+    },
+    "table": {
+      "title": "Zadanie",
+      "module": "Moduł",
+      "difficulty": "Trudność",
+      "type": "Typ",
+      "status": "Status",
+      "eta": "Czas",
+      "xp": "XP",
+      "action": "Akcja",
+      "cta": "{status, select, todo {Rozpocznij} inProgress {Kontynuuj} done {Ukończono} other {Rozpocznij}}",
+      "empty": "Brak zadań dla wybranych filtrów."
+    },
+    "eta": "~{minutes} min",
+    "difficulty": "{difficulty, select, beginner {Początkujący} intermediate {Średni} advanced {Zaawansowany} other {Początkujący}}",
+    "type": "{type, select, task {Task} bugfix {Bugfix} quiz {Quiz} article {Artykuł} other {Task}}",
+    "status": "{status, select, todo {Do zrobienia} inProgress {W trakcie} done {Ukończone} other {Do zrobienia}}"
+  },
+  "task": {
+    "badge": "Misja",
+    "title": "Zadanie: {id}",
+    "subtitle": "Napisz kod, uruchom go i sprawdź testy.",
+    "meta": {
+      "time": "Pozostało: {time}"
+    },
+    "sections": {
+      "description": "Opis zadania",
+      "requirements": "Wymagania",
+      "hint": "Wskazówka",
+      "publicTests": "Przypadki testowe",
+      "results": "Wyniki testów",
+      "editor": "Edytor kodu",
+      "console": "Konsola"
+    },
+    "description": "Napisz funkcję `solve(text)`, która zwraca tekst, w którym każdy znak jest powtórzony.",
+    "requirements": {
+      "noFor": "Nie używaj pętli for.",
+      "noExternalLibs": "Nie używaj bibliotek zewnętrznych."
+    },
+    "tests": {
+      "input": "input",
+      "expectedOutput": "expected-output"
+    },
+    "actions": {
+      "test": "Uruchom testy",
+      "run": "Uruchom kod",
+      "save": "Zapisz",
+      "submit": "Wyślij rozwiązanie",
+      "aiReview": "Oceń kod przez AI",
+      "clearConsole": "Wyczyść"
+    },
+    "results": {
+      "status": "{status, select, pending {Nie uruchomiono} passed {Zdane} failed {Niezdane} other {Nie uruchomiono}}",
+      "fields": {
+        "input": "Dane wejściowe",
+        "expected": "Oczekiwany rezultat",
+        "output": "Twój rezultat"
+      },
+      "emptyOutput": "Brak"
+    },
+    "console": {
+      "empty": "Brak logów.",
+      "running": "Uruchamiam…",
+      "testing": "Testuję…",
+      "aiReviewing": "Oceniam kod przez AI…",
+      "saving": "Zapisuję…",
+      "submitting": "Wysyłam rozwiązanie…",
+      "done": "Gotowe.",
+      "error": "Błąd: {message}"
+    },
+    "toast": {
+      "saveSuccess": "Zapisano kod.",
+      "saveFailed": "Nie udało się zapisać kodu.",
+      "submitSuccess": "Rozwiązanie wysłane.",
+      "submitFailed": "Najpierw popraw testy."
+    },
+    "submitModal": {
+      "message": "{status, select, passed {Gratulacje!} failed {Przykro mi — spróbuj ponownie.} other {}}"
+    }
+  },
+  "article": {
+    "badge": "Artykuł",
+    "toc": "Spis treści",
+    "tocEmpty": "Brak sekcji w spisie treści.",
+    "content": "Treść",
+    "contentHint": "Przeczytaj i zaznacz artykuł jako ukończony.",
+    "summary": "Podsumowanie",
+    "meta": {
+      "readTime": "~{minutes} min"
+    },
+    "actions": {
+      "back": "Wróć do misji",
+      "markRead": "Oznacz jako przeczytane"
+    },
+    "callout": {
+      "info": "Info",
+      "tip": "Tip",
+      "highlight": "Ważne"
+    },
+    "toasts": {
+      "markRead": "Artykuł oznaczony jako przeczytany (mock)."
+    }
+  },
+  "quiz": {
+    "badge": "Quiz",
+    "empty": "Brak pytań dla tego quizu.",
+    "progress": "Pytanie {current}/{total}",
+    "meta": {
+      "answered": "Odpowiedzi: {answered}/{total}",
+      "pass": "Próg: {percent}%",
+      "time": "Pozostało: {time}",
+      "xp": "+{xp} XP"
+    },
+    "question": {
+      "select": "Wybierz jedną odpowiedź"
+    },
+    "actions": {
+      "prev": "Wstecz",
+      "next": "Dalej",
+      "finish": "Zakończ quiz",
+      "close": "Zamknij",
+      "restart": "Spróbuj ponownie"
+    },
+    "results": {
+      "title": "Wynik quizu",
+      "details": "Szczegóły",
+      "score": "Wynik: {score}/{total}",
+      "percent": "{percent}% poprawnych",
+      "passed": "Zaliczone",
+      "failed": "Niezaliczone",
+      "yourAnswer": "Twoja odpowiedź",
+      "correctAnswer": "Poprawna odpowiedź",
+      "noAnswer": "Brak odpowiedzi"
+    }
+  },
+  "profile": {
+    "badge": "Profil",
+    "title": "Twój profil",
+    "subtitle": "Ustaw nick, uzupełnij dane i zobacz statystyki.",
+    "fallbackUser": "Użytkownik",
+    "hint": "Edycja profilu to makieta (na razie).",
+    "account": {
+      "subtitle": "Twoje dane"
+    },
+    "sections": {
+      "stats": "Statystyki"
+    },
+    "fields": {
+      "nickName": "Nick",
+      "firstName": "Imię (opcjonalnie)",
+      "lastName": "Nazwisko (opcjonalnie)"
+    },
+    "placeholders": {
+      "nickName": "np. julia_dev",
+      "firstName": "np. Julia",
+      "lastName": "np. Kowalska"
+    },
+    "actions": {
+      "save": "Zapisz zmiany",
+      "reset": "Resetuj"
+    },
+    "errors": {
+      "nickNameRequired": "Podaj nick.",
+      "nickNameInvalid": "Nick może zawierać tylko litery i cyfry (bez spacji i znaków specjalnych)."
+    },
+    "stats": {
+      "subtitle": "Szybki podgląd Twojego postępu.",
+      "bestStreak": "Największy streak",
+      "bestStreakHint": "Najdłuższa seria w historii.",
+      "totalXp": "Łączne XP",
+      "totalXpHint": "Suma wszystkich zdobytych punktów.",
+      "gradeAvg": "Średnia ocena",
+      "gradeAvgHint": "Średnia ocen od AI z wszystkich zadań."
+    },
+    "toasts": {
+      "saved": "Zapisano zmiany (mock)."
+    }
+  },
+  "ranking": {
+    "badge": "Ranking",
+    "title": "Ranking",
+    "subtitle": "Sprawdź najlepszych w tym miesiącu i zobacz, kto zbiera najwięcej XP.",
+    "tiers": {
+      "champions": "Champions",
+      "gold": "Gold",
+      "silver": "Silver",
+      "bronze": "Bronze"
+    },
+    "columns": {
+      "rank": "Pozycja",
+      "user": "Użytkownik",
+      "xp": "XP",
+      "streak": "Streak"
+    },
+    "row": {
+      "xp": "{xp} XP",
+      "streak": "{days} dni",
+      "grade": "Ocena: {grade}"
+    },
+    "meta": {
+      "count": "{count} osób"
+    }
+  },
   "login": {
     "badge": "Logowanie",
     "hint": "Wróć do misji i kontynuuj progres.",

@@ -7,9 +7,11 @@ type SignOutLayoutProps = {
 
 const SignOutLayout: React.FC<SignOutLayoutProps> = ({ children }) => {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col">
       <TopBar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 overflow-y-scroll scrollbar-thumb-secondary-500 scrollbar-track-primary-500 scrollbar-thin">
+        {children}
+      </main>
       <Footer />
     </div>
   )

@@ -1,4 +1,5 @@
-import type { NextFetchEvent, NextRequest } from 'next/server'
+import type { NextApiRequest } from 'next'
+import type { NextRequest } from 'next/server'
 
 import { NextResponse } from 'next/server'
 import { getSession } from 'next-auth/react'
@@ -12,11 +13,14 @@ function getLocalePrefix(pathname: string) {
   const m = pathname.match(/^\/([\w-]+)(\/|$)/)
   if (!m) return ''
   const locale = m[1]
-  return `/${locale}`
+  return routing.locales.some((supported) => supported === locale) ? `/${locale}` : ''
 }
 
 function stripLocale(pathname: string) {
-  return pathname.replace(/^\/[\w-]+(?=\/|$)/, '') || '/'
+  const localePrefix = getLocalePrefix(pathname)
+  if (!localePrefix) return pathname || '/'
+  const stripped = pathname.slice(localePrefix.length)
+  return stripped || '/'
 }
 
 function redirect(req: NextRequest, targetPathWithLocale: string) {
@@ -26,14 +30,14 @@ function redirect(req: NextRequest, targetPathWithLocale: string) {
   return NextResponse.redirect(url)
 }
 
-export default async function middleware(req: NextRequest, _ev: NextFetchEvent) {
+export default async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 
   const requestForNextAuth = {
     headers: { cookie: req.headers.get('cookie') ?? '' },
-  }
+  } as NextApiRequest
 
-  const session = await getSession({ req: requestForNextAuth as any })
+  const session = await getSession({ req: requestForNextAuth })
   const isAuthed = !!session
 
   const localePrefix = getLocalePrefix(pathname)

@@ -192,7 +192,7 @@
     "badge": "Dashboard",
     "hint": "Najbliższe kroki i szybki podgląd postępu.",
     "title": "Cześć, {name}!",
-    "subtitle": "Kontynuuj sprint, zrób daily i utrzymaj streak — reszta jest kliknięcie dalej.",
+    "subtitle": "Kontynuuj sprint i utrzymaj streak — reszta jest kliknięcie dalej.",
     "fallbackUser": "Użytkowniku",
     "actions": {
       "continueSprint": "Kontynuuj sprint",
@@ -239,32 +239,14 @@
         "test": "Test sprintu"
       }
     },
-    "daily": {
-      "badge": "Wyzwanie dnia",
-      "title": "Daily: krótkie zadanie",
-      "shortDesc": "Napisz funkcję zgodnie z opisem i przejdź testy.",
-      "desc": "Szybki trening z aktualnego zakresu. Wynik: testy + feedback AI.",
-      "types": {
-        "code": "Napisz Kod",
-        "bugfix": "Napraw Błąd",
-        "quiz": "Rozwiąż Quiz"
-      },
-      "statusLabel": "Status:",
-      "status": {
-        "new": "Nowe",
-        "done": "Zrobione",
-        "inProgress": "W toku"
-      },
-      "cta": "Zacznij daily"
-    },
     "plan": {
       "desc": "Trzy małe kroki na dziś — utrzymaj rytm i progres.",
       "bonusHint": "Ukończ wszystkie 3 kroki, aby zgarnąć bonus XP.",
       "bonusReady": "Gratulacje! Bonus XP za dziś jest Twój!",
       "items": {
-        "daily": "Zrób daily",
-        "quiz": "Zalicz quiz na min. 80%",
-        "task": "Otrzymaj ocenę min. B z daily"
+        "tasks": "Ukończ zadania sprintu",
+        "article": "Przeczytaj artykuł",
+        "quiz": "Zalicz quiz na min. 80%"
       }
     },
     "unlock": {
@@ -450,7 +432,7 @@
     },
     "task": {
       "eta": "~{minutes} min",
-      "type": "{type, select, code {Kod} bugfix {Bugfix} quiz {Quiz} other {Kod}}",
+      "type": "{type, select, code {Kod} bugfix {Bugfix} quiz {Quiz} article {Artykuł} other {Kod}}",
       "status": "{status, select, todo {Do zrobienia} inProgress {W trakcie} done {Gotowe} other {Do zrobienia}}",
       "modal": {
         "title": "Zadanie",
@@ -461,6 +443,223 @@
         "noHints": "Brak wskazówek.",
         "goToTask": "Przejdź do zadania"
       }
+    }
+  },
+  "missions": {
+    "badge": "Misje",
+    "title": "Misje",
+    "subtitle": "Wybierz zadanie, ustaw filtry i zacznij rozwiązywać.",
+    "filters": {
+      "difficulty": "Trudność",
+      "modules": "Moduły",
+      "type": "Typ zadania",
+      "progress": "Progres",
+      "all": "Wszystkie",
+      "clear": "Wyczyść filtry"
+    },
+    "pagination": {
+      "perPage": "Na stronę"
+    },
+    "table": {
+      "title": "Zadanie",
+      "module": "Moduł",
+      "difficulty": "Trudność",
+      "type": "Typ",
+      "status": "Status",
+      "eta": "Czas",
+      "xp": "XP",
+      "action": "Akcja",
+      "cta": "{status, select, todo {Rozpocznij} inProgress {Kontynuuj} done {Ukończono} other {Rozpocznij}}",
+      "empty": "Brak zadań dla wybranych filtrów."
+    },
+    "eta": "~{minutes} min",
+    "difficulty": "{difficulty, select, beginner {Początkujący} intermediate {Średni} advanced {Zaawansowany} other {Początkujący}}",
+    "type": "{type, select, task {Task} bugfix {Bugfix} quiz {Quiz} article {Artykuł} other {Task}}",
+    "status": "{status, select, todo {Do zrobienia} inProgress {W trakcie} done {Ukończone} other {Do zrobienia}}"
+  },
+  "task": {
+    "badge": "Misja",
+    "title": "Zadanie: {id}",
+    "subtitle": "Napisz kod, uruchom go i sprawdź testy.",
+    "meta": {
+      "time": "Pozostało: {time}"
+    },
+    "sections": {
+      "description": "Opis zadania",
+      "requirements": "Wymagania",
+      "hint": "Wskazówka",
+      "publicTests": "Przypadki testowe",
+      "results": "Wyniki testów",
+      "editor": "Edytor kodu",
+      "console": "Konsola"
+    },
+    "description": "Napisz funkcję `solve(text)`, która zwraca tekst, w którym każdy znak jest powtórzony.",
+    "requirements": {
+      "noFor": "Nie używaj pętli for.",
+      "noExternalLibs": "Nie używaj bibliotek zewnętrznych."
+    },
+    "tests": {
+      "input": "input",
+      "expectedOutput": "expected-output"
+    },
+    "actions": {
+      "test": "Uruchom testy",
+      "run": "Uruchom kod",
+      "save": "Zapisz",
+      "submit": "Wyślij rozwiązanie",
+      "aiReview": "Oceń kod przez AI",
+      "clearConsole": "Wyczyść"
+    },
+    "results": {
+      "status": "{status, select, pending {Nie uruchomiono} passed {Zdane} failed {Niezdane} other {Nie uruchomiono}}",
+      "fields": {
+        "input": "Dane wejściowe",
+        "expected": "Oczekiwany rezultat",
+        "output": "Twój rezultat"
+      },
+      "emptyOutput": "Brak"
+    },
+    "console": {
+      "empty": "Brak logów.",
+      "running": "Uruchamiam…",
+      "testing": "Testuję…",
+      "aiReviewing": "Oceniam kod przez AI…",
+      "saving": "Zapisuję…",
+      "submitting": "Wysyłam rozwiązanie…",
+      "done": "Gotowe.",
+      "error": "Błąd: {message}"
+    },
+    "toast": {
+      "saveSuccess": "Zapisano kod.",
+      "saveFailed": "Nie udało się zapisać kodu.",
+      "submitSuccess": "Rozwiązanie wysłane.",
+      "submitFailed": "Najpierw popraw testy."
+    },
+    "submitModal": {
+      "message": "{status, select, passed {Gratulacje!} failed {Przykro mi — spróbuj ponownie.} other {}}"
+    }
+  },
+  "article": {
+    "badge": "Artykuł",
+    "toc": "Spis treści",
+    "tocEmpty": "Brak sekcji w spisie treści.",
+    "content": "Treść",
+    "contentHint": "Przeczytaj i zaznacz artykuł jako ukończony.",
+    "summary": "Podsumowanie",
+    "meta": {
+      "readTime": "~{minutes} min"
+    },
+    "actions": {
+      "back": "Wróć do misji",
+      "markRead": "Oznacz jako przeczytane"
+    },
+    "callout": {
+      "info": "Info",
+      "tip": "Tip",
+      "highlight": "Ważne"
+    },
+    "toasts": {
+      "markRead": "Artykuł oznaczony jako przeczytany (mock)."
+    }
+  },
+  "quiz": {
+    "badge": "Quiz",
+    "empty": "Brak pytań dla tego quizu.",
+    "progress": "Pytanie {current}/{total}",
+    "meta": {
+      "answered": "Odpowiedzi: {answered}/{total}",
+      "pass": "Próg: {percent}%",
+      "time": "Pozostało: {time}",
+      "xp": "+{xp} XP"
+    },
+    "question": {
+      "select": "Wybierz jedną odpowiedź"
+    },
+    "actions": {
+      "prev": "Wstecz",
+      "next": "Dalej",
+      "finish": "Zakończ quiz",
+      "close": "Zamknij",
+      "restart": "Spróbuj ponownie"
+    },
+    "results": {
+      "title": "Wynik quizu",
+      "details": "Szczegóły",
+      "score": "Wynik: {score}/{total}",
+      "percent": "{percent}% poprawnych",
+      "passed": "Zaliczone",
+      "failed": "Niezaliczone",
+      "yourAnswer": "Twoja odpowiedź",
+      "correctAnswer": "Poprawna odpowiedź",
+      "noAnswer": "Brak odpowiedzi"
+    }
+  },
+  "profile": {
+    "badge": "Profil",
+    "title": "Twój profil",
+    "subtitle": "Ustaw nick, uzupełnij dane i zobacz statystyki.",
+    "fallbackUser": "Użytkownik",
+    "hint": "Edycja profilu to makieta (na razie).",
+    "account": {
+      "subtitle": "Twoje dane"
+    },
+    "sections": {
+      "stats": "Statystyki"
+    },
+    "fields": {
+      "nickName": "Nick",
+      "firstName": "Imię (opcjonalnie)",
+      "lastName": "Nazwisko (opcjonalnie)"
+    },
+    "placeholders": {
+      "nickName": "np. julia_dev",
+      "firstName": "np. Julia",
+      "lastName": "np. Kowalska"
+    },
+    "actions": {
+      "save": "Zapisz zmiany",
+      "reset": "Resetuj"
+    },
+    "errors": {
+      "nickNameRequired": "Podaj nick.",
+      "nickNameInvalid": "Nick może zawierać tylko litery i cyfry (bez spacji i znaków specjalnych)."
+    },
+    "stats": {
+      "subtitle": "Szybki podgląd Twojego postępu.",
+      "bestStreak": "Największy streak",
+      "bestStreakHint": "Najdłuższa seria w historii.",
+      "totalXp": "Łączne XP",
+      "totalXpHint": "Suma wszystkich zdobytych punktów.",
+      "gradeAvg": "Średnia ocena",
+      "gradeAvgHint": "Średnia ocen od AI z wszystkich zadań."
+    },
+    "toasts": {
+      "saved": "Zapisano zmiany (mock)."
+    }
+  },
+  "ranking": {
+    "badge": "Ranking",
+    "title": "Ranking",
+    "subtitle": "Sprawdź najlepszych w tym miesiącu i zobacz, kto zbiera najwięcej XP.",
+    "tiers": {
+      "champions": "Champions",
+      "gold": "Gold",
+      "silver": "Silver",
+      "bronze": "Bronze"
+    },
+    "columns": {
+      "rank": "Pozycja",
+      "user": "Użytkownik",
+      "xp": "XP",
+      "streak": "Streak"
+    },
+    "row": {
+      "xp": "{xp} XP",
+      "streak": "{days} dni",
+      "grade": "Ocena: {grade}"
+    },
+    "meta": {
+      "count": "{count} osób"
     }
   },
   "login": {

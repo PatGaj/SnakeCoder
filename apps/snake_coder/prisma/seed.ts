@@ -101,9 +101,10 @@ const seedUsers = async () => {
 }
 
 const seedPcepModule = async () => {
-  await prisma.module.upsert({
-    where: { id: 'pcep' },
+  const moduleRecord = await prisma.module.upsert({
+    where: { name: 'pcep' },
     update: {
+      name: 'pcep',
       code: 'PCEP',
       title: 'PCEP: fundamenty Pythona',
       description:
@@ -115,7 +116,7 @@ const seedPcepModule = async () => {
       isBuilding: false,
     },
     create: {
-      id: 'pcep',
+      name: 'pcep',
       code: 'PCEP',
       title: 'PCEP: fundamenty Pythona',
       description:
@@ -130,41 +131,42 @@ const seedPcepModule = async () => {
 
   const sprints = [
     {
-      id: 'pcep-1',
+      name: 'pcep-1',
       order: 1,
       title: 'Pierwsze kroki i składnia',
       description: 'Zmienne, proste operacje i podstawowe wejście/wyjście.',
-      etaMinutes: 18,
     },
     {
-      id: 'pcep-2',
+      name: 'pcep-2',
       order: 2,
       title: 'Warunki i pętle',
       description: 'if/elif/else, for/while i praktyczne patterny.',
-      etaMinutes: 22,
     },
   ] as const
 
-  for (const sprint of sprints) {
-    await prisma.sprint.upsert({
-      where: { id: sprint.id },
-      update: {
-        moduleId: 'pcep',
-        order: sprint.order,
-        title: sprint.title,
-        description: sprint.description,
-        etaMinutes: sprint.etaMinutes,
-      },
-      create: {
-        id: sprint.id,
-        moduleId: 'pcep',
-        order: sprint.order,
-        title: sprint.title,
-        description: sprint.description,
-        etaMinutes: sprint.etaMinutes,
-      },
-    })
-  }
+  const sprintRecords = await Promise.all(
+    sprints.map((sprint) =>
+      prisma.sprint.upsert({
+        where: { moduleId_order: { moduleId: moduleRecord.id, order: sprint.order } },
+        update: {
+          moduleId: moduleRecord.id,
+          name: sprint.name,
+          order: sprint.order,
+          title: sprint.title,
+          description: sprint.description,
+        },
+        create: {
+          moduleId: moduleRecord.id,
+          name: sprint.name,
+          order: sprint.order,
+          title: sprint.title,
+          description: sprint.description,
+        },
+      })
+    )
+  )
+
+  const sprintIdByName = new Map(sprintRecords.map((sprint) => [sprint.name, sprint.id]))
 
   const missions = [
     {
@@ -385,11 +387,16 @@ if __name__ == "__main__":
   ] as const
 
   for (const mission of missions) {
+    const sprintId = sprintIdByName.get(mission.sprintId)
+    if (!sprintId) {
+      throw new Error(`Missing sprint for mission ${mission.id} (sprint key: ${mission.sprintId})`)
+    }
+
     await prisma.mission.upsert({
       where: { id: mission.id },
       update: {
-        moduleId: 'pcep',
-        sprintId: mission.sprintId,
+        moduleId: moduleRecord.id,
+        sprintId,
         type: mission.type,
         difficulty: 'BEGINNER',
         title: mission.title,
@@ -403,8 +410,8 @@ if __name__ == "__main__":
       },
       create: {
         id: mission.id,
-        moduleId: 'pcep',
-        sprintId: mission.sprintId,
+        moduleId: moduleRecord.id,
+        sprintId,
         type: mission.type,
         difficulty: 'BEGINNER',
         title: mission.title,
@@ -444,11 +451,16 @@ if __name__ == "__main__":
   }
 
   const quizMissionId = 'pcep-1-quiz-1'
+  const quizSprintId = sprintIdByName.get('pcep-1')
+  if (!quizSprintId) {
+    throw new Error('Missing sprint pcep-1 for quiz mission')
+  }
+
   await prisma.mission.upsert({
     where: { id: quizMissionId },
     update: {
-      moduleId: 'pcep',
-      sprintId: 'pcep-1',
+      moduleId: moduleRecord.id,
+      sprintId: quizSprintId,
       type: 'QUIZ',
       difficulty: 'BEGINNER',
       title: 'Quiz: podstawy składni',
@@ -463,8 +475,8 @@ if __name__ == "__main__":
     },
     create: {
       id: quizMissionId,
-      moduleId: 'pcep',
-      sprintId: 'pcep-1',
+      moduleId: moduleRecord.id,
+      sprintId: quizSprintId,
       type: 'QUIZ',
       difficulty: 'BEGINNER',
       title: 'Quiz: podstawy składni',
@@ -542,11 +554,16 @@ if __name__ == "__main__":
   })
 
   const articleMissionId = 'pcep-1-article-1'
+  const articleSprintId = sprintIdByName.get('pcep-1')
+  if (!articleSprintId) {
+    throw new Error('Missing sprint pcep-1 for article mission')
+  }
+
   await prisma.mission.upsert({
     where: { id: articleMissionId },
     update: {
-      moduleId: 'pcep',
-      sprintId: 'pcep-1',
+      moduleId: moduleRecord.id,
+      sprintId: articleSprintId,
       type: 'ARTICLE',
       difficulty: 'BEGINNER',
       title: 'Artykuł: pierwsze kroki i składnia',
@@ -559,8 +576,8 @@ if __name__ == "__main__":
     },
     create: {
       id: articleMissionId,
-      moduleId: 'pcep',
-      sprintId: 'pcep-1',
+      moduleId: moduleRecord.id,
+      sprintId: articleSprintId,
       type: 'ARTICLE',
       difficulty: 'BEGINNER',
       title: 'Artykuł: pierwsze kroki i składnia',

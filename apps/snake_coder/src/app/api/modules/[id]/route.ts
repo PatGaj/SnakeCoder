@@ -24,10 +24,10 @@ export async function GET(_: Request, { params }: Params) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await params;
+  const { id: moduleName } = await params;
 
   const moduleRecord = await prisma.module.findUnique({
-    where: { id },
+    where: { name: moduleName },
     include: {
       access: {
         where: { userId },
@@ -70,6 +70,8 @@ export async function GET(_: Request, { params }: Params) {
   const locked = !building && !hasAccess;
 
   const sprints = moduleRecord.sprints.map((sprint) => {
+    const etaMinutes = sprint.missions.reduce((acc, mission) => acc + mission.etaMinutes, 0);
+
     const tasks = sprint.missions.filter((m) => m.type === "TASK" || m.type === "BUGFIX" || m.type === "SKILL_TEST");
     const tasksDone = tasks.reduce((acc, m) => acc + (m.progress[0]?.status === "DONE" ? 1 : 0), 0);
 
@@ -77,19 +79,19 @@ export async function GET(_: Request, { params }: Params) {
     const articleDone = articles.some((m) => m.progress[0]?.status === "DONE");
 
     const quizzes = sprint.missions.filter((m) => m.type === "QUIZ" && m.quiz);
-    const quizTotal = quizzes.reduce((acc, q) => acc + (q.quiz?.questions.length ?? 0), 0);
-    const quizScore = quizzes.reduce((acc, q) => acc + (q.quiz?.attempts[0]?.score ?? 0), 0);
+    const quizTotal = quizzes.length;
+    const quizScore = quizzes.reduce((acc, q) => acc + (q.progress[0]?.status === "DONE" ? 1 : 0), 0);
 
     const totalMissions = sprint.missions.length;
     const doneMissions = sprint.missions.reduce((acc, m) => acc + (m.progress[0]?.status === "DONE" ? 1 : 0), 0);
     const progressPercent = totalMissions > 0 ? Math.round((doneMissions / totalMissions) * 100) : 0;
 
     return {
-      id: sprint.id,
+      id: sprint.name,
       sprintNo: sprint.order,
       title: sprint.title,
       desc: sprint.description,
-      etaMinutes: sprint.etaMinutes,
+      etaMinutes,
       progressPercent,
       tasksDone,
       tasksTotal: tasks.length,
@@ -97,7 +99,7 @@ export async function GET(_: Request, { params }: Params) {
       quizScore,
       quizTotal,
       status: "available" as const,
-      route: `/modules/${moduleRecord.id}/${sprint.id}`,
+      route: `/modules/${moduleRecord.name}/${sprint.name}`,
     };
   });
 
@@ -127,7 +129,7 @@ export async function GET(_: Request, { params }: Params) {
 
   return NextResponse.json({
     module: {
-      id: moduleRecord.id,
+      id: moduleRecord.name,
       title: moduleRecord.title,
       desc: moduleRecord.description,
       status: headerStatus,

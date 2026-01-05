@@ -32,7 +32,7 @@ export async function GET() {
       sprints: {
         orderBy: { order: "asc" },
         select: {
-          id: true,
+          name: true,
           missions: {
             select: {
               id: true,
@@ -62,7 +62,7 @@ export async function GET() {
       }, 0);
 
       return {
-        id: sprint.id,
+        id: sprint.name,
         progressPercent: total > 0 ? Math.round((done / total) * 100) : 0,
       };
     });
@@ -84,7 +84,7 @@ export async function GET() {
     const progressPercent = totalMissions > 0 ? Math.round((doneMissions / totalMissions) * 100) : 0;
 
     return {
-      id: module.id,
+      id: module.name,
       code: module.code,
       title: module.title,
       requirements: module.requirements,
@@ -98,10 +98,9 @@ export async function GET() {
       locked,
       building,
       completed,
-      route: `/modules/${module.id}`,
+      route: `/modules/${module.name}`,
     };
   });
 
   return NextResponse.json(payload);
 }
-

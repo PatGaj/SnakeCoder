@@ -18,10 +18,10 @@ export async function POST(_: Request, { params }: Params) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await params;
+  const { id: moduleName } = await params;
 
   const moduleRecord = await prisma.module.findUnique({
-    where: { id },
+    where: { name: moduleName },
     select: { id: true, isBuilding: true },
   });
 
@@ -41,4 +41,3 @@ export async function POST(_: Request, { params }: Params) {
 
   return NextResponse.json({ ok: true });
 }
-

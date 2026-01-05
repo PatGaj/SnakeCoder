@@ -126,7 +126,8 @@ model Opinion {
 }
 
 model Module {
-  id          String         @id
+  id          String         @id @default(cuid())
+  name        String         @unique
   code        String         @unique
   title       String
   description String
@@ -145,12 +146,12 @@ model Module {
 }
 
 model Sprint {
-  id          String   @id
+  id          String   @id @default(cuid())
   moduleId    String
+  name        String
   order       Int
   title       String
   description String
-  etaMinutes  Int
 
   module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   missions    Mission[]
@@ -159,6 +160,7 @@ model Sprint {
   updatedAt   DateTime @updatedAt
 
   @@unique([moduleId, order])
+  @@unique([moduleId, name])
   @@index([moduleId])
 }
 

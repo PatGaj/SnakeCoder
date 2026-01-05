@@ -100,7 +100,7 @@ const seedUsers = async () => {
   return { demoUserId: demo.id, testUserId: test.id, bobUserId: bob.id }
 }
 
-const seedPcepModule = async (userIds: string[]) => {
+const seedPcepModule = async () => {
   await prisma.module.upsert({
     where: { id: 'pcep' },
     update: {
@@ -127,14 +127,6 @@ const seedPcepModule = async (userIds: string[]) => {
       isBuilding: false,
     },
   })
-
-  for (const userId of userIds) {
-    await prisma.userModuleAccess.upsert({
-      where: { userId_moduleId: { userId, moduleId: 'pcep' } },
-      update: { hasAccess: true },
-      create: { userId, moduleId: 'pcep', hasAccess: true },
-    })
-  }
 
   const sprints = [
     {
@@ -648,8 +640,8 @@ if __name__ == "__main__":
 }
 
 export async function main() {
-  const { demoUserId, testUserId, bobUserId } = await seedUsers()
-  await seedPcepModule([demoUserId, testUserId, bobUserId])
+  await seedUsers()
+  await seedPcepModule()
 }
 
 main()

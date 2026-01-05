@@ -1,5 +1,6 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 
 import type { KanbanColumnId, TaskCardData } from './components'
@@ -23,6 +24,8 @@ export type UseSprintData = {
     count: number
   }>
   hasTasks: boolean
+  isLoading: boolean
+  isError: boolean
 }
 
 export type UseSprintArgs = {
@@ -30,111 +33,37 @@ export type UseSprintArgs = {
   sprintId: string
 }
 
+type SprintApiResponse = {
+  header: SprintHeaderData
+  tasks: TaskCardData[]
+}
+
+const fetchSprint = async ({ moduleId, sprintId }: UseSprintArgs): Promise<SprintApiResponse> => {
+  const response = await fetch(`/api/modules/${moduleId}/sprints/${sprintId}`, { method: 'GET' })
+  if (!response.ok) {
+    throw new Error('Failed to fetch sprint')
+  }
+  return response.json() as Promise<SprintApiResponse>
+}
+
 const useSprint = ({ moduleId, sprintId }: UseSprintArgs): UseSprintData => {
   const t = useTranslations('sprint')
 
-  const header: SprintHeaderData = {
+  const fallbackHeader: SprintHeaderData = {
     moduleId,
     sprintId,
     title: `Sprint: ${sprintId}`,
-    desc: 'Krótki kanban z zadaniami sprintu. Kliknij kartę, aby zobaczyć szczegóły i przejść do zadania.',
+    desc: t('fallback.desc'),
   }
 
-  const taskPool: Record<string, TaskCardData[]> = {
-    'pcep-3': [
-      {
-        id: 'pcep-3-task-1',
-        title: 'Walidacja argumentów funkcji',
-        shortDesc: 'Dodaj sprawdzanie typu i zakresu argumentów oraz upewnij się, że rozwiązanie przechodzi testy.',
-        etaMinutes: 8,
-        xp: 60,
-        type: 'code',
-        status: 'inProgress',
-        route: '/missions/task/pcep-3-task-1',
-        details: {
-          goal: 'Napisz funkcję zgodnie z opisem, dodaj walidację wejścia i przejdź wszystkie testy.',
-          requirements: [
-            'Nie używaj pętli for.',
-            'Nie używaj bibliotek zewnętrznych.',
-            'Błędne dane wejściowe obsłuż przez TypeError / ValueError (bez print).',
-          ],
-          hints: [
-            'Zastanów się, czy lepiej zwracać błąd, czy rzucać wyjątek.',
-            'Obsłuż przypadki brzegowe: None, typy nieint, wartości ujemne.',
-          ],
-        },
-      },
-      {
-        id: 'pcep-3-bugfix-1',
-        title: 'Popraw błąd w warunku',
-        shortDesc: 'Napraw błąd logiczny w warunku, który powoduje zły wynik dla edge-case’ów.',
-        etaMinutes: 6,
-        xp: 45,
-        type: 'bugfix',
-        status: 'todo',
-        route: '/missions/task/pcep-3-bugfix-1',
-        details: {
-          goal: 'Znajdź problem w kodzie i popraw go tak, aby testy przechodziły.',
-          requirements: [
-            'Zmień tylko to, co konieczne — nie przepisuj całego rozwiązania.',
-            'Upewnij się, że wszystkie testy przechodzą po poprawce.',
-          ],
-          hints: ['Uruchom testy i sprawdź, dla jakiego przypadku wynik jest błędny.'],
-        },
-      },
-      {
-        id: 'pcep-3-quiz-1',
-        title: 'Quiz: funkcje i return',
-        shortDesc: 'Krótki quiz z argumentów, return i podstaw walidacji.',
-        etaMinutes: 5,
-        xp: 30,
-        type: 'quiz',
-        status: 'todo',
-        route: '/missions/quiz/pcep-3-quiz-1',
-        details: {
-          goal: 'Odpowiedz na pytania i zobacz wynik od razu.',
-          requirements: [],
-          hints: ['Zwróć uwagę na mutowalność argumentów i domyślne wartości.'],
-        },
-      },
-      {
-        id: 'pcep-3-article-1',
-        title: 'Artykuł: funkcje i walidacja',
-        shortDesc: 'Argumenty, return i walidacja danych wejściowych w praktyce.',
-        etaMinutes: 7,
-        xp: 20,
-        type: 'article',
-        status: 'done',
-        route: '/missions/article/pcep-3-article-1',
-        details: {
-          goal: 'Przeczytaj artykuł i zapamiętaj najważniejsze zasady.',
-          requirements: [],
-          hints: ['Zwróć uwagę na return, walidację i wyjątki.'],
-        },
-      },
-      {
-        id: 'pcep-3-task-2',
-        title: 'Refaktor czytelności',
-        shortDesc: 'Uprość kod: lepsze nazwy, mniejsze zagnieżdżenia, lepsze warunki.',
-        etaMinutes: 7,
-        xp: 40,
-        type: 'code',
-        status: 'done',
-        route: '/missions/task/pcep-3-task-2',
-        details: {
-          goal: 'Popraw czytelność rozwiązania bez zmiany zachowania.',
-          requirements: [
-            'Nie zmieniaj zachowania (testy muszą przejść).',
-            'Unikaj głębokich zagnieżdżeń — uprość warunki.',
-            'Zadbaj o czytelne nazwy zmiennych i funkcji.',
-          ],
-          hints: ['Wyciągnij warunki do pomocniczych funkcji lub zmiennych.'],
-        },
-      },
-    ],
-  }
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['sprint', moduleId, sprintId],
+    queryFn: () => fetchSprint({ moduleId, sprintId }),
+    enabled: Boolean(moduleId && sprintId),
+  })
 
-  const tasks = taskPool[sprintId] ?? []
+  const header = data?.header ?? fallbackHeader
+  const tasks = data?.tasks ?? []
   const tasksByStatus = tasks.reduce<Record<KanbanColumnId, TaskCardData[]>>(
     (acc, task) => {
       acc[task.status].push(task)
@@ -157,6 +86,8 @@ const useSprint = ({ moduleId, sprintId }: UseSprintArgs): UseSprintData => {
       { id: 'done', title: t('columns.done'), tone: 'success', tasks: tasksByStatus.done, count: tasksByStatus.done.length },
     ],
     hasTasks: tasks.length > 0,
+    isLoading,
+    isError,
   }
 }
 

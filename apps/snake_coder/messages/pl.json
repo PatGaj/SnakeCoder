@@ -426,6 +426,9 @@
   },
   "sprint": {
     "badge": "Sprint",
+    "fallback": {
+      "desc": "Krótki kanban z zadaniami sprintu. Kliknij kartę, aby zobaczyć szczegóły i przejść do zadania."
+    },
     "empty": "Brak zadań dla tego sprintu — wkrótce uzupełnimy.",
     "columns": {
       "todo": "Do zrobienia",

@@ -426,6 +426,9 @@
   },
   "sprint": {
     "badge": "Sprint",
+    "fallback": {
+      "desc": "A quick sprint kanban. Click a card to see details and go to the task."
+    },
     "empty": "No tasks for this sprint — we’ll add them soon.",
     "columns": {
       "todo": "To do",

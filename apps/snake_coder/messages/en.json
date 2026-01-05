@@ -376,6 +376,20 @@
       "buildingCta": "Under construction",
       "lockedCta": "Locked",
       "cta": "{state, select, building{Under construction} locked{Get access} completed{View module} continue{Continue module} start{Start module} other{Start module}}"
+    },
+    "unlockModal": {
+      "badge": "Module access",
+      "title": "Get access",
+      "desc": "This module is locked. Unlock it to start sprints and missions.",
+      "note": "Mock only — for now we simulate purchase and unlocking.",
+      "actions": {
+        "cancel": "Cancel",
+        "unlock": "Unlock"
+      },
+      "toast": {
+        "success": "Module unlocked.",
+        "error": "Failed to unlock the module."
+      }
     }
   },
   "module": {

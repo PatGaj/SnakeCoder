@@ -376,6 +376,20 @@
       "buildingCta": "W budowie",
       "lockedCta": "Zablokowane",
       "cta": "{state, select, building{W budowie} locked{Uzyskaj dostęp} completed{Zobacz moduł} continue{Kontynuuj moduł} start{Rozpocznij moduł} other{Rozpocznij moduł}}"
+    },
+    "unlockModal": {
+      "badge": "Dostęp do modułu",
+      "title": "Uzyskaj dostęp",
+      "desc": "Ten moduł jest zablokowany. Odblokuj go, aby rozpocząć sprinty i misje.",
+      "note": "To jest makieta — na razie symulujemy zakup i odblokowanie dostępu.",
+      "actions": {
+        "cancel": "Anuluj",
+        "unlock": "Odblokuj"
+      },
+      "toast": {
+        "success": "Moduł został odblokowany.",
+        "error": "Nie udało się odblokować modułu."
+      }
     }
   },
   "module": {

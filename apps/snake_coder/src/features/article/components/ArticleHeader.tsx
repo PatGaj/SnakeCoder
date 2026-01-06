@@ -14,9 +14,10 @@ export type ArticleHeaderProps = {
   header: ArticleHeaderData
   onBack: () => void
   onMarkRead: () => void
+  markReadLoading?: boolean
 }
 
-const ArticleHeader: React.FC<ArticleHeaderProps> = ({ header, onBack, onMarkRead }) => {
+const ArticleHeader: React.FC<ArticleHeaderProps> = ({ header, onBack, onMarkRead, markReadLoading }) => {
   const t = useTranslations('article')
 
   return (
@@ -51,6 +52,7 @@ const ArticleHeader: React.FC<ArticleHeaderProps> = ({ header, onBack, onMarkRea
             size="md"
             round="lg"
             leftIcon={<RiCheckLine size={18} />}
+            loading={markReadLoading}
             onClick={onMarkRead}
           >
             {t('actions.markRead')}

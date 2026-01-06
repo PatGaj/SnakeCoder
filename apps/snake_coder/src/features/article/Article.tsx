@@ -1,10 +1,5 @@
 'use client'
 
-import toast from 'react-hot-toast'
-import { useTranslations } from 'next-intl'
-
-import { useRouter } from '@/i18n/navigation'
-
 import { ArticleContent, ArticleHeader, ArticleToc } from './components'
 import useArticle from './useArticle'
 
@@ -13,20 +8,26 @@ export type ArticleProps = {
 }
 
 const Article: React.FC<ArticleProps> = ({ id }) => {
-  const t = useTranslations('article')
-  const router = useRouter()
+  const { header, toc, content, isError, errorLabel, onBack, onMarkRead, markReadPending } = useArticle(id)
 
-  const { header, toc, content } = useArticle(id)
+  if (!header) {
+    if (isError) {
+      return (
+        <main className="mx-auto max-w-400 px-6 pb-10 pt-20 md:px-12">
+          <div className="text-sm text-snowWhite-300">{errorLabel}</div>
+        </main>
+      )
+    }
+    return null
+  }
 
   return (
     <main className="mx-auto max-w-400 px-6 pb-10 pt-20 space-y-8 md:px-12">
       <ArticleHeader
         header={header}
-        onBack={() => router.push('/missions')}
-        onMarkRead={() => {
-          toast.success(t('toasts.markRead'))
-          router.push('/missions')
-        }}
+        onBack={onBack}
+        onMarkRead={onMarkRead}
+        markReadLoading={markReadPending}
       />
 
       <section className="grid gap-6 lg:grid-cols-[0.35fr_0.65fr]">

@@ -546,6 +546,7 @@
   },
   "article": {
     "badge": "Article",
+    "error": "Failed to load article.",
     "toc": "Table of contents",
     "tocEmpty": "No sections in the table of contents.",
     "content": "Content",
@@ -564,7 +565,8 @@
       "highlight": "Important"
     },
     "toasts": {
-      "markRead": "Article marked as read (mock)."
+      "markRead": "Article marked as read.",
+      "markReadError": "Couldn't mark the article as read. Please try again."
     }
   },
   "quiz": {

@@ -546,6 +546,7 @@
   },
   "article": {
     "badge": "Artykuł",
+    "error": "Nie udało się wczytać artykułu.",
     "toc": "Spis treści",
     "tocEmpty": "Brak sekcji w spisie treści.",
     "content": "Treść",
@@ -564,7 +565,8 @@
       "highlight": "Ważne"
     },
     "toasts": {
-      "markRead": "Artykuł oznaczony jako przeczytany (mock)."
+      "markRead": "Artykuł oznaczony jako przeczytany.",
+      "markReadError": "Nie udało się oznaczyć artykułu. Spróbuj ponownie."
     }
   },
   "quiz": {

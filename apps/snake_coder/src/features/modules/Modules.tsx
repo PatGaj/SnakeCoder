@@ -32,6 +32,7 @@ const Modules = () => {
       await queryClient.invalidateQueries({ queryKey: ['modules'] })
       await queryClient.invalidateQueries({ queryKey: ['module', id] })
       await queryClient.invalidateQueries({ queryKey: ['user'] })
+      await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
     },
   })
 

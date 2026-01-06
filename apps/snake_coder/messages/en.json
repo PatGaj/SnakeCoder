@@ -179,9 +179,17 @@
   "dashboard": {
     "badge": "Dashboard",
     "hint": "Next steps and a quick progress overview.",
+    "error": "Failed to load dashboard data.",
     "title": "Hi, {name}!",
     "subtitle": "Continue your sprint and keep your streak — the rest is one click away.",
     "fallbackUser": "there",
+    "empty": {
+      "badge": "Start",
+      "badgeHint": "Modules",
+      "title": "Unlock a module to begin",
+      "desc": "Go to modules, unlock a learning path, and start your first sprint.",
+      "cta": "Go to modules"
+    },
     "actions": {
       "continueSprint": "Continue sprint",
       "daily": "Daily",

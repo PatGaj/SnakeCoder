@@ -29,7 +29,7 @@ const StatTopBar = () => {
             label="Rank XP"
             value={`${xpGained} XP`}
             icon={<RiStarSmileLine className="text-aquaBlue-200" size={18} />}
-            className="border-aquaBlue-400/25 bg-linear-to-br from-aquaBlue-500/16 to-primary-950/70"
+            className="min-w-[9rem] border-aquaBlue-400/25 bg-linear-to-br from-aquaBlue-500/16 to-primary-950/70"
             iconWrapperClassName="bg-aquaBlue-500/12"
           />
           <StatTopBarItem
@@ -37,7 +37,7 @@ const StatTopBar = () => {
             label={t('league.label')}
             value={`${leagueName} #${rank}`}
             icon={<RiTrophyLine className="text-yellow-200" size={18} />}
-            className="border-yellow-400/25 bg-linear-to-br from-yellow-500/16 to-primary-950/70"
+            className="min-w-[10rem] border-yellow-400/25 bg-linear-to-br from-yellow-500/16 to-primary-950/70"
             iconWrapperClassName="bg-yellow-500/12"
           />
           <StatTopBarItem

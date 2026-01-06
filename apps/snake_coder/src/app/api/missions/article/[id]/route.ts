@@ -41,7 +41,7 @@ export async function GET(_: Request, { params }: Params) {
       },
       progress: {
         where: { userId },
-        select: { status: true },
+        select: { status: true, startedAt: true },
       },
     },
   })
@@ -49,6 +49,25 @@ export async function GET(_: Request, { params }: Params) {
   if (!mission || !mission.article) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
+
+  const now = new Date()
+  const isAlreadyCompleted = mission.progress[0]?.status === 'DONE'
+  const startedAt = mission.progress[0]?.startedAt ?? now
+
+  await prisma.userMissionProgress.upsert({
+    where: { userId_missionId: { userId, missionId: mission.id } },
+    update: {
+      lastOpenedAt: now,
+      ...(isAlreadyCompleted ? {} : { status: 'IN_PROGRESS', startedAt }),
+    },
+    create: {
+      userId,
+      missionId: mission.id,
+      status: 'IN_PROGRESS',
+      startedAt: now,
+      lastOpenedAt: now,
+    },
+  })
 
   return NextResponse.json({
     header: {
@@ -61,7 +80,7 @@ export async function GET(_: Request, { params }: Params) {
       blocks: mission.article.blocks,
       summary: mission.article.summary,
     },
-    status: mission.progress[0]?.status ?? null,
+    status: isAlreadyCompleted ? 'DONE' : 'IN_PROGRESS',
   })
 }
 
@@ -92,7 +111,7 @@ export async function POST(req: Request, { params }: Params) {
     include: {
       progress: {
         where: { userId },
-        select: { status: true },
+        select: { status: true, startedAt: true },
       },
     },
   })
@@ -102,32 +121,47 @@ export async function POST(req: Request, { params }: Params) {
   }
 
   const isAlreadyCompleted = mission.progress[0]?.status === 'DONE'
+  const now = new Date()
+  const startedAt = mission.progress[0]?.startedAt ?? now
 
-  await prisma.userMissionProgress.upsert({
-    where: { userId_missionId: { userId, missionId: mission.id } },
-    update: {
-      lastOpenedAt: new Date(),
-      ...(isAlreadyCompleted
-        ? {}
-        : {
-            status: 'DONE',
-            completedAt: new Date(),
-            xpEarned: mission.xp,
-            timeSpentSeconds,
-          }),
-    },
-    create: {
-      userId,
-      missionId: mission.id,
-      status: 'DONE',
-      startedAt: new Date(),
-      lastOpenedAt: new Date(),
-      completedAt: new Date(),
-      xpEarned: mission.xp,
-      timeSpentSeconds,
-    },
+  await prisma.$transaction(async (tx) => {
+    await tx.userMissionProgress.upsert({
+      where: { userId_missionId: { userId, missionId: mission.id } },
+      update: {
+        lastOpenedAt: now,
+        ...(isAlreadyCompleted
+          ? {}
+          : {
+              status: 'DONE',
+              startedAt,
+              completedAt: now,
+              xpEarned: mission.xp,
+              timeSpentSeconds,
+            }),
+      },
+      create: {
+        userId,
+        missionId: mission.id,
+        status: 'DONE',
+        startedAt: now,
+        lastOpenedAt: now,
+        completedAt: now,
+        xpEarned: mission.xp,
+        timeSpentSeconds,
+      },
+    })
+
+    if (!isAlreadyCompleted) {
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          xpTotal: { increment: mission.xp },
+          xpMonth: { increment: mission.xp },
+          xpToday: { increment: mission.xp },
+        },
+      })
+    }
   })
 
   return NextResponse.json({ ok: true })
 }
-

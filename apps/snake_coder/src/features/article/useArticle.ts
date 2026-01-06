@@ -61,7 +61,13 @@ const useArticle = (id: string): UseArticleData => {
   const mutation = useMutation({
     mutationFn: () => markRead(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['missions'] })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['missions'] }),
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: ['user'] }),
+        queryClient.invalidateQueries({ queryKey: ['userStats'] }),
+        queryClient.invalidateQueries({ queryKey: ['modules'] }),
+      ])
       toast.success(t('toasts.markRead'))
       router.push('/missions')
     },

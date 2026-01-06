@@ -51,12 +51,35 @@ export async function GET(_: Request, { params }: Params) {
           },
         },
       },
+      progress: {
+        where: { userId },
+        select: { status: true, startedAt: true },
+      },
     },
   })
 
   if (!mission || !mission.quiz) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
+
+  const now = new Date()
+  const isAlreadyCompleted = mission.progress[0]?.status === 'DONE'
+  const startedAt = mission.progress[0]?.startedAt ?? now
+
+  await prisma.userMissionProgress.upsert({
+    where: { userId_missionId: { userId, missionId: mission.id } },
+    update: {
+      lastOpenedAt: now,
+      ...(isAlreadyCompleted ? {} : { status: 'IN_PROGRESS', startedAt }),
+    },
+    create: {
+      userId,
+      missionId: mission.id,
+      status: 'IN_PROGRESS',
+      startedAt: now,
+      lastOpenedAt: now,
+    },
+  })
 
   const timeLimitSeconds = mission.timeLimitSeconds ?? mission.etaMinutes * 60
   const passPercent = mission.passPercent ?? 80
@@ -124,7 +147,7 @@ export async function POST(req: Request, { params }: Params) {
       },
       progress: {
         where: { userId },
-        select: { status: true, completedAt: true, xpEarned: true, timeSpentSeconds: true },
+        select: { status: true, startedAt: true, completedAt: true, xpEarned: true, timeSpentSeconds: true },
       },
     },
   })
@@ -160,44 +183,60 @@ export async function POST(req: Request, { params }: Params) {
 
   const timeSpentSeconds = typeof body.timeSpentSeconds === 'number' ? body.timeSpentSeconds : undefined
 
-  await prisma.quizAttempt.create({
-    data: {
-      userId,
-      quizId: mission.id,
-      answers,
-      score,
-      total,
-      percent,
-      passed,
-      timeSpentSeconds,
-    },
-  })
-
   const isAlreadyCompleted = mission.progress[0]?.status === 'DONE'
+  const now = new Date()
+  const startedAt = mission.progress[0]?.startedAt ?? now
 
-  await prisma.userMissionProgress.upsert({
-    where: { userId_missionId: { userId, missionId: mission.id } },
-    update: {
-      lastOpenedAt: new Date(),
-      ...(isAlreadyCompleted
-        ? {}
-        : {
-            status: passed ? 'DONE' : 'IN_PROGRESS',
-            completedAt: passed ? new Date() : null,
-            xpEarned: passed ? mission.xp : null,
-            timeSpentSeconds,
-          }),
-    },
-    create: {
-      userId,
-      missionId: mission.id,
-      status: passed ? 'DONE' : 'IN_PROGRESS',
-      startedAt: new Date(),
-      lastOpenedAt: new Date(),
-      completedAt: passed ? new Date() : null,
-      xpEarned: passed ? mission.xp : null,
-      timeSpentSeconds,
-    },
+  await prisma.$transaction(async (tx) => {
+    await tx.quizAttempt.create({
+      data: {
+        userId,
+        quizId: mission.id,
+        answers,
+        score,
+        total,
+        percent,
+        passed,
+        timeSpentSeconds,
+      },
+    })
+
+    await tx.userMissionProgress.upsert({
+      where: { userId_missionId: { userId, missionId: mission.id } },
+      update: {
+        lastOpenedAt: now,
+        ...(isAlreadyCompleted
+          ? {}
+          : {
+              status: passed ? 'DONE' : 'IN_PROGRESS',
+              startedAt,
+              completedAt: passed ? now : null,
+              xpEarned: passed ? mission.xp : null,
+              timeSpentSeconds,
+            }),
+      },
+      create: {
+        userId,
+        missionId: mission.id,
+        status: passed ? 'DONE' : 'IN_PROGRESS',
+        startedAt: now,
+        lastOpenedAt: now,
+        completedAt: passed ? now : null,
+        xpEarned: passed ? mission.xp : null,
+        timeSpentSeconds,
+      },
+    })
+
+    if (!isAlreadyCompleted && passed) {
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          xpTotal: { increment: mission.xp },
+          xpMonth: { increment: mission.xp },
+          xpToday: { increment: mission.xp },
+        },
+      })
+    }
   })
 
   return NextResponse.json({

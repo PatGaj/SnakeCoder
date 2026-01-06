@@ -126,7 +126,13 @@ const useQuiz = (id: string): UseQuizData => {
   const submitMutation = useMutation({
     mutationFn: (payload: QuizSubmitPayload) => submitQuiz(id, payload),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['missions'] })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['missions'] }),
+        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+        queryClient.invalidateQueries({ queryKey: ['user'] }),
+        queryClient.invalidateQueries({ queryKey: ['userStats'] }),
+        queryClient.invalidateQueries({ queryKey: ['modules'] }),
+      ])
     },
   })
 

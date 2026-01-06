@@ -179,9 +179,17 @@
   "dashboard": {
     "badge": "Dashboard",
     "hint": "Najbliższe kroki i szybki podgląd postępu.",
+    "error": "Nie udało się wczytać danych dashboardu.",
     "title": "Cześć, {name}!",
     "subtitle": "Kontynuuj sprint i utrzymaj streak — reszta jest kliknięcie dalej.",
     "fallbackUser": "Użytkowniku",
+    "empty": {
+      "badge": "Start",
+      "badgeHint": "Moduły",
+      "title": "Odblokuj moduł, żeby zacząć",
+      "desc": "Przejdź do modułów, odblokuj wybrany zakres i rozpocznij pierwszy sprint.",
+      "cta": "Przejdź do modułów"
+    },
     "actions": {
       "continueSprint": "Kontynuuj sprint",
       "daily": "Daily",

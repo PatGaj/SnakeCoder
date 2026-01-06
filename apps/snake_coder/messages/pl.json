@@ -569,6 +569,7 @@
   },
   "quiz": {
     "badge": "Quiz",
+    "error": "Nie udało się wczytać quizu.",
     "empty": "Brak pytań dla tego quizu.",
     "progress": "Pytanie {current}/{total}",
     "meta": {
@@ -597,6 +598,9 @@
       "yourAnswer": "Twoja odpowiedź",
       "correctAnswer": "Poprawna odpowiedź",
       "noAnswer": "Brak odpowiedzi"
+    },
+    "toast": {
+      "submitError": "Nie udało się zakończyć quizu. Spróbuj ponownie."
     }
   },
   "profile": {

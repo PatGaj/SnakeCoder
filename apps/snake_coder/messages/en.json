@@ -569,6 +569,7 @@
   },
   "quiz": {
     "badge": "Quiz",
+    "error": "Failed to load quiz.",
     "empty": "No questions for this quiz.",
     "progress": "Question {current}/{total}",
     "meta": {
@@ -597,6 +598,9 @@
       "yourAnswer": "Your answer",
       "correctAnswer": "Correct answer",
       "noAnswer": "No answer"
+    },
+    "toast": {
+      "submitError": "Couldn't finish the quiz. Please try again."
     }
   },
   "profile": {

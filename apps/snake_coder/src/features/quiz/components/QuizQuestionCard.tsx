@@ -14,7 +14,6 @@ export type QuizQuestionData = {
   title: string
   prompt: string
   options: QuizOption[]
-  correctOptionId: string
 }
 
 export type QuizQuestionCardProps = {

@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { RiRefreshLine, RiSave2Line, RiUserSmileLine } from 'react-icons/ri'
+import toast from 'react-hot-toast'
 
 import { Badge, Box, Button, Input, Separator } from '@/components'
 
@@ -20,12 +21,16 @@ type ProfileAccountFormValues = {
   lastName?: string
 }
 
+export type ProfileAccountSaveResult =
+  | { ok: true }
+  | { ok: false; error: 'Invalid nickname' | 'Nickname already exists' | 'Generic' }
+
 export type ProfileAccountCardProps = {
   account: ProfileAccountData
-  onSave: (values: ProfileAccountFormValues) => void
+  onSave: (values: ProfileAccountFormValues) => Promise<ProfileAccountSaveResult>
 }
 
-const NICKNAME_REGEX = /^[A-Za-z0-9]+$/
+const NICKNAME_REGEX = /^[A-Za-z0-9_]+$/
 
 const ProfileAccountCard: React.FC<ProfileAccountCardProps> = ({ account, onSave }) => {
   const t = useTranslations('profile')
@@ -48,6 +53,7 @@ const ProfileAccountCard: React.FC<ProfileAccountCardProps> = ({ account, onSave
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<ProfileAccountFormValues>({
     resolver: zodResolver(schema),
@@ -57,6 +63,29 @@ const ProfileAccountCard: React.FC<ProfileAccountCardProps> = ({ account, onSave
       lastName: account.lastName ?? '',
     },
     mode: 'onTouched',
+  })
+
+  const onSubmit = handleSubmit(async (values) => {
+    const result = await onSave(values)
+    if (result.ok) {
+      toast.success(t('toasts.saved'))
+      reset(values)
+      return
+    }
+
+    if (result.error === 'Invalid nickname') {
+      toast.error(t('errors.nickNameInvalid'))
+      setError('nickName', { message: t('errors.nickNameInvalid') })
+      return
+    }
+
+    if (result.error === 'Nickname already exists') {
+      toast.error(t('errors.nickNameTaken'))
+      setError('nickName', { message: t('errors.nickNameTaken') })
+      return
+    }
+
+    toast.error(t('errors.generic'))
   })
 
   return (
@@ -77,7 +106,7 @@ const ProfileAccountCard: React.FC<ProfileAccountCardProps> = ({ account, onSave
 
         <Separator className="bg-primary-800/70" />
 
-        <form onSubmit={handleSubmit(onSave)} className="space-y-3">
+        <form onSubmit={onSubmit} className="space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <Input

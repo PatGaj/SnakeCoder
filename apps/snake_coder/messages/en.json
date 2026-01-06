@@ -609,13 +609,22 @@
     "badge": "Profile",
     "title": "Your profile",
     "subtitle": "Set your nickname, fill in details, and see your stats.",
+    "error": "Failed to load profile.",
     "fallbackUser": "User",
-    "hint": "Profile editing is a mockup (for now).",
+    "hint": "Edit your nickname and profile details.",
     "account": {
       "subtitle": "Your details"
     },
     "sections": {
-      "stats": "Statistics"
+      "stats": "Statistics",
+      "modules": "Unlocked modules"
+    },
+    "modules": {
+      "subtitle": "A list of modules you have access to.",
+      "empty": "You don't have any unlocked modules yet.",
+      "count": "{count} modules",
+      "unlockedAt": "Unlocked: {date}",
+      "completedAt": "Completed: {date}"
     },
     "fields": {
       "nickName": "Nickname",
@@ -633,7 +642,9 @@
     },
     "errors": {
       "nickNameRequired": "Enter a nickname.",
-      "nickNameInvalid": "Nickname can contain only letters and numbers (no spaces or special characters)."
+      "nickNameInvalid": "Nickname can contain only letters, numbers, and _ (no spaces).",
+      "nickNameTaken": "This nickname is already taken.",
+      "generic": "Something went wrong. Please try again."
     },
     "stats": {
       "subtitle": "A quick overview of your progress.",
@@ -645,7 +656,7 @@
       "gradeAvgHint": "Average AI ratings across all tasks."
     },
     "toasts": {
-      "saved": "Changes saved (mock)."
+      "saved": "Changes saved."
     }
   },
   "ranking": {
@@ -745,7 +756,7 @@
     },
     "errors": {
       "nickNameRequired": "Enter a nickname.",
-      "nickNameInvalid": "Nickname can contain only letters and numbers (no spaces or special characters).",
+      "nickNameInvalid": "Nickname can contain only letters, numbers, and _ (no spaces).",
       "nickNameTaken": "That nickname is already taken.",
       "email": "Enter a valid email address.",
       "passwordRequired": "Enter a password.",

@@ -4,17 +4,19 @@ import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-const NICKNAME_REGEX = /^[A-Za-z0-9]+$/;
+const NICKNAME_REGEX = /^[A-Za-z0-9_]+$/;
 
 export async function POST(req: Request) {
   try {
     const { email, password, nickName, firstName, lastName } = await req.json();
 
-    if (!email || !password || !nickName) {
+    const safeNickName = typeof nickName === "string" ? nickName.trim() : "";
+
+    if (!email || !password || !safeNickName) {
       return NextResponse.json({ error: "Email, password and nickName are required" }, { status: 400 });
     }
 
-    if (!NICKNAME_REGEX.test(String(nickName))) {
+    if (!NICKNAME_REGEX.test(safeNickName)) {
       return NextResponse.json({ error: "Invalid nickname" }, { status: 400 });
     }
 
@@ -27,7 +29,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User already exists" }, { status: 409 });
     }
 
-    const existingNick = await prisma.user.findUnique({ where: { nickName } });
+    const existingNick = await prisma.user.findFirst({
+      where: {
+        nickName: { equals: safeNickName, mode: "insensitive" },
+      },
+      select: { id: true },
+    });
     if (existingNick) {
       return NextResponse.json({ error: "Nickname already exists" }, { status: 409 });
     }
@@ -36,12 +43,12 @@ export async function POST(req: Request) {
 
     const safeFirstName = typeof firstName === "string" && firstName.trim().length ? firstName.trim() : undefined;
     const safeLastName = typeof lastName === "string" && lastName.trim().length ? lastName.trim() : undefined;
-    const displayName = [safeFirstName, safeLastName].filter(Boolean).join(" ").trim() || nickName;
+    const displayName = [safeFirstName, safeLastName].filter(Boolean).join(" ").trim() || safeNickName;
 
     const user = await prisma.user.create({
       data: {
         email,
-        nickName,
+        nickName: safeNickName,
         firstName: safeFirstName,
         lastName: safeLastName,
         name: displayName,

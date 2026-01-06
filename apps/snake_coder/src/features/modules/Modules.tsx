@@ -31,6 +31,7 @@ const Modules = () => {
     onSuccess: async (_data, id) => {
       await queryClient.invalidateQueries({ queryKey: ['modules'] })
       await queryClient.invalidateQueries({ queryKey: ['module', id] })
+      await queryClient.invalidateQueries({ queryKey: ['user'] })
     },
   })
 

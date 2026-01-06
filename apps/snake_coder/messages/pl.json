@@ -609,13 +609,22 @@
     "badge": "Profil",
     "title": "Twój profil",
     "subtitle": "Ustaw nick, uzupełnij dane i zobacz statystyki.",
+    "error": "Nie udało się wczytać profilu.",
     "fallbackUser": "Użytkownik",
-    "hint": "Edycja profilu to makieta (na razie).",
+    "hint": "Edytuj swój nick i dane profilu.",
     "account": {
       "subtitle": "Twoje dane"
     },
     "sections": {
-      "stats": "Statystyki"
+      "stats": "Statystyki",
+      "modules": "Odblokowane moduły"
+    },
+    "modules": {
+      "subtitle": "Lista modułów, do których masz dostęp.",
+      "empty": "Nie masz jeszcze odblokowanych modułów.",
+      "count": "{count} modułów",
+      "unlockedAt": "Odblokowano: {date}",
+      "completedAt": "Ukończono: {date}"
     },
     "fields": {
       "nickName": "Nick",
@@ -633,7 +642,9 @@
     },
     "errors": {
       "nickNameRequired": "Podaj nick.",
-      "nickNameInvalid": "Nick może zawierać tylko litery i cyfry (bez spacji i znaków specjalnych)."
+      "nickNameInvalid": "Nick może zawierać tylko litery, cyfry i _ (bez spacji).",
+      "nickNameTaken": "Taki nick jest już zajęty.",
+      "generic": "Coś poszło nie tak. Spróbuj ponownie."
     },
     "stats": {
       "subtitle": "Szybki podgląd Twojego postępu.",
@@ -645,7 +656,7 @@
       "gradeAvgHint": "Średnia ocen od AI z wszystkich zadań."
     },
     "toasts": {
-      "saved": "Zapisano zmiany (mock)."
+      "saved": "Zapisano zmiany."
     }
   },
   "ranking": {
@@ -745,7 +756,7 @@
     },
     "errors": {
       "nickNameRequired": "Podaj nick.",
-      "nickNameInvalid": "Nick może zawierać tylko litery i cyfry (bez spacji i znaków specjalnych).",
+      "nickNameInvalid": "Nick może zawierać tylko litery, cyfry i _ (bez spacji).",
       "nickNameTaken": "Taki nick jest już zajęty.",
       "email": "Podaj poprawny adres email.",
       "passwordRequired": "Podaj hasło.",

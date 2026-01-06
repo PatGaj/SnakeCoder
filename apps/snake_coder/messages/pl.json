@@ -492,6 +492,7 @@
   },
   "task": {
     "badge": "Misja",
+    "error": "Nie udało się wczytać zadania.",
     "title": "Zadanie: {id}",
     "subtitle": "Napisz kod, uruchom go i sprawdź testy.",
     "meta": {
@@ -519,6 +520,7 @@
       "test": "Uruchom testy",
       "run": "Uruchom kod",
       "save": "Zapisz",
+      "reset": "Resetuj",
       "submit": "Wyślij rozwiązanie",
       "aiReview": "Oceń kod przez AI",
       "clearConsole": "Wyczyść"
@@ -546,7 +548,7 @@
       "saveSuccess": "Zapisano kod.",
       "saveFailed": "Nie udało się zapisać kodu.",
       "submitSuccess": "Rozwiązanie wysłane.",
-      "submitFailed": "Najpierw popraw testy."
+      "submitFailed": "Rozwiązanie nie przeszło wszystkich testów."
     },
     "submitModal": {
       "message": "{status, select, passed {Gratulacje!} failed {Przykro mi — spróbuj ponownie.} other {}}"

@@ -492,6 +492,7 @@
   },
   "task": {
     "badge": "Mission",
+    "error": "Failed to load task.",
     "title": "Task: {id}",
     "subtitle": "Write the code, run it, and check the tests.",
     "meta": {
@@ -519,6 +520,7 @@
       "test": "Run tests",
       "run": "Run code",
       "save": "Save",
+      "reset": "Reset",
       "submit": "Submit solution",
       "aiReview": "Review code with AI",
       "clearConsole": "Clear"
@@ -546,7 +548,7 @@
       "saveSuccess": "Code saved.",
       "saveFailed": "Couldn’t save code.",
       "submitSuccess": "Solution submitted.",
-      "submitFailed": "Fix the tests first."
+      "submitFailed": "Solution didn’t pass all tests."
     },
     "submitModal": {
       "message": "{status, select, passed {Congratulations!} failed {Sorry — try again.} other {}}"

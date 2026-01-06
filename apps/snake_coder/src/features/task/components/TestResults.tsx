@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import React from 'react'
 import { useTranslations } from 'next-intl'
-import { RiArrowDownSLine, RiCheckLine, RiCloseLine, RiLoader4Line } from 'react-icons/ri'
+import { RiArrowDownSLine, RiCheckLine, RiCloseLine, RiLoader4Line, RiTestTubeLine } from 'react-icons/ri'
 
 import { Badge, Box, Separator } from '@/components'
 
@@ -23,6 +23,7 @@ export type TestResultsData = {
 
 export type TestResultsProps = {
   results: TestResultsData
+  isRunning?: boolean
   className?: string
 }
 
@@ -33,14 +34,14 @@ const STATUS_BADGE_VARIANT = {
 } as const
 
 const STATUS_ICON = {
-  pending: RiLoader4Line,
   passed: RiCheckLine,
   failed: RiCloseLine,
 } as const
 
-const TestResults: React.FC<TestResultsProps> = ({ results, className }) => {
+const TestResults: React.FC<TestResultsProps> = ({ results, isRunning, className }) => {
   const t = useTranslations('task')
-  const StatusIcon = STATUS_ICON[results.status]
+  const StatusIcon =
+    results.status === 'pending' ? (isRunning ? RiLoader4Line : RiTestTubeLine) : STATUS_ICON[results.status]
   const [openTestId, setOpenTestId] = React.useState<string | null>(null)
 
   const totalTests = results.tests.length
@@ -53,7 +54,7 @@ const TestResults: React.FC<TestResultsProps> = ({ results, className }) => {
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-secondary-300">{t('sections.results')}</p>
         <Badge variant={STATUS_BADGE_VARIANT[results.status]} size="sm" className="px-3 py-1">
           <span className="inline-flex items-center gap-2">
-            <StatusIcon size={16} className={clsx(results.status === 'pending' && 'animate-spin')} />
+            <StatusIcon size={16} className={clsx(results.status === 'pending' && isRunning && 'animate-spin')} />
             {passedTests}/{totalTests} {statusLabel}
           </span>
         </Badge>

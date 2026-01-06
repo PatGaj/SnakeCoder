@@ -1,13 +1,16 @@
 import { Task } from '@/features/task'
 
 type TaskPageProps = {
-  params: {
+  params: Promise<{
+    locale: string
     id: string
-  }
+  }>
 }
 
-const TaskPage = ({ params }: TaskPageProps) => {
-  return <Task id={params.id} />
+const TaskPage = async ({ params }: TaskPageProps) => {
+  const { id } = await params
+
+  return <Task id={id} />
 }
 
 export default TaskPage

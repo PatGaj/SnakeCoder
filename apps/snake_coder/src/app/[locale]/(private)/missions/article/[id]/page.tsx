@@ -1,14 +1,16 @@
 import { Article } from '@/features/article'
 
 type ArticlePageProps = {
-  params: {
+  params: Promise<{
+    locale: string
     id: string
-  }
+  }>
 }
 
-const ArticlePage = ({ params }: ArticlePageProps) => {
-  return <Article id={params.id} />
+const ArticlePage = async ({ params }: ArticlePageProps) => {
+  const { id } = await params
+
+  return <Article id={id} />
 }
 
 export default ArticlePage
-

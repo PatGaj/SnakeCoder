@@ -45,8 +45,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onOpen }) => {
         size="md"
         round="2xl"
         className={clsx(
-          'w-full border-primary-800/70 transition cursor-pointer',
-          'hover:-translate-y-px hover:bg-white/6 hover:shadow-[0_14px_40px_rgba(3,10,38,0.55)]'
+          'w-full border-primary-800/70 cursor-pointer shadow-[0_8px_18px_rgba(5,12,30,0.24)] transition-shadow',
+          'hover:bg-white/6 hover:shadow-[0_12px_24px_rgba(5,12,30,0.32)]'
         )}
       >
         <div className="flex items-start justify-between gap-3">

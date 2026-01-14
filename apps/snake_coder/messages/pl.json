@@ -646,6 +646,14 @@
       "firstName": "np. Julia",
       "lastName": "np. Kowalska"
     },
+    "language": {
+      "title": "Język interfejsu",
+      "hint": "Zmiana języka przeładuje stronę.",
+      "options": {
+        "pl": "Polski",
+        "en": "English"
+      }
+    },
     "actions": {
       "save": "Zapisz zmiany",
       "reset": "Resetuj"

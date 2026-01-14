@@ -1,12 +1,13 @@
 import React from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { RiRefreshLine, RiSave2Line, RiUserSmileLine } from 'react-icons/ri'
 import toast from 'react-hot-toast'
 
-import { Badge, Box, Button, Input, Separator } from '@/components'
+import { Badge, Box, Button, Input, Select, Separator } from '@/components'
+import { usePathname, useRouter } from '@/i18n/navigation'
 
 export type ProfileAccountData = {
   userName: string
@@ -34,6 +35,9 @@ const NICKNAME_REGEX = /^[A-Za-z0-9_]+$/
 
 const ProfileAccountCard: React.FC<ProfileAccountCardProps> = ({ account, onSave }) => {
   const t = useTranslations('profile')
+  const locale = useLocale()
+  const pathname = usePathname()
+  const router = useRouter()
 
   const schema = React.useMemo(
     () =>
@@ -137,6 +141,27 @@ const ProfileAccountCard: React.FC<ProfileAccountCardProps> = ({ account, onSave
               autoComplete="family-name"
               {...register('lastName')}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Select
+              title={t('language.title')}
+              value={locale}
+              disabled={isSubmitting}
+              onChange={(event) => {
+                const nextLocale = event.target.value
+                if (nextLocale !== locale) {
+                  router.replace(pathname, { locale: nextLocale })
+                }
+              }}
+              variant="muted"
+              size="sm"
+              round="lg"
+            >
+              <option value="pl">{t('language.options.pl')}</option>
+              <option value="en">{t('language.options.en')}</option>
+            </Select>
+            <p className="text-xs text-snowWhite-300">{t('language.hint')}</p>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2">

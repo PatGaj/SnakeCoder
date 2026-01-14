@@ -646,6 +646,14 @@
       "firstName": "e.g. Julia",
       "lastName": "e.g. Smith"
     },
+    "language": {
+      "title": "Interface language",
+      "hint": "Changing the language will reload the page.",
+      "options": {
+        "pl": "Polish",
+        "en": "English"
+      }
+    },
     "actions": {
       "save": "Save changes",
       "reset": "Reset"

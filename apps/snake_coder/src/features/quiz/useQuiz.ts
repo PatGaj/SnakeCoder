@@ -60,8 +60,18 @@ type QuizApiResponse = {
 
 type QuizSubmitPayload = { answers: Record<string, string | null>; timeSpentSeconds: number }
 
-const fetchQuiz = async (id: string): Promise<QuizApiResponse> => {
-  const response = await fetch(`/api/missions/quiz/${encodeURIComponent(id)}`, { method: 'GET' })
+const createAttemptId = () => {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID()
+  }
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
+const fetchQuiz = async (id: string, attemptId: string): Promise<QuizApiResponse> => {
+  const response = await fetch(
+    `/api/missions/quiz/${encodeURIComponent(id)}?attempt=${encodeURIComponent(attemptId)}`,
+    { method: 'GET' }
+  )
   if (!response.ok) {
     throw new Error('Failed to fetch quiz')
   }
@@ -94,9 +104,11 @@ const useQuiz = (id: string): UseQuizData => {
   const router = useRouter()
   const queryClient = useQueryClient()
 
+  const [attemptId, setAttemptId] = React.useState(() => createAttemptId())
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['quiz', id],
-    queryFn: () => fetchQuiz(id),
+    queryKey: ['quiz', id, attemptId],
+    queryFn: () => fetchQuiz(id, attemptId),
     enabled: Boolean(id),
   })
 
@@ -223,6 +235,7 @@ const useQuiz = (id: string): UseQuizData => {
   }
 
   const restart = () => {
+    setAttemptId(createAttemptId())
     setAnswers({})
     setCurrentIndex(0)
     setFinished(false)

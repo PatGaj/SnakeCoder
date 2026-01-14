@@ -13,7 +13,34 @@ type Params = {
 type AnswerMap = Record<string, string | null | undefined>
 type QuizSubmitPayload = { answers?: AnswerMap; timeSpentSeconds?: number }
 
-export async function GET(_: Request, { params }: Params) {
+const hashString = (value: string) => {
+  let hash = 2166136261
+  for (let i = 0; i < value.length; i += 1) {
+    hash ^= value.charCodeAt(i)
+    hash = Math.imul(hash, 16777619)
+  }
+  return hash >>> 0
+}
+
+const createRng = (seed: number) => {
+  let state = seed >>> 0
+  return () => {
+    state = (state * 1664525 + 1013904223) >>> 0
+    return state / 2 ** 32
+  }
+}
+
+const shuffleWithSeed = <T,>(items: T[], seed: number) => {
+  const result = [...items]
+  const rand = createRng(seed)
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rand() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
+
+export async function GET(req: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
 
@@ -83,6 +110,7 @@ export async function GET(_: Request, { params }: Params) {
 
   const timeLimitSeconds = mission.timeLimitSeconds ?? mission.etaMinutes * 60
   const passPercent = mission.passPercent ?? 80
+  const attempt = new URL(req.url).searchParams.get('attempt') ?? ''
 
   return NextResponse.json({
     header: {
@@ -95,7 +123,10 @@ export async function GET(_: Request, { params }: Params) {
       id: q.id,
       title: q.title,
       prompt: q.prompt,
-      options: q.options.map((o) => ({ id: o.id, label: o.label })),
+      options: shuffleWithSeed(q.options, hashString(`${userId}:${mission.id}:${q.id}:${attempt}`)).map((o) => ({
+        id: o.id,
+        label: o.label,
+      })),
     })),
     timeLimitSeconds,
   })

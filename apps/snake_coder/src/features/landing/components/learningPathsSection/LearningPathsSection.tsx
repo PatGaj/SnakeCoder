@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl'
-import { RiGraduationCapLine, RiRoadMapLine } from 'react-icons/ri'
+import { RiRoadMapLine } from 'react-icons/ri'
 
 import SectionHeader from '../SectionHeader'
 import PathCard from './PathCard'

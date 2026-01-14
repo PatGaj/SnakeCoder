@@ -57,6 +57,13 @@ const availabilityConfigByKey: Record<AvailabilityKey, AvailabilityConfig> = {
   available: { variant: 'secondary', icon: <RiCheckboxCircleLine size={16} /> },
 }
 
+const availabilityLabelByKey: Record<AvailabilityKey, 'card.building' | 'card.locked' | 'card.completed' | 'card.available'> = {
+  building: 'card.building',
+  locked: 'card.locked',
+  completed: 'card.completed',
+  available: 'card.available',
+}
+
 const difficultyVariantByDifficulty: Record<ModuleCardData['difficulty'], 'success' | 'warning' | 'danger'> = {
   beginner: 'success',
   intermediate: 'warning',
@@ -91,7 +98,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, onOpen }) => {
       ctaLabel: t('card.cta', { state: ctaKey }),
       availability: {
         ...availabilityConfig,
-        text: t(`card.${availabilityKey}` as any),
+        text: t(availabilityLabelByKey[availabilityKey]),
       },
       difficulty: {
         variant: difficultyVariantByDifficulty[module.difficulty],

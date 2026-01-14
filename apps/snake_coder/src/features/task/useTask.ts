@@ -169,7 +169,7 @@ const useTask = (id: string): UseTaskData => {
     setResults({ status: 'pending', tests: [] })
     setSubmitScore(null)
     setAiLoading(false)
-  }, [data?.patternCode, id])
+  }, [data, id])
 
   const runMutation = useMutation({
     mutationFn: (source: string) => executeTask(id, { source, mode: 'runCode' }),

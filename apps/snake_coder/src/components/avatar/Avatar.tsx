@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import React from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '@/lib/utils'
@@ -49,11 +50,18 @@ type AvatarProps = VariantProps<typeof avatarStyles> & {
 const Avatar: React.FC<AvatarProps> = ({ src, alt = 'avatar', userName, size, tone, className, onClick }) => {
   const styles = avatarStyles({ size, tone })
   const firstName = userName?.split(' ')[0][0].toUpperCase()
+  const sizeKey = size ?? 'md'
+  const imageSizes: Record<NonNullable<AvatarProps['size']>, string> = {
+    xs: '32px',
+    sm: '40px',
+    md: '48px',
+    lg: '56px',
+  }
 
   return (
     <span className={cn(styles.root(), className)} onClick={onClick}>
       {src ? (
-        <img src={src} alt={alt} className={styles.image()} />
+        <Image src={src} alt={alt} fill sizes={imageSizes[sizeKey]} className={styles.image()} />
       ) : (
         <span className={styles.icon()}>
           {firstName}

@@ -1,7 +1,9 @@
+import Image from 'next/image'
+
 const NotFound = () => {
   return (
-    <div className="w-full h-screen flex justify-center items-center">
-      <img src="/images/notFound.png" className="w-1/2" />
+    <div className="flex h-screen w-full items-center justify-center">
+      <Image src="/images/notFound.png" alt="Nie znaleziono" width={960} height={540} className="w-1/2" />
     </div>
   )
 }

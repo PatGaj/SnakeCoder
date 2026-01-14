@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { SessionProvider } from 'next-auth/react'
-import { NextIntlClientProvider } from 'next-intl'
+import { NextIntlClientProvider, type AbstractIntlMessages } from 'next-intl'
 import { Toaster } from 'react-hot-toast'
 
 import { GlobalLoader } from '@/components'
@@ -11,7 +11,7 @@ import { GlobalLoader } from '@/components'
 type ProvidersWrapperProps = {
   children: React.ReactNode
   locale: string
-  messages: any
+  messages: AbstractIntlMessages
 }
 
 const queryClient = new QueryClient()

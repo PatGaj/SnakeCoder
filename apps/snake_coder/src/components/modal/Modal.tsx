@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { tv, type VariantProps } from 'tailwind-variants'
 
 const modalStyles = tv({
@@ -51,25 +52,43 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, footer, h
     return () => document.removeEventListener('keydown', handleKey)
   }, [open, onClose])
 
-  if (!open) return null
-
   return (
-    <div className={styles.overlay()} role="dialog" aria-modal="true" onClick={onClose}>
-      <div className={styles.dialog()} onClick={(e) => e.stopPropagation()}>
-        {(title || !hideCloseButton) && (
-          <div className={styles.header()}>
-            {title && <div className={styles.title()}>{title}</div>}
-            {!hideCloseButton && (
-              <button type="button" className={styles.close()} onClick={onClose} aria-label="Zamknij">
-                x
-              </button>
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className={styles.overlay()}
+          role="dialog"
+          aria-modal="true"
+          onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
+          <motion.div
+            className={styles.dialog()}
+            onClick={(e) => e.stopPropagation()}
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            {(title || !hideCloseButton) && (
+              <div className={styles.header()}>
+                {title && <div className={styles.title()}>{title}</div>}
+                {!hideCloseButton && (
+                  <button type="button" className={styles.close()} onClick={onClose} aria-label="Zamknij">
+                    x
+                  </button>
+                )}
+              </div>
             )}
-          </div>
-        )}
-        <div className={styles.body()}>{children}</div>
-        {footer && <div className={styles.footer()}>{footer}</div>}
-      </div>
-    </div>
+            <div className={styles.body()}>{children}</div>
+            {footer && <div className={styles.footer()}>{footer}</div>}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 

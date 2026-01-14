@@ -2,6 +2,7 @@
 
 import clsx from 'clsx'
 import React from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 
 import { Avatar, Badge, Box, Pagination, Separator } from '@/components'
@@ -33,6 +34,7 @@ const RankingTable: React.FC<RankingTableProps> = ({ users, perPage = 7 }) => {
   const safePage = Math.min(page, totalPages)
   const startIndex = (safePage - 1) * perPage
   const pageUsers = users.slice(startIndex, startIndex + perPage)
+  const tableKey = `${safePage}-${perPage}`
 
   React.useEffect(() => {
     if (page !== safePage) setPage(safePage)
@@ -69,69 +71,78 @@ const RankingTable: React.FC<RankingTableProps> = ({ users, perPage = 7 }) => {
       <Separator className="my-5 bg-primary-800/70" />
 
       <div className="overflow-x-auto rounded-lg border border-primary-800/80 shadow-[0_18px_42px_#00000084]">
-        <table className="min-w-full divide-y divide-primary-800/70 bg-primary-950/80 text-sm text-snowWhite-50">
-          <thead className="bg-primary-900/60">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
-                {t('columns.rank')}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
-                {t('columns.user')}
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
-                {t('columns.xp')}
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
-                {t('columns.streak')}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {pageUsers.map((user) => {
-              const tier = tierByRank(user.rank)
-              return (
-                <tr key={user.id} className={clsx('border-b transition-colors', ROW_STYLE_BY_TIER[tier])}>
-                  <td className="relative py-3 pl-6 pr-4 whitespace-nowrap">
-                    <span
-                      aria-hidden
-                      className={clsx('absolute inset-y-0 left-0 w-1.5 rounded-r-full', {
-                        'bg-mangoYellow-500/80': tier === 'gold',
-                        'bg-snowWhite-50/30': tier === 'silver',
-                        'bg-primary-700/80': tier === 'bronze',
-                      })}
-                    />
-                    <span
-                      className={clsx('font-semibold', {
-                        'text-mangoYellow-200': tier === 'gold',
-                        'text-snowWhite-100': tier === 'silver',
-                        'text-snowWhite-50': tier === 'bronze',
-                      })}
-                    >
-                      #{user.rank}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-flex items-center gap-3">
-                      <Avatar size="sm" tone="muted" userName={user.name} src={user.avatarUrl} />
-                      <span className="min-w-0">
-                        <span className="block truncate font-semibold text-snowWhite-50">{user.name}</span>
-                        <span className="block text-xs text-snowWhite-300">{t('row.grade', { grade: user.grade })}</span>
+        <AnimatePresence mode="wait">
+          <motion.table
+            key={tableKey}
+            className="min-w-full divide-y divide-primary-800/70 bg-primary-950/80 text-sm text-snowWhite-50"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            <thead className="bg-primary-900/60">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
+                  {t('columns.rank')}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
+                  {t('columns.user')}
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
+                  {t('columns.xp')}
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
+                  {t('columns.streak')}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {pageUsers.map((user) => {
+                const tier = tierByRank(user.rank)
+                return (
+                  <tr key={user.id} className={clsx('border-b transition-colors', ROW_STYLE_BY_TIER[tier])}>
+                    <td className="relative py-3 pl-6 pr-4 whitespace-nowrap">
+                      <span
+                        aria-hidden
+                        className={clsx('absolute inset-y-0 left-0 w-1.5 rounded-r-full', {
+                          'bg-mangoYellow-500/80': tier === 'gold',
+                          'bg-snowWhite-50/30': tier === 'silver',
+                          'bg-primary-700/80': tier === 'bronze',
+                        })}
+                      />
+                      <span
+                        className={clsx('font-semibold', {
+                          'text-mangoYellow-200': tier === 'gold',
+                          'text-snowWhite-100': tier === 'silver',
+                          'text-snowWhite-50': tier === 'bronze',
+                        })}
+                      >
+                        #{user.rank}
                       </span>
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap">
-                    <span className={clsx('font-semibold', tier === 'gold' ? 'text-mangoYellow-200' : 'text-secondary-300')}>
-                      {t('row.xp', { xp: user.xp })}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap">
-                    <span className="text-snowWhite-200">{t('row.streak', { days: user.streakDays })}</span>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center gap-3">
+                        <Avatar size="sm" tone="muted" userName={user.name} src={user.avatarUrl} />
+                        <span className="min-w-0">
+                          <span className="block truncate font-semibold text-snowWhite-50">{user.name}</span>
+                          <span className="block text-xs text-snowWhite-300">{t('row.grade', { grade: user.grade })}</span>
+                        </span>
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <span className={clsx('font-semibold', tier === 'gold' ? 'text-mangoYellow-200' : 'text-secondary-300')}>
+                        {t('row.xp', { xp: user.xp })}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <span className="text-snowWhite-200">{t('row.streak', { days: user.streakDays })}</span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </motion.table>
+        </AnimatePresence>
       </div>
 
       <div className={clsx('mt-5 flex justify-end', { invisible: totalPages <= 1 })}>

@@ -73,6 +73,20 @@ type ExecuteResponse = ExecuteRunResponse | ExecuteCompleteResponse
 
 const scoreToPercent = (score: SubmitScore) => (score.total > 0 ? Math.round((score.passed / score.total) * 100) : 0)
 
+type SprintTaskStatus = 'todo' | 'inProgress' | 'done'
+
+type SprintCacheData = {
+  tasks: Array<{
+    id: string
+    status: SprintTaskStatus
+  }>
+}
+
+type MissionsCacheData = Array<{
+  id: string
+  status: SprintTaskStatus
+}>
+
 const fetchTask = async (id: string): Promise<TaskApiResponse> => {
   const response = await fetch(`/api/missions/task/${encodeURIComponent(id)}`, { method: 'GET' })
   if (!response.ok) {
@@ -144,10 +158,55 @@ const useTask = (id: string): UseTaskData => {
   const t = useTranslations('task')
   const queryClient = useQueryClient()
 
+  const updateSprintStatus = React.useCallback(
+    (nextStatus: SprintTaskStatus) => {
+      queryClient.setQueriesData<SprintCacheData>({ queryKey: ['sprint'] }, (prev) => {
+        if (!prev) return prev
+        let changed = false
+        const tasks = prev.tasks.map((task) => {
+          if (task.id !== id) return task
+          if (task.status === nextStatus) return task
+          changed = true
+          return { ...task, status: nextStatus }
+        })
+
+        return changed ? { ...prev, tasks } : prev
+      })
+
+      queryClient.setQueriesData<MissionsCacheData>({ queryKey: ['missions'] }, (prev) => {
+        if (!prev) return prev
+        let changed = false
+        const missions = prev.map((mission) => {
+          if (mission.id !== id) return mission
+          if (mission.status === nextStatus) return mission
+          changed = true
+          return { ...mission, status: nextStatus }
+        })
+
+        return changed ? missions : prev
+      })
+    },
+    [id, queryClient]
+  )
+
   const { data, isError } = useQuery({
     queryKey: ['task', id],
     queryFn: () => fetchTask(id),
     enabled: Boolean(id),
+    onSuccess: async (response) => {
+      const nextStatus: SprintTaskStatus =
+        response.status === 'DONE' ? 'done' : response.status === 'IN_PROGRESS' ? 'inProgress' : 'todo'
+
+      if (nextStatus !== 'todo') {
+        updateSprintStatus(nextStatus)
+      }
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['modules'] }),
+        queryClient.invalidateQueries({ queryKey: ['module'] }),
+        queryClient.invalidateQueries({ queryKey: ['sprint'] }),
+      ])
+    },
   })
 
   const task = data?.task
@@ -199,13 +258,19 @@ const useTask = (id: string): UseTaskData => {
 
   const submitMutation = useMutation({
     mutationFn: (source: string) => executeTask(id, { source, mode: 'completeTask' }),
-    onSuccess: async () => {
+    onSuccess: async (response) => {
+      if (response.mode === 'completeTask') {
+        updateSprintStatus(response.isTaskPassed ? 'done' : 'inProgress')
+      }
+
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['missions'] }),
         queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
         queryClient.invalidateQueries({ queryKey: ['user'] }),
         queryClient.invalidateQueries({ queryKey: ['userStats'] }),
         queryClient.invalidateQueries({ queryKey: ['modules'] }),
+        queryClient.invalidateQueries({ queryKey: ['module'] }),
+        queryClient.invalidateQueries({ queryKey: ['sprint'] }),
       ])
     },
   })

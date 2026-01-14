@@ -39,7 +39,10 @@ type SprintApiResponse = {
 }
 
 const fetchSprint = async ({ moduleId, sprintId }: UseSprintArgs): Promise<SprintApiResponse> => {
-  const response = await fetch(`/api/modules/${moduleId}/sprints/${sprintId}`, { method: 'GET' })
+  const response = await fetch(`/api/modules/${moduleId}/sprints/${sprintId}`, {
+    method: 'GET',
+    cache: 'no-store',
+  })
   if (!response.ok) {
     throw new Error('Failed to fetch sprint')
   }
@@ -60,6 +63,7 @@ const useSprint = ({ moduleId, sprintId }: UseSprintArgs): UseSprintData => {
     queryKey: ['sprint', moduleId, sprintId],
     queryFn: () => fetchSprint({ moduleId, sprintId }),
     enabled: Boolean(moduleId && sprintId),
+    refetchOnMount: 'always',
   })
 
   const header = data?.header ?? fallbackHeader

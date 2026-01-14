@@ -1,14 +1,16 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from ..schemas import CodeExecutionRequest, CodeExecutionResponse, ExecutionMode
+from ..security import require_app_auth
 from ..services.executor import run_user_code
+from ..services.task_loader import load_task_by_id
 from tests.test_tasks import get_test_task_by_id
 
 router = APIRouter()
 
 
 @router.post("/execute")
-def execute_code(payload: CodeExecutionRequest) -> dict:
+def execute_code(payload: CodeExecutionRequest, _auth: dict = Depends(require_app_auth)) -> dict:
     """Executes user code for a given task (or ad-hoc) and returns test results."""
 
     task = None
@@ -22,6 +24,11 @@ def execute_code(payload: CodeExecutionRequest) -> dict:
             )
         if payload.task_id.split("-")[0] == "test_task":
             task = get_test_task_by_id(payload.task_id)
+        else:
+            try:
+                task = load_task_by_id(payload.task_id, payload.mode)
+            except Exception as exc:
+                raise HTTPException(status_code=503, detail=str(exc)) from exc
         if task is None:
             raise HTTPException(
                 status_code=404,

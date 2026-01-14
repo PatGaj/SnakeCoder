@@ -240,9 +240,9 @@
       "bonusHint": "Complete all 3 steps to claim bonus XP.",
       "bonusReady": "Congratulations! Today’s bonus XP is yours!",
       "items": {
-        "tasks": "Complete sprint tasks",
-        "article": "Read the article",
-        "quiz": "Pass the quiz with at least 80%"
+        "tasks": "Complete 1 task",
+        "article": "Read 1 article",
+        "quiz": "Pass 1 quiz (min. 80%)"
       }
     },
     "unlock": {

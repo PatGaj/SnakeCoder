@@ -30,6 +30,8 @@ const itemVariants = {
 const Dashboard = () => {
   const router = useRouter()
   const { name, plan, lastResult, sprint, isLoading, isError, errorLabel } = useDashboard()
+  const showPlan = Boolean(plan)
+  const showNoSprint = !sprint
 
   if (isError) {
     return (
@@ -54,8 +56,12 @@ const Dashboard = () => {
         <DashboardHeader name={name} />
       </motion.div>
 
-      <motion.section className="grid gap-6 lg:grid-cols-[1fr_0.95fr]" variants={itemVariants}>
-        {plan ? <PlanCard plan={plan} /> : <NoSprintCard onGoToModules={() => router.push('/modules')} />}
+      <motion.section
+        className={showPlan || showNoSprint ? 'grid gap-6 lg:grid-cols-[1fr_0.95fr]' : 'grid gap-6'}
+        variants={itemVariants}
+      >
+        {showPlan && <PlanCard plan={plan} />}
+        {!showPlan && showNoSprint && <NoSprintCard onGoToModules={() => router.push('/modules')} />}
         <LastResultCard lastResult={lastResult} />
       </motion.section>
 

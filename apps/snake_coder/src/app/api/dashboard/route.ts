@@ -17,6 +17,8 @@ type DashboardSprintData = {
   tasksDone: number
   tasksTotal: number
   articleDone: boolean
+  articleDoneCount: number
+  articleTotal: number
   quizScore: number
   quizTotal: number
   nextTaskTitle: string
@@ -63,36 +65,46 @@ const speedPercentFromTime = ({ timeSeconds, avgSeconds }: { timeSeconds?: numbe
   return 50
 }
 
-type ActiveSprintRef = {
+const MISSION_TYPES = ['TASK', 'BUGFIX', 'QUIZ', 'ARTICLE'] as const
+
+const moduleAccessFilter = (userId: string) => ({
+  isBuilding: false,
+  category: 'CERTIFICATIONS',
+  OR: [
+    {
+      access: {
+        some: { userId, hasAccess: true },
+      },
+    },
+    { code: { in: PUBLIC_MODULE_CODES_LIST } },
+  ],
+})
+
+type ProgressRef = {
+  status: 'IN_PROGRESS' | 'DONE'
+  missionId: string
   moduleId: string
   module: { name: string; code: string }
   sprint: { id: string; name: string } | null
 }
 
-const fetchActiveSprintRef = async (userId: string, status?: 'IN_PROGRESS'): Promise<ActiveSprintRef | null> => {
+const fetchLastProgressRef = async (userId: string, status: ProgressRef['status']): Promise<ProgressRef | null> => {
   const progress = await prisma.userMissionProgress.findFirst({
     where: {
       userId,
-      ...(status ? { status } : {}),
+      status,
       mission: {
-        type: { in: ['TASK', 'BUGFIX', 'QUIZ', 'ARTICLE'] },
+        type: { in: MISSION_TYPES },
         sprintId: { not: null },
-        module: {
-          isBuilding: false,
-          category: 'CERTIFICATIONS',
-          OR: [
-            {
-              access: {
-                some: { userId, hasAccess: true },
-              },
-            },
-            { code: { in: PUBLIC_MODULE_CODES_LIST } },
-          ],
-        },
+        module: moduleAccessFilter(userId),
       },
     },
-    orderBy: [{ lastOpenedAt: 'desc' }, { completedAt: 'desc' }, { startedAt: 'desc' }],
+    orderBy:
+      status === 'IN_PROGRESS'
+        ? [{ lastOpenedAt: 'desc' }, { startedAt: 'desc' }]
+        : [{ completedAt: 'desc' }, { lastOpenedAt: 'desc' }],
     select: {
+      missionId: true,
       mission: {
         select: {
           moduleId: true,
@@ -103,7 +115,93 @@ const fetchActiveSprintRef = async (userId: string, status?: 'IN_PROGRESS'): Pro
     },
   })
 
-  return progress?.mission ?? null
+  if (!progress?.mission) {
+    return null
+  }
+
+  return {
+    status,
+    missionId: progress.missionId,
+    moduleId: progress.mission.moduleId,
+    module: progress.mission.module,
+    sprint: progress.mission.sprint,
+  }
+}
+
+type MissionWithProgress = {
+  id: string
+  type: string
+  title: string
+  shortDesc: string
+  etaMinutes: number
+  progress: Array<{ status: string | null }>
+}
+
+type SprintWithMissions = {
+  id: string
+  name: string
+  order: number
+  title: string
+  description: string
+  missions: MissionWithProgress[]
+}
+
+type NextMissionSelection = {
+  sprint: SprintWithMissions
+  mission: MissionWithProgress
+}
+
+const pickNextMission = ({
+  sprints,
+  startSprintId,
+  baseMissionId,
+  preferMissionId,
+}: {
+  sprints: SprintWithMissions[]
+  startSprintId?: string | null
+  baseMissionId?: string | null
+  preferMissionId?: string | null
+}): NextMissionSelection | null => {
+  const startIndex = startSprintId ? sprints.findIndex((s) => s.id === startSprintId) : 0
+  const firstIndex = startIndex >= 0 ? startIndex : 0
+
+  for (let i = firstIndex; i < sprints.length; i += 1) {
+    const sprint = sprints[i]
+    if (!sprint.missions.length) {
+      continue
+    }
+
+    const pendingMissions = sprint.missions.filter((mission) => mission.progress[0]?.status !== 'DONE')
+
+    if (i === firstIndex && startSprintId) {
+      if (preferMissionId) {
+        const preferred = sprint.missions.find((mission) => mission.id === preferMissionId)
+        if (preferred && preferred.progress[0]?.status === 'IN_PROGRESS') {
+          return { sprint, mission: preferred }
+        }
+      }
+
+      if (baseMissionId) {
+        const baseIndex = sprint.missions.findIndex((mission) => mission.id === baseMissionId)
+        if (baseIndex >= 0) {
+          const afterBase = sprint.missions
+            .slice(baseIndex + 1)
+            .find((mission) => mission.progress[0]?.status !== 'DONE')
+          if (afterBase) {
+            return { sprint, mission: afterBase }
+          }
+        }
+      }
+
+      if (pendingMissions.length > 0) {
+        return { sprint, mission: pendingMissions[0] }
+      }
+    } else if (pendingMissions.length > 0) {
+      return { sprint, mission: pendingMissions[0] }
+    }
+  }
+
+  return null
 }
 
 export async function GET() {
@@ -162,40 +260,13 @@ export async function GET() {
   const todayXp = todayAgg._sum.xpEarned ?? 0
   const yesterdayXp = yesterdayAgg._sum.xpEarned ?? 0
 
-  const activeSprintRef = (await fetchActiveSprintRef(userId, 'IN_PROGRESS')) ?? (await fetchActiveSprintRef(userId))
+  const modules = await prisma.module.findMany({
+    where: moduleAccessFilter(userId),
+    orderBy: { createdAt: 'asc' },
+    select: { id: true, name: true, code: true },
+  })
 
-  let access =
-    activeSprintRef ??
-    (await prisma.userModuleAccess.findFirst({
-      where: {
-        userId,
-        hasAccess: true,
-        module: { isBuilding: false, category: 'CERTIFICATIONS' },
-      },
-      orderBy: { startedAt: 'desc' },
-      select: { moduleId: true, module: { select: { name: true, code: true } } },
-    }))
-
-  if (!access) {
-    const publicModule = await prisma.module.findFirst({
-      where: {
-        isBuilding: false,
-        category: 'CERTIFICATIONS',
-        code: { in: PUBLIC_MODULE_CODES_LIST },
-      },
-      orderBy: { createdAt: 'asc' },
-      select: { id: true, name: true, code: true },
-    })
-
-    if (publicModule) {
-      access = {
-        moduleId: publicModule.id,
-        module: { name: publicModule.name, code: publicModule.code },
-      }
-    }
-  }
-
-  if (!access) {
+  if (modules.length === 0) {
     const payload: DashboardResponse = {
       name: user.name,
       sprint: null,
@@ -209,57 +280,62 @@ export async function GET() {
     return NextResponse.json(payload)
   }
 
-  const sprints = await prisma.sprint.findMany({
-    where: { moduleId: access.moduleId },
-    orderBy: { order: 'asc' },
-    select: {
-      id: true,
-      name: true,
-      order: true,
-      title: true,
-      description: true,
-      missions: {
-        where: { type: { in: ['TASK', 'BUGFIX', 'QUIZ', 'ARTICLE'] } },
-        orderBy: { createdAt: 'asc' },
-        select: {
-          id: true,
-          type: true,
-          title: true,
-          shortDesc: true,
-          etaMinutes: true,
-          progress: {
-            where: { userId },
-            select: { status: true },
+  const baseProgress =
+    (await fetchLastProgressRef(userId, 'IN_PROGRESS')) ?? (await fetchLastProgressRef(userId, 'DONE'))
+
+  const startModuleIndex = baseProgress ? modules.findIndex((item) => item.id === baseProgress.moduleId) : 0
+  const firstModuleIndex = startModuleIndex >= 0 ? startModuleIndex : 0
+
+  let selection: { module: (typeof modules)[number]; sprint: SprintWithMissions; mission: MissionWithProgress } | null =
+    null
+
+  for (let i = firstModuleIndex; i < modules.length; i += 1) {
+    const moduleItem = modules[i]
+    const sprints = await prisma.sprint.findMany({
+      where: { moduleId: moduleItem.id },
+      orderBy: { order: 'asc' },
+      select: {
+        id: true,
+        name: true,
+        order: true,
+        title: true,
+        description: true,
+        missions: {
+          where: { type: { in: MISSION_TYPES } },
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            type: true,
+            title: true,
+            shortDesc: true,
+            etaMinutes: true,
+            progress: {
+              where: { userId },
+              select: { status: true },
+            },
           },
         },
       },
-    },
-  })
+    })
 
-  const sprintById = new Map(sprints.map((sprint) => [sprint.id, sprint]))
+    const nextSelection = pickNextMission({
+      sprints,
+      startSprintId: moduleItem.id === baseProgress?.moduleId ? baseProgress?.sprint?.id : null,
+      baseMissionId:
+        moduleItem.id === baseProgress?.moduleId && baseProgress?.status === 'DONE' ? baseProgress.missionId : null,
+      preferMissionId:
+        moduleItem.id === baseProgress?.moduleId && baseProgress?.status === 'IN_PROGRESS'
+          ? baseProgress.missionId
+          : null,
+    })
 
-  const isSprintComplete = (sprint: (typeof sprints)[number]) => {
-    const tasks = sprint.missions.filter((m) => m.type === 'TASK' || m.type === 'BUGFIX')
-    const tasksTotal = tasks.length
-    const tasksDone = tasks.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
-    const tasksComplete = tasksTotal === 0 || tasksDone >= tasksTotal
-
-    const articles = sprint.missions.filter((m) => m.type === 'ARTICLE')
-    const articleDoneCount = articles.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
-    const articleDone = articles.length === 0 || articleDoneCount >= articles.length
-
-    const quizzes = sprint.missions.filter((m) => m.type === 'QUIZ')
-    const quizDone = quizzes.length === 0 || quizzes.every((m) => m.progress[0]?.status === 'DONE')
-
-    return tasksComplete && articleDone && quizDone
+    if (nextSelection) {
+      selection = { module: moduleItem, ...nextSelection }
+      break
+    }
   }
 
-  const sprint =
-    (activeSprintRef?.sprint?.id ? sprintById.get(activeSprintRef.sprint.id) : null) ??
-    sprints.find((s) => !isSprintComplete(s)) ??
-    sprints[sprints.length - 1]
-
-  if (!sprint) {
+  if (!selection) {
     const payload: DashboardResponse = {
       name: user.name,
       sprint: null,
@@ -272,34 +348,34 @@ export async function GET() {
     }
     return NextResponse.json(payload)
   }
+
+  const { module: moduleItem, sprint, mission: nextMission } = selection
 
   const tasks = sprint.missions.filter((m) => m.type === 'TASK' || m.type === 'BUGFIX')
   const tasksTotal = tasks.length
   const tasksDone = tasks.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
 
   const articles = sprint.missions.filter((m) => m.type === 'ARTICLE')
+  const articleTotal = articles.length
   const articleDoneCount = articles.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
-  const articleDone = articles.length === 0 || articleDoneCount >= articles.length
+  const articleDone = articleTotal === 0 || articleDoneCount >= articleTotal
 
   const quizzes = sprint.missions.filter((m) => m.type === 'QUIZ')
   const quizTotal = quizzes.length
   const quizScore = quizzes.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
 
-  const activeMission = sprint.missions.find((m) => m.progress[0]?.status === 'IN_PROGRESS') ?? null
-  const nextMission = activeMission ?? sprint.missions.find((m) => m.progress[0]?.status !== 'DONE') ?? sprint.missions[0]
-
-  const hasActiveTask = Boolean(activeMission)
+  const hasActiveTask = nextMission.progress[0]?.status === 'IN_PROGRESS'
 
   const etaMinutes = sprint.missions.reduce((acc, mission) => acc + mission.etaMinutes, 0)
 
-  const sprintRoute = `/modules/${access.module.name}/${sprint.name}`
-  const taskRoute = nextMission ? missionRoute(nextMission.type, nextMission.id) : `/modules/${access.module.name}`
+  const sprintRoute = `/modules/${moduleItem.name}/${sprint.name}`
+  const taskRoute = missionRoute(nextMission.type, nextMission.id)
 
   const payload: DashboardResponse = {
     name: user.name,
     sprint: {
-      module: mapModuleCode(access.module.code),
-      moduleId: access.module.name,
+      module: mapModuleCode(moduleItem.code),
+      moduleId: moduleItem.name,
       sprintId: sprint.name,
       sprintNo: sprint.order,
       etaMinutes,
@@ -307,10 +383,12 @@ export async function GET() {
       tasksDone,
       tasksTotal,
       articleDone,
+      articleDoneCount,
+      articleTotal,
       quizScore,
       quizTotal,
-      nextTaskTitle: nextMission?.title ?? '',
-      nextTaskDesc: nextMission?.shortDesc ?? '',
+      nextTaskTitle: nextMission.title,
+      nextTaskDesc: nextMission.shortDesc,
       title: sprint.title,
       desc: sprint.description,
       taskRoute,

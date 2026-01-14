@@ -34,6 +34,8 @@ type DashboardApiResponse = {
         tasksDone: number
         tasksTotal: number
         articleDone: boolean
+        articleDoneCount: number
+        articleTotal: number
         quizScore: number
         quizTotal: number
         nextTaskTitle: string
@@ -103,13 +105,26 @@ const useDashboard = (): UseDashboardData => {
       (data.sprint.quizTotal > 0 ? (data.sprint.quizScore / data.sprint.quizTotal) * 15 : 15)
   )
 
-  const quizPercent =
-    data.sprint.quizTotal > 0 ? Math.round((data.sprint.quizScore / data.sprint.quizTotal) * 100) : 100
-  const quizOk = data.sprint.quizTotal > 0 ? quizPercent >= 80 : true
+  const tasksRemaining = data.sprint.tasksTotal - data.sprint.tasksDone
+  const articleRemaining = data.sprint.articleTotal - data.sprint.articleDoneCount
+  const quizRemaining = data.sprint.quizTotal - data.sprint.quizScore
 
-  const tasksDoneOk = data.sprint.tasksDone >= data.sprint.tasksTotal
-  const articleOk = data.sprint.articleDone
-  const planComplete = tasksDoneOk && quizOk && articleOk
+  const showTasks = tasksRemaining > 0
+  const showArticle = articleRemaining > 0
+  const showQuiz = quizRemaining > 0
+
+  const hasPlanItems = showTasks || showArticle || showQuiz
+
+  const planTasksTotal = showTasks ? 1 : 0
+  const planTasksDone = showTasks ? (data.sprint.tasksDone > 0 ? 1 : 0) : 0
+
+  const planArticleDone = showArticle ? data.sprint.articleDoneCount > 0 : false
+
+  const planQuizPercent = showQuiz ? (data.sprint.quizScore > 0 ? 100 : 0) : 0
+  const planQuizOk = showQuiz ? planQuizPercent >= 80 : true
+
+  const planComplete =
+    (!showTasks || planTasksDone >= planTasksTotal) && (!showArticle || planArticleDone) && (!showQuiz || planQuizOk)
 
   const sprint: SprintBannerData = {
     module: data.sprint.module,
@@ -132,15 +147,20 @@ const useDashboard = (): UseDashboardData => {
 
   return {
     name,
-    plan: {
-      bonusXp: 120,
-      complete: planComplete,
-      tasksDone: data.sprint.tasksDone,
-      tasksTotal: data.sprint.tasksTotal,
-      articleDone: data.sprint.articleDone,
-      quizPercent,
-      quizOk,
-    },
+    plan: hasPlanItems
+      ? {
+          bonusXp: 120,
+          complete: planComplete,
+          tasksDone: planTasksDone,
+          tasksTotal: planTasksTotal,
+          articleDone: planArticleDone,
+          quizPercent: planQuizPercent,
+          quizOk: planQuizOk,
+          showTasks,
+          showArticle,
+          showQuiz,
+        }
+      : undefined,
     lastResult,
     sprint,
     isLoading,

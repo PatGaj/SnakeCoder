@@ -11,6 +11,9 @@ export type PlanCardData = {
   articleDone: boolean
   quizPercent: number
   quizOk: boolean
+  showTasks: boolean
+  showArticle: boolean
+  showQuiz: boolean
 }
 
 export type PlanCardProps = {
@@ -35,38 +38,44 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
       <Separator className="my-4" />
 
       <div className="grid gap-2">
-        <ItemRow
-          icon={<RiFlagLine className="text-secondary-400" size={18} />}
-          label={t('plan.items.tasks')}
-          right={
-            <Badge
-              variant={plan.tasksDone >= plan.tasksTotal ? 'success' : 'muted'}
-              className="px-2 py-0.5 whitespace-nowrap"
-            >
-              {plan.tasksDone}/{plan.tasksTotal}
-            </Badge>
-          }
-        />
+        {plan.showTasks && (
+          <ItemRow
+            icon={<RiFlagLine className="text-secondary-400" size={18} />}
+            label={t('plan.items.tasks')}
+            right={
+              <Badge
+                variant={plan.tasksDone >= plan.tasksTotal ? 'success' : 'muted'}
+                className="px-2 py-0.5 whitespace-nowrap"
+              >
+                {plan.tasksDone}/{plan.tasksTotal}
+              </Badge>
+            }
+          />
+        )}
 
-        <ItemRow
-          icon={<RiBookOpenLine className="text-secondary-400" size={18} />}
-          label={t('plan.items.article')}
-          right={
-            <Badge variant={plan.articleDone ? 'success' : 'muted'} className="px-2 py-0.5 whitespace-nowrap">
-              {plan.articleDone ? t('common.done') : t('common.todo')}
-            </Badge>
-          }
-        />
+        {plan.showArticle && (
+          <ItemRow
+            icon={<RiBookOpenLine className="text-secondary-400" size={18} />}
+            label={t('plan.items.article')}
+            right={
+              <Badge variant={plan.articleDone ? 'success' : 'muted'} className="px-2 py-0.5 whitespace-nowrap">
+                {plan.articleDone ? t('common.done') : t('common.todo')}
+              </Badge>
+            }
+          />
+        )}
 
-        <ItemRow
-          icon={<RiTestTubeLine className="text-secondary-400" size={18} />}
-          label={t('plan.items.quiz')}
-          right={
-            <Badge variant={plan.quizOk ? 'success' : 'muted'} className="px-2 py-0.5 whitespace-nowrap">
-              {plan.quizPercent}%
-            </Badge>
-          }
-        />
+        {plan.showQuiz && (
+          <ItemRow
+            icon={<RiTestTubeLine className="text-secondary-400" size={18} />}
+            label={t('plan.items.quiz')}
+            right={
+              <Badge variant={plan.quizOk ? 'success' : 'muted'} className="px-2 py-0.5 whitespace-nowrap">
+                {plan.quizPercent}%
+              </Badge>
+            }
+          />
+        )}
       </div>
 
       <p className="mt-4 text-xs text-snowWhite-300">{plan.complete ? t('plan.bonusReady') : t('plan.bonusHint')}</p>

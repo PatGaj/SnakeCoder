@@ -240,9 +240,9 @@
       "bonusHint": "Ukończ wszystkie 3 kroki, aby zgarnąć bonus XP.",
       "bonusReady": "Gratulacje! Bonus XP za dziś jest Twój!",
       "items": {
-        "tasks": "Ukończ zadania sprintu",
-        "article": "Przeczytaj artykuł",
-        "quiz": "Zalicz quiz na min. 80%"
+        "tasks": "Zrób 1 zadanie",
+        "article": "Przeczytaj 1 artykuł",
+        "quiz": "Zalicz 1 quiz (min. 80%)"
       }
     },
     "unlock": {

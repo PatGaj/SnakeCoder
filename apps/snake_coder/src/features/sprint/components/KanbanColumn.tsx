@@ -18,11 +18,18 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, tone, count, childre
       variant="glass"
       size="lg"
       round="3xl"
-      className={clsx('flex h-full min-h-0 w-full flex-col border-primary-800/70', {
-        'bg-primary-950/35': tone === 'muted',
-        'border-secondary-500/25 bg-secondary-500/5': tone === 'secondary',
-        'border-jadeGreen-500/25 bg-jadeGreen-500/5': tone === 'success',
-      })}
+      className={clsx(
+        'flex h-full min-h-0 w-full flex-col border-primary-800/70',
+        'transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-px',
+        {
+          'bg-primary-950/35 hover:border-primary-700/80 hover:shadow-[0_18px_40px_rgba(2,8,24,0.55)]':
+            tone === 'muted',
+          'border-secondary-500/25 bg-secondary-500/5 hover:border-secondary-400/45 hover:shadow-[0_18px_40px_rgba(42,117,255,0.25)]':
+            tone === 'secondary',
+          'border-jadeGreen-500/25 bg-jadeGreen-500/5 hover:border-jadeGreen-400/45 hover:shadow-[0_18px_40px_rgba(16,78,32,0.35)]':
+            tone === 'success',
+        }
+      )}
     >
       <div className="flex items-center justify-between gap-3">
         <p

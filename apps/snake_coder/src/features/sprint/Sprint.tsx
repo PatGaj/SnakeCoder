@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import React from 'react'
+import { motion } from 'framer-motion'
 
 import { Breadcrumb } from '@/components'
 import { useRouter } from '@/i18n/navigation'
@@ -13,6 +14,27 @@ import useSprint from './useSprint'
 export type SprintProps = {
   moduleId: string
   sprintId: string
+}
+
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
+
+const boardVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+}
+
+const columnVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: EASE_OUT } },
+}
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 10, scale: 0.98 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.25, ease: EASE_OUT } },
 }
 
 const Sprint: React.FC<SprintProps> = ({ moduleId, sprintId }) => {
@@ -44,15 +66,24 @@ const Sprint: React.FC<SprintProps> = ({ moduleId, sprintId }) => {
           <p className="text-sm text-snowWhite-300">{t('empty')}</p>
         </div>
       ) : (
-        <section className="mt-8 grid flex-1 min-h-0 gap-6 overflow-hidden lg:grid-cols-3">
+        <motion.section
+          className="mt-8 grid flex-1 min-h-0 gap-6 overflow-hidden lg:grid-cols-3"
+          variants={boardVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {columns.map((column) => (
-            <KanbanColumn key={column.id} title={column.title} tone={column.tone} count={column.count}>
-              {column.tasks.map((task) => (
-                <TaskCard key={task.id} task={task} onOpen={() => setSelectedTask(task)} />
-              ))}
-            </KanbanColumn>
+            <motion.div key={column.id} variants={columnVariants} className="h-full min-h-0">
+              <KanbanColumn title={column.title} tone={column.tone} count={column.count}>
+                {column.tasks.map((task) => (
+                  <motion.div key={task.id} variants={cardVariants}>
+                    <TaskCard task={task} onOpen={() => setSelectedTask(task)} />
+                  </motion.div>
+                ))}
+              </KanbanColumn>
+            </motion.div>
           ))}
-        </section>
+        </motion.section>
       )}
 
       <TaskModal

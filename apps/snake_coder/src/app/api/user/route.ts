@@ -74,15 +74,15 @@ export async function GET() {
     })
   }
 
-  for (const module of publicModules) {
-    if (unlockedModulesByName.has(module.name)) {
+  for (const publicModule of publicModules) {
+    if (unlockedModulesByName.has(publicModule.name)) {
       continue
     }
 
-    unlockedModulesByName.set(module.name, {
-      id: module.name,
-      code: module.code,
-      title: module.title,
+    unlockedModulesByName.set(publicModule.name, {
+      id: publicModule.name,
+      code: publicModule.code,
+      title: publicModule.title,
       unlockedAt: null,
       completedAt: null,
     })

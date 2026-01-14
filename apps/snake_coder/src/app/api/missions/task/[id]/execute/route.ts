@@ -28,7 +28,7 @@ const EXECUTOR_EXECUTE_TIMEOUT_MS = 15_000
 let lastHealthyAt = 0
 
 const executorTaskId = (id: string) => {
-  const prefix = process.env.EXECUTOR_TASK_ID_PREFIX ?? 'test_task-'
+  const prefix = process.env.EXECUTOR_TASK_ID_PREFIX
   if (!prefix) return id
   return id.startsWith(prefix) ? id : `${prefix}${id}`
 }

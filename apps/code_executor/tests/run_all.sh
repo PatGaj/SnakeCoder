@@ -38,6 +38,17 @@ require_cmd() {
   fi
 }
 
+require_python() {
+  if command -v python3 >/dev/null 2>&1; then
+    return 0
+  fi
+  if command -v python >/dev/null 2>&1; then
+    return 0
+  fi
+  log_fail "Missing python/python3 in PATH."
+  exit 1
+}
+
 check_docker() {
   log_step "Checking Docker daemon"
   if docker info >/dev/null 2>&1; then
@@ -77,6 +88,8 @@ main() {
   require_cmd docker
   require_cmd curl
   require_cmd bash
+  require_cmd jq
+  require_python
 
   check_docker
   check_fastapi

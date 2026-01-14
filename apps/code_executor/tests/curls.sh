@@ -4,6 +4,10 @@ BASE_URL=${BASE_URL:-http://127.0.0.1:8000}
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=/dev/null
+. "${SCRIPT_DIR}/_auth.sh"
+
 if [ -t 1 ]; then
   GREEN="\033[32m"
   RED="\033[31m"
@@ -51,6 +55,7 @@ echo
 echo "Task results:"
 
 resp1=$(curl -s -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d @- <<'EOF'
 {
@@ -63,6 +68,7 @@ EOF
 print_result "Task 1 (double numbers)" "${resp1}"
 
 resp2=$(curl -s -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d @- <<'EOF'
 {
@@ -75,6 +81,7 @@ EOF
 print_result "Task 2 (summarize scores)" "${resp2}"
 
 resp3=$(curl -s -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d @- <<'EOF'
 {
@@ -86,6 +93,7 @@ EOF
 print_result "Task 3 (cart total)" "${resp3}"
 
 resp4=$(curl -s -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d @- <<'EOF'
 {

@@ -25,7 +25,7 @@ type DashboardApiResponse = {
   name: string | null
   sprint:
     | {
-        module: 'PCEP' | 'PCAP'
+        module: 'PCEP' | 'PCAP' | 'BASICS'
         moduleId: string
         sprintId: string
         sprintNo: number

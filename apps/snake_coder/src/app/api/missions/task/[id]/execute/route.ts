@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 
 import prisma from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
+import { PUBLIC_MODULE_CODES_LIST } from '@/lib/moduleAccess'
 
 type Params = {
   params: Promise<{
@@ -123,9 +124,14 @@ export async function POST(req: Request, { params }: Params) {
       type: { in: ['TASK', 'BUGFIX'] },
       module: {
         isBuilding: false,
-        access: {
-          some: { userId, hasAccess: true },
-        },
+        OR: [
+          {
+            access: {
+              some: { userId, hasAccess: true },
+            },
+          },
+          { code: { in: PUBLIC_MODULE_CODES_LIST } },
+        ],
       },
     },
     include: {

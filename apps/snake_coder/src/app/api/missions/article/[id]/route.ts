@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 
 import prisma from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
+import { PUBLIC_MODULE_CODES_LIST } from '@/lib/moduleAccess'
 
 type Params = {
   params: Promise<{
@@ -30,9 +31,14 @@ export async function GET(_: Request, { params }: Params) {
       type: 'ARTICLE',
       module: {
         isBuilding: false,
-        access: {
-          some: { userId, hasAccess: true },
-        },
+        OR: [
+          {
+            access: {
+              some: { userId, hasAccess: true },
+            },
+          },
+          { code: { in: PUBLIC_MODULE_CODES_LIST } },
+        ],
       },
     },
     include: {
@@ -103,9 +109,14 @@ export async function POST(req: Request, { params }: Params) {
       type: 'ARTICLE',
       module: {
         isBuilding: false,
-        access: {
-          some: { userId, hasAccess: true },
-        },
+        OR: [
+          {
+            access: {
+              some: { userId, hasAccess: true },
+            },
+          },
+          { code: { in: PUBLIC_MODULE_CODES_LIST } },
+        ],
       },
     },
     include: {

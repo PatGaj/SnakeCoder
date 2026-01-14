@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 
 import prisma from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
+import { PUBLIC_MODULE_CODES_LIST } from '@/lib/moduleAccess'
 
 const NICKNAME_REGEX = /^[A-Za-z0-9_]+$/
 
@@ -46,6 +47,47 @@ export async function GET() {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
+  const publicModules = await prisma.module.findMany({
+    where: { isBuilding: false, code: { in: PUBLIC_MODULE_CODES_LIST } },
+    orderBy: { createdAt: 'asc' },
+    select: { name: true, code: true, title: true },
+  })
+
+  const unlockedModulesByName = new Map<
+    string,
+    {
+      id: string
+      code: string
+      title: string
+      unlockedAt: string | null
+      completedAt: string | null
+    }
+  >()
+
+  for (const access of user.moduleAccess) {
+    unlockedModulesByName.set(access.module.name, {
+      id: access.module.name,
+      code: access.module.code,
+      title: access.module.title,
+      unlockedAt: access.startedAt ? access.startedAt.toISOString() : null,
+      completedAt: access.completedAt ? access.completedAt.toISOString() : null,
+    })
+  }
+
+  for (const module of publicModules) {
+    if (unlockedModulesByName.has(module.name)) {
+      continue
+    }
+
+    unlockedModulesByName.set(module.name, {
+      id: module.name,
+      code: module.code,
+      title: module.title,
+      unlockedAt: null,
+      completedAt: null,
+    })
+  }
+
   return NextResponse.json({
     account: {
       userName: user.name,
@@ -58,13 +100,7 @@ export async function GET() {
       bestStreakDays: user.streakBest,
       gradeAvg: user.gradeAvg,
     },
-    unlockedModules: user.moduleAccess.map((access) => ({
-      id: access.module.name,
-      code: access.module.code,
-      title: access.module.title,
-      unlockedAt: access.startedAt ? access.startedAt.toISOString() : null,
-      completedAt: access.completedAt ? access.completedAt.toISOString() : null,
-    })),
+    unlockedModules: Array.from(unlockedModulesByName.values()),
   })
 }
 

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { isPublicModuleCode } from "@/lib/moduleAccess";
 
 const mapCategory = (category: string): "certifications" | "libraries" => {
   if (category === "CERTIFICATIONS") return "certifications";
@@ -51,8 +52,8 @@ export async function GET() {
   const payload = modules.map((module) => {
     const access = module.access[0];
     const building = module.isBuilding;
-    const locked = !building && !(access?.hasAccess ?? false);
-    const completed = Boolean(access?.completedAt);
+    const isPublic = isPublicModuleCode(module.code);
+    const locked = !building && !isPublic && !(access?.hasAccess ?? false);
 
     const sprintProgress = module.sprints.map((sprint) => {
       const total = sprint.missions.length;
@@ -69,6 +70,8 @@ export async function GET() {
 
     const sprintsTotal = sprintProgress.length;
     const sprintsDone = sprintProgress.filter((s) => s.progressPercent >= 100).length;
+
+    const completed = Boolean(access?.completedAt) || (sprintsTotal > 0 && sprintsDone >= sprintsTotal);
 
     const totalMissions = module.sprints.reduce((acc, sprint) => acc + sprint.missions.length, 0);
     const doneMissions = module.sprints.reduce((acc, sprint) => {

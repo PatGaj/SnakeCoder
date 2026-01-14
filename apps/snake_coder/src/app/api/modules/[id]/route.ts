@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { isPublicModuleCode } from "@/lib/moduleAccess";
 
 const mapDifficulty = (difficulty: string): "beginner" | "intermediate" | "advanced" => {
   if (difficulty === "INTERMEDIATE") return "intermediate";
@@ -66,7 +67,8 @@ export async function GET(_: Request, { params }: Params) {
 
   const access = moduleRecord.access[0];
   const building = moduleRecord.isBuilding;
-  const hasAccess = Boolean(access?.hasAccess);
+  const isPublic = isPublicModuleCode(moduleRecord.code);
+  const hasAccess = isPublic || Boolean(access?.hasAccess);
   const locked = !building && !hasAccess;
 
   const sprints = moduleRecord.sprints.map((sprint) => {

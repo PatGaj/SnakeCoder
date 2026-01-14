@@ -3,9 +3,12 @@ import { getServerSession } from 'next-auth/next'
 
 import prisma from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
+import { PUBLIC_MODULE_CODES_LIST } from '@/lib/moduleAccess'
+
+type DashboardModuleCode = 'PCEP' | 'PCAP' | 'BASICS'
 
 type DashboardSprintData = {
-  module: 'PCEP' | 'PCAP'
+  module: DashboardModuleCode
   moduleId: string
   sprintId: string
   sprintNo: number
@@ -41,7 +44,11 @@ const missionRoute = (type: string, id: string) => {
   return `/missions/task/${id}`
 }
 
-const mapModuleCode = (code: string): 'PCEP' | 'PCAP' => (code === 'PCAP' ? 'PCAP' : 'PCEP')
+const mapModuleCode = (code: string): DashboardModuleCode => {
+  if (code === 'PCAP') return 'PCAP'
+  if (code === 'BASICS') return 'BASICS'
+  return 'PCEP'
+}
 
 const speedPercentFromTime = ({ timeSeconds, avgSeconds }: { timeSeconds?: number | null; avgSeconds?: number }) => {
   if (!timeSeconds || !avgSeconds || avgSeconds <= 0) return 100
@@ -73,9 +80,14 @@ const fetchActiveSprintRef = async (userId: string, status?: 'IN_PROGRESS'): Pro
         module: {
           isBuilding: false,
           category: 'CERTIFICATIONS',
-          access: {
-            some: { userId, hasAccess: true },
-          },
+          OR: [
+            {
+              access: {
+                some: { userId, hasAccess: true },
+              },
+            },
+            { code: { in: PUBLIC_MODULE_CODES_LIST } },
+          ],
         },
       },
     },
@@ -152,7 +164,7 @@ export async function GET() {
 
   const activeSprintRef = (await fetchActiveSprintRef(userId, 'IN_PROGRESS')) ?? (await fetchActiveSprintRef(userId))
 
-  const access =
+  let access =
     activeSprintRef ??
     (await prisma.userModuleAccess.findFirst({
       where: {
@@ -163,6 +175,25 @@ export async function GET() {
       orderBy: { startedAt: 'desc' },
       select: { moduleId: true, module: { select: { name: true, code: true } } },
     }))
+
+  if (!access) {
+    const publicModule = await prisma.module.findFirst({
+      where: {
+        isBuilding: false,
+        category: 'CERTIFICATIONS',
+        code: { in: PUBLIC_MODULE_CODES_LIST },
+      },
+      orderBy: { createdAt: 'asc' },
+      select: { id: true, name: true, code: true },
+    })
+
+    if (publicModule) {
+      access = {
+        moduleId: publicModule.id,
+        module: { name: publicModule.name, code: publicModule.code },
+      }
+    }
+  }
 
   if (!access) {
     const payload: DashboardResponse = {

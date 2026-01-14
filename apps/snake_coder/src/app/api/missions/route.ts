@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { PUBLIC_MODULE_CODES_LIST } from "@/lib/moduleAccess";
 
 const mapDifficulty = (difficulty: string): "beginner" | "intermediate" | "advanced" => {
   if (difficulty === "INTERMEDIATE") return "intermediate";
@@ -42,9 +43,16 @@ export async function GET() {
       type: { in: ["TASK", "BUGFIX", "QUIZ", "ARTICLE", "SKILL_TEST"] },
       module: {
         isBuilding: false,
-        access: {
-          some: { userId, hasAccess: true },
-        },
+        OR: [
+          {
+            access: {
+              some: { userId, hasAccess: true },
+            },
+          },
+          {
+            code: { in: PUBLIC_MODULE_CODES_LIST },
+          },
+        ],
       },
     },
     include: {
@@ -90,4 +98,3 @@ export async function GET() {
 
   return NextResponse.json(payload);
 }
-

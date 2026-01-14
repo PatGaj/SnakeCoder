@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { isPublicModuleCode } from "@/lib/moduleAccess";
 
 type Params = {
   params: Promise<{
@@ -42,20 +43,23 @@ export async function GET(_: Request, { params }: Params) {
 
   const moduleRecord = await prisma.module.findUnique({
     where: { name: moduleName },
-    select: { id: true, name: true },
+    select: { id: true, name: true, code: true },
   });
 
   if (!moduleRecord) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const access = await prisma.userModuleAccess.findUnique({
-    where: { userId_moduleId: { userId, moduleId: moduleRecord.id } },
-    select: { hasAccess: true },
-  });
+  const isPublic = isPublicModuleCode(moduleRecord.code);
+  if (!isPublic) {
+    const access = await prisma.userModuleAccess.findUnique({
+      where: { userId_moduleId: { userId, moduleId: moduleRecord.id } },
+      select: { hasAccess: true },
+    });
 
-  if (!access?.hasAccess) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!access?.hasAccess) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   const sprint = await prisma.sprint.findUnique({

@@ -6,6 +6,8 @@ import { SessionProvider } from 'next-auth/react'
 import { NextIntlClientProvider } from 'next-intl'
 import { Toaster } from 'react-hot-toast'
 
+import { GlobalLoader } from '@/components'
+
 type ProvidersWrapperProps = {
   children: React.ReactNode
   locale: string
@@ -20,6 +22,7 @@ export const ProviderWrapper: React.FC<ProvidersWrapperProps> = ({ children, loc
       <NextIntlClientProvider locale={locale} messages={messages} timeZone="Europe/Warsaw">
         <QueryClientProvider client={queryClient}>
           {children}
+          <GlobalLoader />
           <Toaster position="top-right" />
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>

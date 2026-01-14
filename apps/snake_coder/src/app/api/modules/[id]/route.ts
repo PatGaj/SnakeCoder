@@ -76,7 +76,9 @@ export async function GET(_: Request, { params }: Params) {
     const tasksDone = tasks.reduce((acc, m) => acc + (m.progress[0]?.status === "DONE" ? 1 : 0), 0);
 
     const articles = sprint.missions.filter((m) => m.type === "ARTICLE");
-    const articleDone = articles.some((m) => m.progress[0]?.status === "DONE");
+    const articleTotal = articles.length;
+    const articleDoneCount = articles.reduce((acc, m) => acc + (m.progress[0]?.status === "DONE" ? 1 : 0), 0);
+    const articleDone = articleTotal === 0 ? true : articleDoneCount >= articleTotal;
 
     const quizzes = sprint.missions.filter((m) => m.type === "QUIZ" && m.quiz);
     const quizTotal = quizzes.length;
@@ -96,6 +98,8 @@ export async function GET(_: Request, { params }: Params) {
       tasksDone,
       tasksTotal: tasks.length,
       articleDone,
+      articleDoneCount,
+      articleTotal,
       quizScore,
       quizTotal,
       status: "available" as const,

@@ -214,7 +214,8 @@ export async function GET() {
     const tasksComplete = tasksTotal === 0 || tasksDone >= tasksTotal
 
     const articles = sprint.missions.filter((m) => m.type === 'ARTICLE')
-    const articleDone = articles.length === 0 || articles.some((m) => m.progress[0]?.status === 'DONE')
+    const articleDoneCount = articles.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
+    const articleDone = articles.length === 0 || articleDoneCount >= articles.length
 
     const quizzes = sprint.missions.filter((m) => m.type === 'QUIZ')
     const quizDone = quizzes.length === 0 || quizzes.every((m) => m.progress[0]?.status === 'DONE')
@@ -246,7 +247,8 @@ export async function GET() {
   const tasksDone = tasks.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
 
   const articles = sprint.missions.filter((m) => m.type === 'ARTICLE')
-  const articleDone = articles.length === 0 || articles.some((m) => m.progress[0]?.status === 'DONE')
+  const articleDoneCount = articles.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
+  const articleDone = articles.length === 0 || articleDoneCount >= articles.length
 
   const quizzes = sprint.missions.filter((m) => m.type === 'QUIZ')
   const quizTotal = quizzes.length

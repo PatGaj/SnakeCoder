@@ -21,6 +21,7 @@ export type UseSprintTabsCardVM = {
   isDone: boolean
   tasksDone: boolean
   quizDone: boolean
+  articleDone: boolean
 }
 
 const useSprintTabsCard = (sprints: SprintCardData[]): UseSprintTabsCardVM => {
@@ -45,6 +46,7 @@ const useSprintTabsCard = (sprints: SprintCardData[]): UseSprintTabsCardVM => {
       isDone: false,
       tasksDone: false,
       quizDone: false,
+      articleDone: false,
     }
   }
 
@@ -62,6 +64,7 @@ const useSprintTabsCard = (sprints: SprintCardData[]): UseSprintTabsCardVM => {
   const isDone = active.status === 'done'
   const tasksDone = active.tasksTotal > 0 && active.tasksDone >= active.tasksTotal
   const quizDone = active.quizTotal > 0 && active.quizScore >= active.quizTotal
+  const articleDone = active.articleTotal === 0 ? true : active.articleDoneCount >= active.articleTotal
 
   return {
     activeId,
@@ -74,6 +77,7 @@ const useSprintTabsCard = (sprints: SprintCardData[]): UseSprintTabsCardVM => {
     isDone,
     tasksDone,
     quizDone,
+    articleDone,
   }
 }
 

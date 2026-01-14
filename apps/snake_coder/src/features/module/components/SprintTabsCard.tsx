@@ -18,6 +18,8 @@ export type SprintCardData = {
   tasksDone: number
   tasksTotal: number
   articleDone: boolean
+  articleDoneCount: number
+  articleTotal: number
   quizScore: number
   quizTotal: number
   status: 'locked' | 'available' | 'inProgress' | 'done'
@@ -41,6 +43,7 @@ const SprintTabsCard: React.FC<SprintTabsCardProps> = ({ sprints, onOpen }) => {
     isDone,
     tasksDone,
     quizDone,
+    articleDone,
   } = useSprintTabsCard(sprints)
 
   if (!active) return null
@@ -120,8 +123,8 @@ const SprintTabsCard: React.FC<SprintTabsCardProps> = ({ sprints, onOpen }) => {
             <SprintMetaBadge done={tasksDone} todoIcon={RiFlagLine}>
               {t('sprints.meta.tasks', { done: active.tasksDone, total: active.tasksTotal })}
             </SprintMetaBadge>
-            <SprintMetaBadge done={active.articleDone} todoIcon={RiBookOpenLine}>
-              {t('sprints.meta.article', { done: active.articleDone ? 1 : 0, total: 1 })}
+            <SprintMetaBadge done={articleDone} todoIcon={RiBookOpenLine}>
+              {t('sprints.meta.article', { done: active.articleDoneCount, total: active.articleTotal })}
             </SprintMetaBadge>
             <SprintMetaBadge done={quizDone} todoIcon={RiTestTubeLine}>
               {t('sprints.meta.quiz', { score: active.quizScore, total: active.quizTotal })}

@@ -4,6 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg'
 
 import { PrismaClient } from '../src/generated/prisma/client'
 
+import { basicsSprints } from './basics-content'
 import { pcepSprints } from './pcep-content'
 
 const adapter = new PrismaPg({
@@ -13,6 +14,30 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({
   adapter,
 })
+
+const baseRequirements = ['Zwróć poprawny wynik.']
+const baseHints = ['Wykorzystaj podstawowe operacje Pythona.']
+
+const buildTaskTests = (publicCases: Array<[string, string]>, hiddenCases: Array<[string, string]>) => {
+  if (publicCases.length !== 3 || hiddenCases.length !== 5) {
+    throw new Error('Każde zadanie/bugfix musi mieć 3 testy jawne i 5 ukrytych.')
+  }
+
+  return [
+    ...publicCases.map((item, index) => ({
+      order: index + 1,
+      input: item[0],
+      expectedOutput: item[1],
+      isPublic: true,
+    })),
+    ...hiddenCases.map((item, index) => ({
+      order: index + 4,
+      input: item[0],
+      expectedOutput: item[1],
+      isPublic: false,
+    })),
+  ]
+}
 
 const seedUsers = async () => {
   const plainPassword = 'Test1234!'
@@ -138,6 +163,221 @@ const seedUsers = async () => {
   return { demoUserId: demo.id, testUserId: test.id, bobUserId: bob.id }
 }
 
+const seedBasicsModule = async () => {
+  const moduleRecord = await prisma.module.upsert({
+    where: { name: 'basics' },
+    update: {
+      name: 'basics',
+      code: 'BASICS',
+      title: 'Podstawy programowania',
+      description:
+        'Moduł startowy dla osób początkujących: algorytmy, dane, wejście/wyjście, warunki, pętle, listy, napisy i funkcje.',
+      requirements: ['Brak wymagań'],
+      category: 'CERTIFICATIONS',
+      difficulty: 'BEGINNER',
+      imagePath: '/images/python-image.png',
+      isBuilding: false,
+    },
+    create: {
+      name: 'basics',
+      code: 'BASICS',
+      title: 'Podstawy programowania',
+      description:
+        'Moduł startowy dla osób początkujących: algorytmy, dane, wejście/wyjście, warunki, pętle, listy, napisy i funkcje.',
+      requirements: ['Brak wymagań'],
+      category: 'CERTIFICATIONS',
+      difficulty: 'BEGINNER',
+      imagePath: '/images/python-image.png',
+      isBuilding: false,
+    },
+  })
+
+  await prisma.mission.deleteMany({ where: { moduleId: moduleRecord.id } })
+  await prisma.sprint.deleteMany({ where: { moduleId: moduleRecord.id } })
+
+  const sprintRecords = await Promise.all(
+    basicsSprints.map((sprint) =>
+      prisma.sprint.create({
+        data: {
+          moduleId: moduleRecord.id,
+          name: sprint.key,
+          order: sprint.order,
+          title: sprint.title,
+          description: sprint.description,
+        },
+      })
+    )
+  )
+
+  const sprintIdByName = new Map(sprintRecords.map((sprint) => [sprint.name, sprint.id]))
+
+  for (const sprint of basicsSprints) {
+    const sprintId = sprintIdByName.get(sprint.key)
+    if (!sprintId) {
+      throw new Error(`Missing sprint for ${sprint.key}`)
+    }
+
+    for (const [index, task] of sprint.tasks.entries()) {
+      const missionId = `${sprint.key}-task-${index + 1}`
+
+      await prisma.mission.create({
+        data: {
+          id: missionId,
+          moduleId: moduleRecord.id,
+          sprintId,
+          type: 'TASK',
+          difficulty: 'BEGINNER',
+          title: task.title,
+          shortDesc: task.shortDesc,
+          description: task.description,
+          requirements: task.requirements ?? baseRequirements,
+          hints: task.hints ?? baseHints,
+          etaMinutes: task.etaMinutes,
+          xp: task.xp,
+          timeLimitSeconds: task.etaMinutes * 60,
+        },
+      })
+
+      await prisma.task.create({
+        data: {
+          missionId,
+          starterCode: task.starterCode,
+          language: 'python',
+        },
+      })
+
+      await prisma.taskTestCase.createMany({
+        data: buildTaskTests(task.publicTests, task.hiddenTests).map((test) => ({
+          taskId: missionId,
+          order: test.order,
+          input: test.input,
+          expectedOutput: test.expectedOutput,
+          isPublic: test.isPublic,
+        })),
+      })
+    }
+
+    for (const [index, bugfix] of sprint.bugfixes.entries()) {
+      const missionId = `${sprint.key}-bugfix-${index + 1}`
+
+      await prisma.mission.create({
+        data: {
+          id: missionId,
+          moduleId: moduleRecord.id,
+          sprintId,
+          type: 'BUGFIX',
+          difficulty: 'BEGINNER',
+          title: bugfix.title,
+          shortDesc: bugfix.shortDesc,
+          description: bugfix.description,
+          requirements: bugfix.requirements ?? baseRequirements,
+          hints: bugfix.hints ?? baseHints,
+          etaMinutes: bugfix.etaMinutes,
+          xp: bugfix.xp,
+          timeLimitSeconds: bugfix.etaMinutes * 60,
+        },
+      })
+
+      await prisma.task.create({
+        data: {
+          missionId,
+          starterCode: bugfix.starterCode,
+          language: 'python',
+        },
+      })
+
+      await prisma.taskTestCase.createMany({
+        data: buildTaskTests(bugfix.publicTests, bugfix.hiddenTests).map((test) => ({
+          taskId: missionId,
+          order: test.order,
+          input: test.input,
+          expectedOutput: test.expectedOutput,
+          isPublic: test.isPublic,
+        })),
+      })
+    }
+
+    for (const [index, quiz] of sprint.quizzes.entries()) {
+      const missionId = `${sprint.key}-quiz-${index + 1}`
+
+      await prisma.mission.create({
+        data: {
+          id: missionId,
+          moduleId: moduleRecord.id,
+          sprintId,
+          type: 'QUIZ',
+          difficulty: 'BEGINNER',
+          title: quiz.title,
+          shortDesc: quiz.shortDesc,
+          description: quiz.description,
+          requirements: [],
+          hints: [],
+          etaMinutes: quiz.etaMinutes,
+          xp: quiz.xp,
+          timeLimitSeconds: quiz.etaMinutes * 60,
+          passPercent: 80,
+        },
+      })
+
+      await prisma.quiz.create({
+        data: {
+          missionId,
+        },
+      })
+
+      for (const [questionIndex, question] of quiz.questions.entries()) {
+        const questionRecord = await prisma.quizQuestion.create({
+          data: {
+            quizId: missionId,
+            order: questionIndex + 1,
+            title: question.title,
+            prompt: question.prompt,
+          },
+        })
+
+        await prisma.quizOption.createMany({
+          data: question.options.map((option, optionIndex) => ({
+            questionId: questionRecord.id,
+            order: optionIndex + 1,
+            label: option.label,
+            isCorrect: option.isCorrect,
+          })),
+        })
+      }
+    }
+
+    for (const [index, article] of sprint.articles.entries()) {
+      const articleId = `${sprint.key}-article-${index + 1}`
+
+      await prisma.mission.create({
+        data: {
+          id: articleId,
+          moduleId: moduleRecord.id,
+          sprintId,
+          type: 'ARTICLE',
+          difficulty: 'BEGINNER',
+          title: article.title,
+          shortDesc: article.shortDesc,
+          description: article.description,
+          requirements: [],
+          hints: [],
+          etaMinutes: article.etaMinutes,
+          xp: article.xp,
+        },
+      })
+
+      await prisma.article.create({
+        data: {
+          missionId: articleId,
+          tags: article.tags,
+          blocks: article.blocks,
+          summary: article.summary,
+        },
+      })
+    }
+  }
+}
+
 const seedPcepModule = async () => {
   const moduleRecord = await prisma.module.upsert({
     where: { name: 'pcep' },
@@ -218,30 +458,6 @@ const seedPcepModule = async () => {
   )
 
   const sprintIdByName = new Map(sprintRecords.map((sprint) => [sprint.name, sprint.id]))
-
-  const baseRequirements = ['Zwróć poprawny wynik.']
-  const baseHints = ['Wykorzystaj podstawowe operacje Pythona.']
-
-  const buildTaskTests = (publicCases: Array<[string, string]>, hiddenCases: Array<[string, string]>) => {
-    if (publicCases.length !== 3 || hiddenCases.length !== 5) {
-      throw new Error('Każde zadanie/bugfix musi mieć 3 testy jawne i 5 ukrytych.')
-    }
-
-    return [
-      ...publicCases.map((item, index) => ({
-        order: index + 1,
-        input: item[0],
-        expectedOutput: item[1],
-        isPublic: true,
-      })),
-      ...hiddenCases.map((item, index) => ({
-        order: index + 4,
-        input: item[0],
-        expectedOutput: item[1],
-        isPublic: false,
-      })),
-    ]
-  }
 
   for (const sprint of pcepSprints) {
     const sprintId = sprintIdByName.get(sprint.key)
@@ -456,6 +672,7 @@ const seedBuildingModules = async () => {
 
 export async function main() {
   await seedUsers()
+  await seedBasicsModule()
   await seedPcepModule()
   await seedBuildingModules()
 }

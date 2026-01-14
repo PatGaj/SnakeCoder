@@ -20,7 +20,6 @@ export type SprintBannerData = {
   articleDone: boolean
   quizScore: number
   quizTotal: number
-  sprintTestUnlocked: boolean
   progressPercent: number
   nextTaskTitle: string
   nextTaskDesc: string

@@ -3,7 +3,7 @@
 import { useRouter } from '@/i18n/navigation'
 import { motion } from 'framer-motion'
 
-import { DashboardHeader, LastResultCard, PlanCard, SkillTestCard, SprintBanner, NoSprintCard } from './components'
+import { DashboardHeader, LastResultCard, PlanCard, SprintBanner, NoSprintCard } from './components'
 import useDashboard from './useDashboard'
 
 const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
@@ -29,7 +29,7 @@ const itemVariants = {
 
 const Dashboard = () => {
   const router = useRouter()
-  const { name, plan, lastResult, sprint, skillTest, isLoading, isError, errorLabel } = useDashboard()
+  const { name, plan, lastResult, sprint, isLoading, isError, errorLabel } = useDashboard()
 
   if (isError) {
     return (
@@ -69,11 +69,6 @@ const Dashboard = () => {
         </motion.div>
       )}
 
-      {skillTest && (
-        <motion.div variants={itemVariants}>
-          <SkillTestCard skillTest={skillTest} onGoToTest={() => router.push(skillTest.route)} />
-        </motion.div>
-      )}
     </motion.main>
   )
 }

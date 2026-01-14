@@ -8,7 +8,6 @@ import type {
   LastResultBadgeVariant,
   LastResultCardData,
   PlanCardData,
-  SkillTestCardData,
   SprintBannerData,
 } from './components'
 
@@ -17,7 +16,6 @@ export type UseDashboardData = {
   plan?: PlanCardData
   lastResult: LastResultCardData
   sprint?: SprintBannerData
-  skillTest?: SkillTestCardData
   isLoading: boolean
   isError: boolean
   errorLabel: string
@@ -113,8 +111,6 @@ const useDashboard = (): UseDashboardData => {
   const articleOk = data.sprint.articleDone
   const planComplete = tasksDoneOk && quizOk && articleOk
 
-  const skillTestReady = tasksDoneOk && articleOk && quizOk
-
   const sprint: SprintBannerData = {
     module: data.sprint.module,
     sprintNo: data.sprint.sprintNo,
@@ -125,7 +121,6 @@ const useDashboard = (): UseDashboardData => {
     articleDone: data.sprint.articleDone,
     quizScore: data.sprint.quizScore,
     quizTotal: data.sprint.quizTotal,
-    sprintTestUnlocked: skillTestReady,
     progressPercent: sprintProgress,
     title: data.sprint.title,
     desc: data.sprint.desc,
@@ -148,27 +143,6 @@ const useDashboard = (): UseDashboardData => {
     },
     lastResult,
     sprint,
-    skillTest: {
-      ready: skillTestReady,
-      requirements: [
-        {
-          id: 'tasks',
-          done: tasksDoneOk,
-          meta: `${data.sprint.tasksDone}/${data.sprint.tasksTotal}`,
-        },
-        {
-          id: 'article',
-          done: articleOk,
-          meta: articleOk ? t('common.done') : t('common.todo'),
-        },
-        {
-          id: 'quiz',
-          done: quizOk,
-          meta: data.sprint.quizTotal > 0 ? `${data.sprint.quizScore}/${data.sprint.quizTotal}` : t('common.done'),
-        },
-      ],
-      route: '/missions',
-    },
     isLoading,
     isError,
     errorLabel: t('error'),

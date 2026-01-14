@@ -420,8 +420,7 @@
         "quiz": "Quiz {score}/{total}"
       },
       "fallbackTitle": "Sprint",
-      "fallbackDesc": "Sprint description — coming soon.",
-      "unlockHint": "Complete sprint test {no} to unlock the ability to start."
+      "fallbackDesc": "Sprint description — coming soon."
     },
     "common": {
       "done": "✓",

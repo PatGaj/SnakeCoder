@@ -420,8 +420,7 @@
         "quiz": "Quiz {score}/{total}"
       },
       "fallbackTitle": "Sprint",
-      "fallbackDesc": "Opis sprintu — w przygotowaniu.",
-      "unlockHint": "Ukończ test sprintu {no}, by odblokować możliwość rozpoczęcia."
+      "fallbackDesc": "Opis sprintu — w przygotowaniu."
     },
     "common": {
       "done": "✓",

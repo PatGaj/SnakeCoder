@@ -115,17 +115,14 @@ export async function GET(_: Request, { params }: Params) {
   const completed = Boolean(access?.completedAt) || (sprintsTotal > 0 && sprintsDone >= sprintsTotal);
   const headerStatus = building ? "building" : locked ? "locked" : completed ? "completed" : "available";
 
-  const sprintsWithStatus = building || !hasAccess
-    ? sprints.map((s) => ({ ...s, status: "locked" as const }))
-    : sprints.map((s, idx) => {
-        const prev = sprints[idx - 1];
-        const prevDone = idx === 0 ? true : prev.progressPercent >= 100;
-
-        if (!prevDone) return { ...s, status: "locked" as const };
-        if (s.progressPercent >= 100) return { ...s, status: "done" as const };
-        if (s.progressPercent > 0) return { ...s, status: "inProgress" as const };
-        return { ...s, status: "available" as const };
-      });
+  const sprintsWithStatus =
+    building || !hasAccess
+      ? sprints.map((s) => ({ ...s, status: "locked" as const }))
+      : sprints.map((s) => {
+          if (s.progressPercent >= 100) return { ...s, status: "done" as const };
+          if (s.progressPercent > 0) return { ...s, status: "inProgress" as const };
+          return { ...s, status: "available" as const };
+        });
 
   return NextResponse.json({
     module: {

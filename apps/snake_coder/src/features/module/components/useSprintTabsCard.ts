@@ -21,7 +21,6 @@ export type UseSprintTabsCardVM = {
   isDone: boolean
   tasksDone: boolean
   quizDone: boolean
-  unlockSprintNo?: number
 }
 
 const useSprintTabsCard = (sprints: SprintCardData[]): UseSprintTabsCardVM => {
@@ -46,11 +45,8 @@ const useSprintTabsCard = (sprints: SprintCardData[]): UseSprintTabsCardVM => {
       isDone: false,
       tasksDone: false,
       quizDone: false,
-      unlockSprintNo: undefined,
     }
   }
-
-  const activeIndex = sprints.findIndex((sprint) => sprint.id === active.id)
 
   const tabs: SprintTabVM[] = sprints.map((sprint) => ({
     id: sprint.id,
@@ -66,7 +62,6 @@ const useSprintTabsCard = (sprints: SprintCardData[]): UseSprintTabsCardVM => {
   const isDone = active.status === 'done'
   const tasksDone = active.tasksTotal > 0 && active.tasksDone >= active.tasksTotal
   const quizDone = active.quizTotal > 0 && active.quizScore >= active.quizTotal
-  const unlockSprintNo = isLocked && activeIndex > 0 ? sprints[activeIndex - 1]?.sprintNo : undefined
 
   return {
     activeId,
@@ -79,7 +74,6 @@ const useSprintTabsCard = (sprints: SprintCardData[]): UseSprintTabsCardVM => {
     isDone,
     tasksDone,
     quizDone,
-    unlockSprintNo,
   }
 }
 

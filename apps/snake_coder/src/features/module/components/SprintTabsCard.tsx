@@ -41,7 +41,6 @@ const SprintTabsCard: React.FC<SprintTabsCardProps> = ({ sprints, onOpen }) => {
     isDone,
     tasksDone,
     quizDone,
-    unlockSprintNo,
   } = useSprintTabsCard(sprints)
 
   if (!active) return null
@@ -114,11 +113,6 @@ const SprintTabsCard: React.FC<SprintTabsCardProps> = ({ sprints, onOpen }) => {
               >
                 {t('sprints.cta', { status: active.status })}
               </Button>
-              {isLocked && (
-                <p className="mt-2 max-w-60 text-xs text-snowWhite-300 text-end">
-                  {t('sprints.unlockHint', { no: unlockSprintNo ?? active.sprintNo })}
-                </p>
-              )}
             </div>
           </div>
           <Separator className="my-5" />

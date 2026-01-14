@@ -11,7 +11,7 @@ const StatTopBar = () => {
   const { streakDays, xpGained, rank, grade, leagueName } = useStatTopBar()
 
   return (
-    <div className="fixed right-10 top-0 z-90 max-w-155">
+    <div className="fixed right-10 top-0 z-90 w-fit max-w-none">
       <div className="relative overflow-hidden rounded-b-2xl border border-primary-800/70 border-r-0 border-t-0 bg-primary-950/70 px-4 py-3 shadow-[0_26px_70px_#00000085]">
         <div className="pointer-events-none absolute -left-12 -top-14 h-44 w-44 rounded-full bg-secondary-500/15 blur-3xl" />
         <div className="pointer-events-none absolute -right-8 -top-10 h-44 w-44 rounded-full bg-aquaBlue-500/10 blur-3xl" />
@@ -29,7 +29,7 @@ const StatTopBar = () => {
             label="Rank XP"
             value={`${xpGained} XP`}
             icon={<RiStarSmileLine className="text-aquaBlue-200" size={18} />}
-            className="border-aquaBlue-400/25 bg-linear-to-br from-aquaBlue-500/16 to-primary-950/70"
+            className="min-w-[9rem] border-aquaBlue-400/25 bg-linear-to-br from-aquaBlue-500/16 to-primary-950/70"
             iconWrapperClassName="bg-aquaBlue-500/12"
           />
           <StatTopBarItem
@@ -37,7 +37,7 @@ const StatTopBar = () => {
             label={t('league.label')}
             value={`${leagueName} #${rank}`}
             icon={<RiTrophyLine className="text-yellow-200" size={18} />}
-            className="border-yellow-400/25 bg-linear-to-br from-yellow-500/16 to-primary-950/70"
+            className="min-w-[10rem] border-yellow-400/25 bg-linear-to-br from-yellow-500/16 to-primary-950/70"
             iconWrapperClassName="bg-yellow-500/12"
           />
           <StatTopBarItem

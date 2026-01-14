@@ -179,9 +179,17 @@
   "dashboard": {
     "badge": "Dashboard",
     "hint": "Next steps and a quick progress overview.",
+    "error": "Failed to load dashboard data.",
     "title": "Hi, {name}!",
     "subtitle": "Continue your sprint and keep your streak — the rest is one click away.",
     "fallbackUser": "there",
+    "empty": {
+      "badge": "Start",
+      "badgeHint": "Modules",
+      "title": "Unlock a module to begin",
+      "desc": "Go to modules, unlock a learning path, and start your first sprint.",
+      "cta": "Go to modules"
+    },
     "actions": {
       "continueSprint": "Continue sprint",
       "daily": "Daily",
@@ -376,6 +384,20 @@
       "buildingCta": "Under construction",
       "lockedCta": "Locked",
       "cta": "{state, select, building{Under construction} locked{Get access} completed{View module} continue{Continue module} start{Start module} other{Start module}}"
+    },
+    "unlockModal": {
+      "badge": "Module access",
+      "title": "Get access",
+      "desc": "This module is locked. Unlock it to start sprints and missions.",
+      "note": "Mock only — for now we simulate purchase and unlocking.",
+      "actions": {
+        "cancel": "Cancel",
+        "unlock": "Unlock"
+      },
+      "toast": {
+        "success": "Module unlocked.",
+        "error": "Failed to unlock the module."
+      }
     }
   },
   "module": {
@@ -412,6 +434,9 @@
   },
   "sprint": {
     "badge": "Sprint",
+    "fallback": {
+      "desc": "A quick sprint kanban. Click a card to see details and go to the task."
+    },
     "empty": "No tasks for this sprint — we’ll add them soon.",
     "columns": {
       "todo": "To do",
@@ -467,6 +492,7 @@
   },
   "task": {
     "badge": "Mission",
+    "error": "Failed to load task.",
     "title": "Task: {id}",
     "subtitle": "Write the code, run it, and check the tests.",
     "meta": {
@@ -494,6 +520,7 @@
       "test": "Run tests",
       "run": "Run code",
       "save": "Save",
+      "reset": "Reset",
       "submit": "Submit solution",
       "aiReview": "Review code with AI",
       "clearConsole": "Clear"
@@ -521,7 +548,7 @@
       "saveSuccess": "Code saved.",
       "saveFailed": "Couldn’t save code.",
       "submitSuccess": "Solution submitted.",
-      "submitFailed": "Fix the tests first."
+      "submitFailed": "Solution didn’t pass all tests."
     },
     "submitModal": {
       "message": "{status, select, passed {Congratulations!} failed {Sorry — try again.} other {}}"
@@ -529,6 +556,7 @@
   },
   "article": {
     "badge": "Article",
+    "error": "Failed to load article.",
     "toc": "Table of contents",
     "tocEmpty": "No sections in the table of contents.",
     "content": "Content",
@@ -547,11 +575,13 @@
       "highlight": "Important"
     },
     "toasts": {
-      "markRead": "Article marked as read (mock)."
+      "markRead": "Article marked as read.",
+      "markReadError": "Couldn't mark the article as read. Please try again."
     }
   },
   "quiz": {
     "badge": "Quiz",
+    "error": "Failed to load quiz.",
     "empty": "No questions for this quiz.",
     "progress": "Question {current}/{total}",
     "meta": {
@@ -580,19 +610,31 @@
       "yourAnswer": "Your answer",
       "correctAnswer": "Correct answer",
       "noAnswer": "No answer"
+    },
+    "toast": {
+      "submitError": "Couldn't finish the quiz. Please try again."
     }
   },
   "profile": {
     "badge": "Profile",
     "title": "Your profile",
     "subtitle": "Set your nickname, fill in details, and see your stats.",
+    "error": "Failed to load profile.",
     "fallbackUser": "User",
-    "hint": "Profile editing is a mockup (for now).",
+    "hint": "Edit your nickname and profile details.",
     "account": {
       "subtitle": "Your details"
     },
     "sections": {
-      "stats": "Statistics"
+      "stats": "Statistics",
+      "modules": "Unlocked modules"
+    },
+    "modules": {
+      "subtitle": "A list of modules you have access to.",
+      "empty": "You don't have any unlocked modules yet.",
+      "count": "{count} modules",
+      "unlockedAt": "Unlocked: {date}",
+      "completedAt": "Completed: {date}"
     },
     "fields": {
       "nickName": "Nickname",
@@ -610,7 +652,9 @@
     },
     "errors": {
       "nickNameRequired": "Enter a nickname.",
-      "nickNameInvalid": "Nickname can contain only letters and numbers (no spaces or special characters)."
+      "nickNameInvalid": "Nickname can contain only letters, numbers, and _ (no spaces).",
+      "nickNameTaken": "This nickname is already taken.",
+      "generic": "Something went wrong. Please try again."
     },
     "stats": {
       "subtitle": "A quick overview of your progress.",
@@ -622,7 +666,7 @@
       "gradeAvgHint": "Average AI ratings across all tasks."
     },
     "toasts": {
-      "saved": "Changes saved (mock)."
+      "saved": "Changes saved."
     }
   },
   "ranking": {
@@ -722,7 +766,7 @@
     },
     "errors": {
       "nickNameRequired": "Enter a nickname.",
-      "nickNameInvalid": "Nickname can contain only letters and numbers (no spaces or special characters).",
+      "nickNameInvalid": "Nickname can contain only letters, numbers, and _ (no spaces).",
       "nickNameTaken": "That nickname is already taken.",
       "email": "Enter a valid email address.",
       "passwordRequired": "Enter a password.",

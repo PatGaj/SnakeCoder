@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { RiSave2Line } from 'react-icons/ri'
+import { RiRefreshLine, RiSave2Line } from 'react-icons/ri'
 
 import { Button, Modal } from '@/components'
 
@@ -14,6 +14,8 @@ export type TaskProps = {
 
 const Task: React.FC<TaskProps> = ({ id }) => {
   const {
+    errorLabel,
+    isError,
     task,
     editor,
     publicTests,
@@ -30,6 +32,7 @@ const Task: React.FC<TaskProps> = ({ id }) => {
     onRun,
     onTest,
     onSave,
+    onReset,
     onSubmit,
     onAiReview,
     submitModalOpen,
@@ -37,7 +40,19 @@ const Task: React.FC<TaskProps> = ({ id }) => {
     submitModalMessage,
     closeSubmitModal,
     saveLabel,
+    resetLabel,
   } = useTask(id)
+
+  if (!task || !editor || !publicTests) {
+    if (isError) {
+      return (
+        <main className="mx-auto max-w-400 px-6 pb-6 pt-20 md:px-12">
+          <div className="text-sm text-snowWhite-300">{errorLabel}</div>
+        </main>
+      )
+    }
+    return null
+  }
 
   return (
     <main className="mx-auto max-w-400 px-6 pb-6 pt-20 md:px-12 flex flex-col gap-6 lg:h-screen lg:overflow-hidden">
@@ -55,6 +70,7 @@ const Task: React.FC<TaskProps> = ({ id }) => {
           />
           <TestResults
             results={results}
+            isRunning={testLoading}
             className="flex-1 min-h-0 overflow-y-auto scrollbar-thumb-secondary-500 scrollbar-track-primary-500 scrollbar-thin"
           />
         </div>
@@ -68,6 +84,19 @@ const Task: React.FC<TaskProps> = ({ id }) => {
                 onChange={onCodeChange}
                 headerRight={
                   <div className="flex items-center gap-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      round="lg"
+                      leftIcon={<RiRefreshLine size={16} />}
+                      className="px-3 border border-primary-800/70"
+                      loading={saveLoading}
+                      disabled={saveLoading}
+                      onClick={onReset}
+                      type="button"
+                    >
+                      {resetLabel}
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"

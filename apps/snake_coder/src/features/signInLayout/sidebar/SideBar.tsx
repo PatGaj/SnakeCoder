@@ -4,6 +4,7 @@ import React from 'react'
 import { signOut, useSession } from 'next-auth/react'
 import { useLocale, useTranslations } from 'next-intl'
 import clsx from 'clsx'
+import { useQuery } from '@tanstack/react-query'
 import {
   RiArrowRightSLine,
   RiFlagLine,
@@ -20,6 +21,21 @@ import { normalizeUrlPath } from '@/lib/normalize'
 import SideBarNavItem from './SideBarNavItem'
 import SideBarToggle from './SideBarToggle'
 
+type UserApiResponse = {
+  account: {
+    userName: string | null
+    nickName: string | null
+  }
+}
+
+const fetchUser = async (): Promise<UserApiResponse> => {
+  const response = await fetch('/api/user', { method: 'GET', cache: 'no-store' })
+  if (!response.ok) {
+    throw new Error('Failed to fetch user')
+  }
+  return response.json() as Promise<UserApiResponse>
+}
+
 const SideBar = () => {
   const [collapsed, setCollapsed] = React.useState<boolean>(false)
 
@@ -28,11 +44,15 @@ const SideBar = () => {
   const rawPathname = usePathname()
   const router = useRouter()
   const { data: session } = useSession()
+  const { data: userData } = useQuery({
+    queryKey: ['user'],
+    queryFn: fetchUser,
+  })
 
   const pathname = normalizeUrlPath(rawPathname || '/')
 
   const displayName = (() => {
-    const possible = (session?.user as { nickName?: string } | null)?.nickName || session?.user?.name
+    const possible = userData?.account.userName || userData?.account.nickName || session?.user?.name
     return possible || 'USER'
   })()
 

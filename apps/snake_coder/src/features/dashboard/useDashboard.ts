@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
+import { useQuery } from '@tanstack/react-query'
 
 import type {
   LastResultBadgeVariant,
@@ -13,145 +14,164 @@ import type {
 
 export type UseDashboardData = {
   name: string
-  plan: PlanCardData
+  plan?: PlanCardData
   lastResult: LastResultCardData
-  sprint: SprintBannerData
-  skillTest: SkillTestCardData
+  sprint?: SprintBannerData
+  skillTest?: SkillTestCardData
+  isLoading: boolean
+  isError: boolean
+  errorLabel: string
+}
+
+type DashboardApiResponse = {
+  name: string | null
+  sprint:
+    | {
+        module: 'PCEP' | 'PCAP'
+        moduleId: string
+        sprintId: string
+        sprintNo: number
+        etaMinutes: number
+        hasActiveTask: boolean
+        tasksDone: number
+        tasksTotal: number
+        articleDone: boolean
+        quizScore: number
+        quizTotal: number
+        nextTaskTitle: string
+        nextTaskDesc: string
+        title: string
+        desc: string
+        taskRoute: string
+        route: string
+      }
+    | null
+  lastResult: {
+    todayXp: number
+    yesterdayXp: number
+    grade: string
+    speedPercent: number
+  }
+}
+
+const fetchDashboard = async (): Promise<DashboardApiResponse> => {
+  const response = await fetch('/api/dashboard', { method: 'GET', cache: 'no-store' })
+  if (!response.ok) {
+    throw new Error('Failed to fetch dashboard')
+  }
+  return response.json() as Promise<DashboardApiResponse>
 }
 
 const useDashboard = (): UseDashboardData => {
   const t = useTranslations('dashboard')
   const { data: session } = useSession()
 
-  const name = session?.user?.name || t('fallbackUser')
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['dashboard'],
+    queryFn: fetchDashboard,
+  })
 
-  const hardData = {
-    sprint: {
-      module: 'PCEP' as const,
-      sprintNo: 3,
-      etaMinutes: 18,
-      hasActiveTask: false,
-      tasksDone: 2,
-      tasksTotal: 6,
-      articleDone: true,
-      quizScore: 6,
-      quizTotal: 10,
-      sprintTestUnlocked: false,
-      title: 'Funkcje: argumenty i zwracanie',
-      desc: 'Krótkie ćwiczenia z funkcji: argumenty, return i walidacja.',
-      nextTaskTitle: 'Walidacja danych wejściowych',
-      nextTaskDesc: 'Dodaj sprawdzanie typu i zakresu argumentów oraz upewnij się, że rozwiązanie przechodzi testy.',
-      taskRoute: '/missions/task/pcep-3-task-1',
-      sprintRoute: '/modules/pcep/pcep-3',
-    },
-    lastResult: {
-      todayXp: 40,
-      yesterdayXp: 180,
-      grade: 'B+',
-      avgSeconds: 120,
-      lastSeconds: 105,
-    },
-    plan: {
-      bonusXp: 120,
-    },
+  const name = data?.name || session?.user?.name || t('fallbackUser')
+
+  const speedBadgeVariant: LastResultBadgeVariant = (() => {
+    const percent = data?.lastResult.speedPercent ?? 100
+    if (percent >= 120) return 'success'
+    if (percent >= 100) return 'secondary'
+    if (percent >= 80) return 'muted'
+    return 'warning'
+  })()
+
+  const lastResult: LastResultCardData = {
+    todayXp: data?.lastResult.todayXp ?? 0,
+    yesterdayXp: data?.lastResult.yesterdayXp ?? 0,
+    grade: data?.lastResult.grade ?? '—',
+    speedPercent: data?.lastResult.speedPercent ?? 100,
+    speedBadgeVariant,
+  }
+
+  if (!data?.sprint) {
+    return {
+      name,
+      lastResult,
+      isLoading,
+      isError,
+      errorLabel: t('error'),
+    }
   }
 
   const sprintProgress = Math.round(
-    (hardData.sprint.tasksDone / Math.max(hardData.sprint.tasksTotal, 1)) * 70 +
-      (hardData.sprint.articleDone ? 15 : 0) +
-      (hardData.sprint.quizScore / Math.max(hardData.sprint.quizTotal, 1)) * 15
+    (data.sprint.tasksDone / Math.max(data.sprint.tasksTotal, 1)) * 70 +
+      (data.sprint.articleDone ? 15 : 0) +
+      (data.sprint.quizTotal > 0 ? (data.sprint.quizScore / data.sprint.quizTotal) * 15 : 15)
   )
 
-  const quizPercent = Math.round((hardData.sprint.quizScore / Math.max(hardData.sprint.quizTotal, 1)) * 100)
-  const quizOk = quizPercent >= 80
+  const quizPercent =
+    data.sprint.quizTotal > 0 ? Math.round((data.sprint.quizScore / data.sprint.quizTotal) * 100) : 100
+  const quizOk = data.sprint.quizTotal > 0 ? quizPercent >= 80 : true
 
-  const tasksDoneOk = hardData.sprint.tasksDone >= hardData.sprint.tasksTotal
-  const articleOk = hardData.sprint.articleDone
+  const tasksDoneOk = data.sprint.tasksDone >= data.sprint.tasksTotal
+  const articleOk = data.sprint.articleDone
   const planComplete = tasksDoneOk && quizOk && articleOk
 
-  const skillTestReady =
-    hardData.sprint.tasksDone >= hardData.sprint.tasksTotal &&
-    hardData.sprint.articleDone &&
-    hardData.sprint.quizScore >= hardData.sprint.quizTotal
+  const skillTestReady = tasksDoneOk && articleOk && quizOk
 
-  const speedMultiplier = (() => {
-    const timeSeconds = hardData.lastResult.lastSeconds
-    const avg = hardData.lastResult.avgSeconds
-    const fastUpper = Math.round(avg * 0.83)
-    const avgUpper = Math.round(avg * 1.17)
-    const slowUpper = Math.round(avg * 2.0)
-
-    if (timeSeconds < fastUpper) return 1.2
-    if (timeSeconds <= avgUpper) return 1.0
-    if (timeSeconds <= slowUpper) return 0.8
-    return 0.5
-  })()
-
-  const speedBadgeVariant: LastResultBadgeVariant = (() => {
-    if (speedMultiplier >= 1.2) return 'success'
-    if (speedMultiplier >= 1.0) return 'secondary'
-    if (speedMultiplier >= 0.8) return 'muted'
-    return 'warning'
-  })()
+  const sprint: SprintBannerData = {
+    module: data.sprint.module,
+    sprintNo: data.sprint.sprintNo,
+    etaMinutes: data.sprint.etaMinutes,
+    hasActiveTask: data.sprint.hasActiveTask,
+    tasksDone: data.sprint.tasksDone,
+    tasksTotal: data.sprint.tasksTotal,
+    articleDone: data.sprint.articleDone,
+    quizScore: data.sprint.quizScore,
+    quizTotal: data.sprint.quizTotal,
+    sprintTestUnlocked: skillTestReady,
+    progressPercent: sprintProgress,
+    title: data.sprint.title,
+    desc: data.sprint.desc,
+    nextTaskTitle: data.sprint.nextTaskTitle,
+    nextTaskDesc: data.sprint.nextTaskDesc,
+    taskRoute: data.sprint.taskRoute,
+    route: data.sprint.route,
+  }
 
   return {
     name,
     plan: {
-      bonusXp: hardData.plan.bonusXp,
+      bonusXp: 120,
       complete: planComplete,
-      tasksDone: hardData.sprint.tasksDone,
-      tasksTotal: hardData.sprint.tasksTotal,
-      articleDone: hardData.sprint.articleDone,
+      tasksDone: data.sprint.tasksDone,
+      tasksTotal: data.sprint.tasksTotal,
+      articleDone: data.sprint.articleDone,
       quizPercent,
       quizOk,
     },
-    lastResult: {
-      todayXp: hardData.lastResult.todayXp,
-      yesterdayXp: hardData.lastResult.yesterdayXp,
-      grade: hardData.lastResult.grade,
-      speedPercent: Math.round(speedMultiplier * 100),
-      speedBadgeVariant,
-    },
-    sprint: {
-      module: hardData.sprint.module,
-      sprintNo: hardData.sprint.sprintNo,
-      etaMinutes: hardData.sprint.etaMinutes,
-      hasActiveTask: hardData.sprint.hasActiveTask,
-      tasksDone: hardData.sprint.tasksDone,
-      tasksTotal: hardData.sprint.tasksTotal,
-      articleDone: hardData.sprint.articleDone,
-      quizScore: hardData.sprint.quizScore,
-      quizTotal: hardData.sprint.quizTotal,
-      sprintTestUnlocked: hardData.sprint.sprintTestUnlocked,
-      progressPercent: sprintProgress,
-      title: hardData.sprint.title,
-      desc: hardData.sprint.desc,
-      nextTaskTitle: hardData.sprint.nextTaskTitle,
-      nextTaskDesc: hardData.sprint.nextTaskDesc,
-      taskRoute: hardData.sprint.taskRoute,
-      route: hardData.sprint.sprintRoute,
-    },
+    lastResult,
+    sprint,
     skillTest: {
       ready: skillTestReady,
       requirements: [
         {
           id: 'tasks',
-          done: hardData.sprint.tasksDone >= hardData.sprint.tasksTotal,
-          meta: `${hardData.sprint.tasksDone}/${hardData.sprint.tasksTotal}`,
+          done: tasksDoneOk,
+          meta: `${data.sprint.tasksDone}/${data.sprint.tasksTotal}`,
         },
         {
           id: 'article',
-          done: hardData.sprint.articleDone,
-          meta: hardData.sprint.articleDone ? t('common.done') : t('common.todo'),
+          done: articleOk,
+          meta: articleOk ? t('common.done') : t('common.todo'),
         },
         {
           id: 'quiz',
-          done: hardData.sprint.quizScore >= hardData.sprint.quizTotal,
-          meta: `${hardData.sprint.quizScore}/${hardData.sprint.quizTotal}`,
+          done: quizOk,
+          meta: data.sprint.quizTotal > 0 ? `${data.sprint.quizScore}/${data.sprint.quizTotal}` : t('common.done'),
         },
       ],
       route: '/missions',
     },
+    isLoading,
+    isError,
+    errorLabel: t('error'),
   }
 }
 

@@ -40,6 +40,8 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
   const t = useTranslations('dashboard')
   const taskLabel = sprint.hasActiveTask ? t('sprint.currentTaskLabel') : t('sprint.nextTaskLabel')
   const ctaLabel = sprint.hasActiveTask ? t('sprint.ctaContinueTask') : t('sprint.ctaStartTask')
+  const quizPercent = sprint.quizTotal > 0 ? (sprint.quizScore / sprint.quizTotal) * 100 : 100
+  const quizDone = sprint.quizTotal > 0 ? quizPercent >= 80 : true
 
   return (
     <Box variant="glass" size="xl" round="3xl" className="relative w-full overflow-hidden border-primary-800/70">
@@ -122,7 +124,7 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
             icon={<RiTestTubeLine className="text-secondary-400" size={18} />}
             label={t('sprint.items.quiz')}
             right={
-              <Badge variant="muted" className="px-2 py-0.5">
+              <Badge variant={quizDone ? 'success' : 'muted'} className="px-2 py-0.5">
                 {sprint.quizScore}/{sprint.quizTotal}
               </Badge>
             }

@@ -179,9 +179,17 @@
   "dashboard": {
     "badge": "Dashboard",
     "hint": "Najbliższe kroki i szybki podgląd postępu.",
+    "error": "Nie udało się wczytać danych dashboardu.",
     "title": "Cześć, {name}!",
     "subtitle": "Kontynuuj sprint i utrzymaj streak — reszta jest kliknięcie dalej.",
     "fallbackUser": "Użytkowniku",
+    "empty": {
+      "badge": "Start",
+      "badgeHint": "Moduły",
+      "title": "Odblokuj moduł, żeby zacząć",
+      "desc": "Przejdź do modułów, odblokuj wybrany zakres i rozpocznij pierwszy sprint.",
+      "cta": "Przejdź do modułów"
+    },
     "actions": {
       "continueSprint": "Kontynuuj sprint",
       "daily": "Daily",
@@ -376,6 +384,20 @@
       "buildingCta": "W budowie",
       "lockedCta": "Zablokowane",
       "cta": "{state, select, building{W budowie} locked{Uzyskaj dostęp} completed{Zobacz moduł} continue{Kontynuuj moduł} start{Rozpocznij moduł} other{Rozpocznij moduł}}"
+    },
+    "unlockModal": {
+      "badge": "Dostęp do modułu",
+      "title": "Uzyskaj dostęp",
+      "desc": "Ten moduł jest zablokowany. Odblokuj go, aby rozpocząć sprinty i misje.",
+      "note": "To jest makieta — na razie symulujemy zakup i odblokowanie dostępu.",
+      "actions": {
+        "cancel": "Anuluj",
+        "unlock": "Odblokuj"
+      },
+      "toast": {
+        "success": "Moduł został odblokowany.",
+        "error": "Nie udało się odblokować modułu."
+      }
     }
   },
   "module": {
@@ -412,6 +434,9 @@
   },
   "sprint": {
     "badge": "Sprint",
+    "fallback": {
+      "desc": "Krótki kanban z zadaniami sprintu. Kliknij kartę, aby zobaczyć szczegóły i przejść do zadania."
+    },
     "empty": "Brak zadań dla tego sprintu — wkrótce uzupełnimy.",
     "columns": {
       "todo": "Do zrobienia",
@@ -467,6 +492,7 @@
   },
   "task": {
     "badge": "Misja",
+    "error": "Nie udało się wczytać zadania.",
     "title": "Zadanie: {id}",
     "subtitle": "Napisz kod, uruchom go i sprawdź testy.",
     "meta": {
@@ -494,6 +520,7 @@
       "test": "Uruchom testy",
       "run": "Uruchom kod",
       "save": "Zapisz",
+      "reset": "Resetuj",
       "submit": "Wyślij rozwiązanie",
       "aiReview": "Oceń kod przez AI",
       "clearConsole": "Wyczyść"
@@ -521,7 +548,7 @@
       "saveSuccess": "Zapisano kod.",
       "saveFailed": "Nie udało się zapisać kodu.",
       "submitSuccess": "Rozwiązanie wysłane.",
-      "submitFailed": "Najpierw popraw testy."
+      "submitFailed": "Rozwiązanie nie przeszło wszystkich testów."
     },
     "submitModal": {
       "message": "{status, select, passed {Gratulacje!} failed {Przykro mi — spróbuj ponownie.} other {}}"
@@ -529,6 +556,7 @@
   },
   "article": {
     "badge": "Artykuł",
+    "error": "Nie udało się wczytać artykułu.",
     "toc": "Spis treści",
     "tocEmpty": "Brak sekcji w spisie treści.",
     "content": "Treść",
@@ -547,11 +575,13 @@
       "highlight": "Ważne"
     },
     "toasts": {
-      "markRead": "Artykuł oznaczony jako przeczytany (mock)."
+      "markRead": "Artykuł oznaczony jako przeczytany.",
+      "markReadError": "Nie udało się oznaczyć artykułu. Spróbuj ponownie."
     }
   },
   "quiz": {
     "badge": "Quiz",
+    "error": "Nie udało się wczytać quizu.",
     "empty": "Brak pytań dla tego quizu.",
     "progress": "Pytanie {current}/{total}",
     "meta": {
@@ -580,19 +610,31 @@
       "yourAnswer": "Twoja odpowiedź",
       "correctAnswer": "Poprawna odpowiedź",
       "noAnswer": "Brak odpowiedzi"
+    },
+    "toast": {
+      "submitError": "Nie udało się zakończyć quizu. Spróbuj ponownie."
     }
   },
   "profile": {
     "badge": "Profil",
     "title": "Twój profil",
     "subtitle": "Ustaw nick, uzupełnij dane i zobacz statystyki.",
+    "error": "Nie udało się wczytać profilu.",
     "fallbackUser": "Użytkownik",
-    "hint": "Edycja profilu to makieta (na razie).",
+    "hint": "Edytuj swój nick i dane profilu.",
     "account": {
       "subtitle": "Twoje dane"
     },
     "sections": {
-      "stats": "Statystyki"
+      "stats": "Statystyki",
+      "modules": "Odblokowane moduły"
+    },
+    "modules": {
+      "subtitle": "Lista modułów, do których masz dostęp.",
+      "empty": "Nie masz jeszcze odblokowanych modułów.",
+      "count": "{count} modułów",
+      "unlockedAt": "Odblokowano: {date}",
+      "completedAt": "Ukończono: {date}"
     },
     "fields": {
       "nickName": "Nick",
@@ -610,7 +652,9 @@
     },
     "errors": {
       "nickNameRequired": "Podaj nick.",
-      "nickNameInvalid": "Nick może zawierać tylko litery i cyfry (bez spacji i znaków specjalnych)."
+      "nickNameInvalid": "Nick może zawierać tylko litery, cyfry i _ (bez spacji).",
+      "nickNameTaken": "Taki nick jest już zajęty.",
+      "generic": "Coś poszło nie tak. Spróbuj ponownie."
     },
     "stats": {
       "subtitle": "Szybki podgląd Twojego postępu.",
@@ -622,7 +666,7 @@
       "gradeAvgHint": "Średnia ocen od AI z wszystkich zadań."
     },
     "toasts": {
-      "saved": "Zapisano zmiany (mock)."
+      "saved": "Zapisano zmiany."
     }
   },
   "ranking": {
@@ -722,7 +766,7 @@
     },
     "errors": {
       "nickNameRequired": "Podaj nick.",
-      "nickNameInvalid": "Nick może zawierać tylko litery i cyfry (bez spacji i znaków specjalnych).",
+      "nickNameInvalid": "Nick może zawierać tylko litery, cyfry i _ (bez spacji).",
       "nickNameTaken": "Taki nick jest już zajęty.",
       "email": "Podaj poprawny adres email.",
       "passwordRequired": "Podaj hasło.",

@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl'
-import { RiAwardLine, RiQuestionAnswerLine } from 'react-icons/ri'
+import { RiAwardLine, RiQuestionAnswerLine, RiTimerLine } from 'react-icons/ri'
 
 import { Badge, Box, Progressbar, Separator } from '@/components'
 
@@ -15,9 +15,11 @@ export type QuizHeaderProps = {
   current: number
   total: number
   answered: number
+  timeLeftLabel?: string
+  isTimeWarning?: boolean
 }
 
-const QuizHeader: React.FC<QuizHeaderProps> = ({ header, current, total, answered }) => {
+const QuizHeader: React.FC<QuizHeaderProps> = ({ header, current, total, answered, timeLeftLabel, isTimeWarning }) => {
   const t = useTranslations('quiz')
   const percent = total > 0 ? Math.round((current / total) * 100) : 0
 
@@ -42,6 +44,14 @@ const QuizHeader: React.FC<QuizHeaderProps> = ({ header, current, total, answere
               {t('meta.pass', { percent: header.passPercent })}
             </span>
           </Badge>
+          {timeLeftLabel && (
+            <Badge variant={isTimeWarning ? 'warning' : 'muted'} size="sm" className="px-3 py-1">
+              <span className="inline-flex items-center gap-2">
+                <RiTimerLine size={16} className={isTimeWarning ? 'text-nightBlack-900' : 'text-secondary-300'} />
+                {t('meta.time', { time: timeLeftLabel })}
+              </span>
+            </Badge>
+          )}
           <Badge variant="secondary" size="sm" className="px-3 py-1">
             {t('meta.xp', { xp: header.xp })}
           </Badge>

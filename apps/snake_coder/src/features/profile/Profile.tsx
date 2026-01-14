@@ -1,14 +1,24 @@
 'use client'
 
-import toast from 'react-hot-toast'
 import { useTranslations } from 'next-intl'
 
-import { ProfileAccountCard, ProfileStatsCard } from './components'
+import { ProfileAccountCard, ProfileStatsCard, ProfileUnlockedModulesCard } from './components'
 import useProfile from './useProfile'
 
 const Profile = () => {
   const t = useTranslations('profile')
-  const { account, stats } = useProfile()
+  const { account, stats, unlockedModules, isError, errorLabel, saveAccount } = useProfile()
+
+  if (!account || !stats) {
+    if (isError) {
+      return (
+        <main className="mx-auto max-w-400 px-6 pb-10 pt-20 md:px-12">
+          <div className="text-sm text-snowWhite-300">{errorLabel}</div>
+        </main>
+      )
+    }
+    return null
+  }
 
   return (
     <main className="mx-auto max-w-400 px-6 pb-10 pt-20 space-y-8 md:px-12">
@@ -19,13 +29,12 @@ const Profile = () => {
       </header>
 
       <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <ProfileAccountCard
-          account={account}
-          onSave={() => {
-            toast.success(t('toasts.saved'))
-          }}
-        />
+        <ProfileAccountCard account={account} onSave={saveAccount} />
         <ProfileStatsCard stats={stats} />
+      </section>
+
+      <section>
+        <ProfileUnlockedModulesCard modules={unlockedModules} />
       </section>
     </main>
   )

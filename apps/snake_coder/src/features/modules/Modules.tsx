@@ -3,6 +3,7 @@
 import React from 'react'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import toast from 'react-hot-toast'
 import { RiLock2Line } from 'react-icons/ri'
@@ -12,6 +13,37 @@ import { useRouter } from '@/i18n/navigation'
 
 import ModuleCard from './moduleCard'
 import useModules from './useModules'
+
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: EASE_OUT,
+      when: 'beforeChildren',
+      staggerChildren: 0.08,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: EASE_OUT } },
+}
+
+const gridVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.06,
+    },
+  },
+}
 
 const Modules = () => {
   const t = useTranslations('modules')
@@ -57,36 +89,45 @@ const Modules = () => {
   }
 
   return (
-    <main className="mx-auto max-w-400 px-6 py-10 space-y-8 md:px-12">
-      <header className="space-y-2">
+    <motion.main
+      className="mx-auto max-w-400 px-6 py-10 space-y-8 md:px-12"
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.header className="space-y-2" variants={itemVariants}>
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-secondary-300">{t('badge')}</p>
         <h1 className="text-3xl font-semibold text-snowWhite-50">{t('title')}</h1>
         <p className="max-w-2xl text-sm text-snowWhite-300 md:text-base">{t('subtitle')}</p>
-      </header>
+      </motion.header>
 
-      <section className="space-y-4">
+      <motion.section className="space-y-4" variants={itemVariants}>
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-secondary-300">{t('sections.certifications.title')}</p>
           <p className="max-w-2xl text-sm text-snowWhite-300 md:text-base">{t('sections.certifications.subtitle')}</p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <motion.div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3" variants={gridVariants}>
           {certificationModules.map((module) => (
-            <ModuleCard key={module.id} module={module} onOpen={() => handleOpen(module)} />
+            <motion.div key={module.id} variants={itemVariants}>
+              <ModuleCard module={module} onOpen={() => handleOpen(module)} />
+            </motion.div>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      <section className="space-y-4">
+      <motion.section className="space-y-4" variants={itemVariants}>
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-secondary-300">{t('sections.libraries.title')}</p>
           <p className="max-w-2xl text-sm text-snowWhite-300 md:text-base">{t('sections.libraries.subtitle')}</p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <motion.div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3" variants={gridVariants}>
           {libraryModules.map((module) => (
-            <ModuleCard key={module.id} module={module} onOpen={() => handleOpen(module)} />
+            <motion.div key={module.id} variants={itemVariants}>
+              <ModuleCard module={module} onOpen={() => handleOpen(module)} />
+            </motion.div>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       <Modal
         open={Boolean(unlockTarget)}
@@ -140,7 +181,7 @@ const Modules = () => {
           <p className="text-xs text-snowWhite-300">{t('unlockModal.note')}</p>
         </div>
       </Modal>
-    </main>
+    </motion.main>
   )
 }
 export default Modules

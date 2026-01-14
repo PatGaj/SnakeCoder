@@ -2,6 +2,7 @@
 
 import clsx from 'clsx'
 import React from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 import { RiArrowRightLine, RiBookOpenLine, RiBugLine, RiCodeLine, RiQuestionAnswerLine } from 'react-icons/ri'
 
@@ -35,6 +36,27 @@ const ICON_BY_TYPE = {
 } as const
 
 const PER_PAGE_OPTIONS = [6, 12, 24, 50] as const
+
+const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.45,
+      ease: EASE_OUT,
+      when: 'beforeChildren',
+      staggerChildren: 0.08,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: EASE_OUT } },
+}
 
 const Missions = () => {
   const t = useTranslations('missions')
@@ -106,16 +128,31 @@ const Missions = () => {
   }, [router, t])
 
   const canClear = Boolean(filters.difficulty || filters.moduleId || filters.type || filters.status)
+  const tableKey = [
+    page,
+    perPage,
+    filters.difficulty,
+    filters.moduleId,
+    filters.type,
+    filters.status,
+  ]
+    .filter(Boolean)
+    .join('-')
 
   return (
-    <main className="mx-auto max-w-400 space-y-8 px-6 py-10 md:px-12">
-      <header className="space-y-2">
+    <motion.main
+      className="mx-auto max-w-400 space-y-8 px-6 py-10 md:px-12"
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.header className="space-y-2" variants={itemVariants}>
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-secondary-300">{t('badge')}</p>
         <h1 className="text-3xl font-semibold text-snowWhite-50">{t('title')}</h1>
         <p className="max-w-2xl text-sm text-snowWhite-300 md:text-base">{t('subtitle')}</p>
-      </header>
+      </motion.header>
 
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <motion.div className="flex flex-wrap items-end justify-between gap-4" variants={itemVariants}>
         <div className="flex flex-wrap items-end gap-4">
           <Select
             title={t('filters.difficulty')}
@@ -205,14 +242,25 @@ const Missions = () => {
             </option>
           ))}
         </Select>
-      </div>
+      </motion.div>
 
-      <Table columns={columns} data={pageMissions} zebra emptyLabel={t('table.empty')} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={tableKey}
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
+          <Table columns={columns} data={pageMissions} zebra emptyLabel={t('table.empty')} />
+        </motion.div>
+      </AnimatePresence>
 
-      <div className={clsx('flex justify-end', { invisible: totalPages <= 1 })}>
+      <motion.div className={clsx('flex justify-end', { invisible: totalPages <= 1 })} variants={itemVariants}>
         <Pagination totalPages={totalPages} currentPage={page} onPageChange={setPage} />
-      </div>
-    </main>
+      </motion.div>
+    </motion.main>
   )
 }
 

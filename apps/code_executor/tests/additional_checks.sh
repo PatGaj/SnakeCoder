@@ -6,6 +6,10 @@ set -euo pipefail
 
 BASE_URL=${BASE_URL:-http://127.0.0.1:8000}
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=/dev/null
+. "${SCRIPT_DIR}/_auth.sh"
+
 if [ -t 1 ]; then
   GREEN="\033[32m"
   RED="\033[31m"
@@ -33,13 +37,15 @@ log_result() {
 
 # 404 for unknown task
 raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
-  -d '{"source": "print(1)", "task_id": "unknown-task", "mode": "fullTest"}')
+  -d '{"source": "print(1)", "task_id": "test_task-404", "mode": "fullTest"}')
 http_code=${raw##*$'\n'}
 log_result "404 for unknown task_id" "$( [ "${http_code}" = "404" ] && echo true || echo false )"
 
 # Schema validation - missing source should yield 422
 raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d '{"task_id": "test_task-1", "mode": "fullTest"}')
 http_code=${raw##*$'\n'}
@@ -47,6 +53,7 @@ log_result "422 when source is missing" "$( [ "${http_code}" = "422" ] && echo t
 
 # Runtime error (exception) should return passed=false
 raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d '{"source": "def transform(numbers):\n    raise ValueError(\"boom\")", "task_id": "test_task-1", "mode": "fullTest"}')
 http_code=${raw##*$'\n'}
@@ -56,6 +63,7 @@ log_result "Runtime error reports FAIL" "$( [[ "${http_code}" =~ ^2 ]] && [ "${o
 
 # stdout should be present in results[*].stdout
 raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d '{"source": "def transform(numbers):\n    print(\"dua\")\n    return [n*2 for n in numbers]", "task_id": "test_task-1", "mode": "fullTest"}')
 http_code=${raw##*$'\n'}
@@ -70,6 +78,7 @@ log_result "stdout returned for full test" "${stdout_ok}"
 
 # stderr should be present in results[*].stderr
 raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d '{"source": "import sys\n\ndef transform(numbers):\n    print(\"warn\", file=sys.stderr)\n    return [n*2 for n in numbers]", "task_id": "test_task-1", "mode": "fullTest"}')
 http_code=${raw##*$'\n'}
@@ -84,6 +93,7 @@ log_result "stderr returned for full test" "${stderr_ok}"
 
 # error field should include the exception message
 raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d '{"source": "def transform(numbers):\n    raise RuntimeError(\"boom\")", "task_id": "test_task-1", "mode": "fullTest"}')
 http_code=${raw##*$'\n'}
@@ -98,6 +108,7 @@ log_result "error field contains exception" "${error_ok}"
 
 # runCode mode - returns result and stdout without task_id
 raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d '{"source": "result = 7\nprint(\"adhoc\")", "mode": "runCode"}')
 http_code=${raw##*$'\n'}
@@ -113,6 +124,7 @@ log_result "runCode returns result and stdout" "${run_ok}"
 
 # runCode mode - no explicit result yields success message
 raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" \
+  -H "${AUTH_HEADER}" \
   -H "Content-Type: application/json" \
   -d '{"source": "print(\"ok\")", "mode": "runCode"}')
 http_code=${raw##*$'\n'}

@@ -7,6 +7,10 @@ set -euo pipefail
 
 BASE_URL=${BASE_URL:-http://127.0.0.1:8000}
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=/dev/null
+. "${SCRIPT_DIR}/_auth.sh"
+
 if [ -t 1 ]; then
   GREEN="\033[32m"
   RED="\033[31m"
@@ -24,6 +28,7 @@ log_case() {
   local payload=$2
 
   raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" \
+    -H "${AUTH_HEADER}" \
     -H "Content-Type: application/json" \
     -d "${payload}" )
 

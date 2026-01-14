@@ -8,6 +8,10 @@ BASE_URL=${BASE_URL:-http://127.0.0.1:8000}
 TASK_ID=${TASK_ID:-test_task-1}
 REQUESTS=${REQUESTS:-5}
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=/dev/null
+. "${SCRIPT_DIR}/_auth.sh"
+
 if [ -t 1 ]; then
   GREEN="\033[32m"
   RED="\033[31m"
@@ -36,7 +40,7 @@ fail_count=0
 send_request() {
   local idx=$1
   local body=${payload_template/__TASK_ID__/${TASK_ID}}
-  raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" -H "Content-Type: application/json" -d "${body}")
+  raw=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/api/execute" -H "${AUTH_HEADER}" -H "Content-Type: application/json" -d "${body}")
   http_code=${raw##*$'\n'}
   response=${raw%$'\n'*}
 

@@ -4,6 +4,8 @@ import { PrismaPg } from '@prisma/adapter-pg'
 
 import { PrismaClient } from '../src/generated/prisma/client'
 
+import { pcepSprints } from './pcep-content'
+
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
 })
@@ -97,6 +99,42 @@ const seedUsers = async () => {
     },
   })
 
+  const rankingUsers = Array.from({ length: 20 }, (_, index) => {
+    const rank = index + 1
+    const xpTotal = 1200 - rank * 40
+    const xpMonth = 320 - rank * 6
+    const xpToday = 40 - rank
+    const streakCurrent = Math.max(1, 12 - rank)
+    const streakBest = 14 + Math.max(0, 6 - rank)
+    const gradeAvg = Number((3.0 + (20 - rank) * 0.05).toFixed(2))
+
+    return {
+      nickName: `ranker${rank}`,
+      name: `Ranker ${rank}`,
+      email: `ranker${rank}@snakecoder.com`,
+      xpTotal,
+      xpMonth,
+      xpToday,
+      streakCurrent,
+      streakBest,
+      gradeAvg,
+    }
+  })
+
+  for (const user of rankingUsers) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {
+        ...user,
+        passwordHash,
+      },
+      create: {
+        ...user,
+        passwordHash,
+      },
+    })
+  }
+
   return { demoUserId: demo.id, testUserId: test.id, bobUserId: bob.id }
 }
 
@@ -108,7 +146,7 @@ const seedPcepModule = async () => {
       code: 'PCEP',
       title: 'PCEP: fundamenty Pythona',
       description:
-        'Zacznij od absolutnych podstaw i ucz się przez krótkie misje. Składnia, typy, warunki, pętle oraz proste funkcje.',
+        'Kompletny kurs PCEP w 5 sprintach: składnia, typy, warunki, pętle, listy, napisy, funkcje, algorytmy i praktyka.',
       requirements: ['Start od zera', 'Podstawy komputera', 'Regularność'],
       category: 'CERTIFICATIONS',
       difficulty: 'BEGINNER',
@@ -120,7 +158,7 @@ const seedPcepModule = async () => {
       code: 'PCEP',
       title: 'PCEP: fundamenty Pythona',
       description:
-        'Zacznij od absolutnych podstaw i ucz się przez krótkie misje. Składnia, typy, warunki, pętle oraz proste funkcje.',
+        'Kompletny kurs PCEP w 5 sprintach: składnia, typy, warunki, pętle, listy, napisy, funkcje, algorytmy i praktyka.',
       requirements: ['Start od zera', 'Podstawy komputera', 'Regularność'],
       category: 'CERTIFICATIONS',
       difficulty: 'BEGINNER',
@@ -129,33 +167,46 @@ const seedPcepModule = async () => {
     },
   })
 
+  await prisma.mission.deleteMany({ where: { moduleId: moduleRecord.id } })
+  await prisma.sprint.deleteMany({ where: { moduleId: moduleRecord.id } })
+
   const sprints = [
     {
       name: 'pcep-1',
       order: 1,
-      title: 'Pierwsze kroki i składnia',
-      description: 'Zmienne, proste operacje i podstawowe wejście/wyjście.',
+      title: 'Start w Pythonie',
+      description: 'Składnia, zmienne, typy i podstawowe operacje na napisach.',
     },
     {
       name: 'pcep-2',
       order: 2,
       title: 'Warunki i pętle',
-      description: 'if/elif/else, for/while i praktyczne patterny.',
+      description: 'Porównania, logika, pętle oraz praca na listach liczb.',
+    },
+    {
+      name: 'pcep-3',
+      order: 3,
+      title: 'Listy i napisy',
+      description: 'Unikalne wartości, sortowanie, split/replace i palindromy.',
+    },
+    {
+      name: 'pcep-4',
+      order: 4,
+      title: 'Funkcje i algorytmy',
+      description: 'Funkcje, silnia, Fibonacci, teksty i formatowanie danych.',
+    },
+    {
+      name: 'pcep-5',
+      order: 5,
+      title: 'Powtórka PCEP',
+      description: 'Mieszane zadania i utrwalenie kluczowych tematów.',
     },
   ] as const
 
   const sprintRecords = await Promise.all(
     sprints.map((sprint) =>
-      prisma.sprint.upsert({
-        where: { moduleId_order: { moduleId: moduleRecord.id, order: sprint.order } },
-        update: {
-          moduleId: moduleRecord.id,
-          name: sprint.name,
-          order: sprint.order,
-          title: sprint.title,
-          description: sprint.description,
-        },
-        create: {
+      prisma.sprint.create({
+        data: {
           moduleId: moduleRecord.id,
           name: sprint.name,
           order: sprint.order,
@@ -168,497 +219,245 @@ const seedPcepModule = async () => {
 
   const sprintIdByName = new Map(sprintRecords.map((sprint) => [sprint.name, sprint.id]))
 
-  const missions = [
+  const baseRequirements = ['Zwróć poprawny wynik.']
+  const baseHints = ['Wykorzystaj podstawowe operacje Pythona.']
+
+  const buildTaskTests = (publicCases: Array<[string, string]>, hiddenCases: Array<[string, string]>) => {
+    if (publicCases.length !== 3 || hiddenCases.length !== 5) {
+      throw new Error('Każde zadanie/bugfix musi mieć 3 testy jawne i 5 ukrytych.')
+    }
+
+    return [
+      ...publicCases.map((item, index) => ({
+        order: index + 1,
+        input: item[0],
+        expectedOutput: item[1],
+        isPublic: true,
+      })),
+      ...hiddenCases.map((item, index) => ({
+        order: index + 4,
+        input: item[0],
+        expectedOutput: item[1],
+        isPublic: false,
+      })),
+    ]
+  }
+
+  for (const sprint of pcepSprints) {
+    const sprintId = sprintIdByName.get(sprint.key)
+    if (!sprintId) {
+      throw new Error(`Missing sprint for ${sprint.key}`)
+    }
+
+    for (const [index, task] of sprint.tasks.entries()) {
+      const missionId = `${sprint.key}-task-${index + 1}`
+
+      await prisma.mission.create({
+        data: {
+          id: missionId,
+          moduleId: moduleRecord.id,
+          sprintId,
+          type: 'TASK',
+          difficulty: 'BEGINNER',
+          title: task.title,
+          shortDesc: task.shortDesc,
+          description: task.description,
+          requirements: task.requirements ?? baseRequirements,
+          hints: task.hints ?? baseHints,
+          etaMinutes: task.etaMinutes,
+          xp: task.xp,
+          timeLimitSeconds: task.etaMinutes * 60,
+        },
+      })
+
+      await prisma.task.create({
+        data: {
+          missionId,
+          starterCode: task.starterCode,
+          language: 'python',
+        },
+      })
+
+      await prisma.taskTestCase.createMany({
+        data: buildTaskTests(task.publicTests, task.hiddenTests).map((test) => ({
+          taskId: missionId,
+          order: test.order,
+          input: test.input,
+          expectedOutput: test.expectedOutput,
+          isPublic: test.isPublic,
+        })),
+      })
+    }
+
+    for (const [index, bugfix] of sprint.bugfixes.entries()) {
+      const missionId = `${sprint.key}-bugfix-${index + 1}`
+
+      await prisma.mission.create({
+        data: {
+          id: missionId,
+          moduleId: moduleRecord.id,
+          sprintId,
+          type: 'BUGFIX',
+          difficulty: 'BEGINNER',
+          title: bugfix.title,
+          shortDesc: bugfix.shortDesc,
+          description: bugfix.description,
+          requirements: bugfix.requirements ?? baseRequirements,
+          hints: bugfix.hints ?? baseHints,
+          etaMinutes: bugfix.etaMinutes,
+          xp: bugfix.xp,
+          timeLimitSeconds: bugfix.etaMinutes * 60,
+        },
+      })
+
+      await prisma.task.create({
+        data: {
+          missionId,
+          starterCode: bugfix.starterCode,
+          language: 'python',
+        },
+      })
+
+      await prisma.taskTestCase.createMany({
+        data: buildTaskTests(bugfix.publicTests, bugfix.hiddenTests).map((test) => ({
+          taskId: missionId,
+          order: test.order,
+          input: test.input,
+          expectedOutput: test.expectedOutput,
+          isPublic: test.isPublic,
+        })),
+      })
+    }
+
+    for (const [index, quiz] of sprint.quizzes.entries()) {
+      const missionId = `${sprint.key}-quiz-${index + 1}`
+
+      await prisma.mission.create({
+        data: {
+          id: missionId,
+          moduleId: moduleRecord.id,
+          sprintId,
+          type: 'QUIZ',
+          difficulty: 'BEGINNER',
+          title: quiz.title,
+          shortDesc: quiz.shortDesc,
+          description: quiz.description,
+          requirements: [],
+          hints: [],
+          etaMinutes: quiz.etaMinutes,
+          xp: quiz.xp,
+          timeLimitSeconds: quiz.etaMinutes * 60,
+          passPercent: 80,
+        },
+      })
+
+      await prisma.quiz.create({
+        data: {
+          missionId,
+        },
+      })
+
+      for (const [questionIndex, question] of quiz.questions.entries()) {
+        const questionRecord = await prisma.quizQuestion.create({
+          data: {
+            quizId: missionId,
+            order: questionIndex + 1,
+            title: question.title,
+            prompt: question.prompt,
+          },
+        })
+
+        await prisma.quizOption.createMany({
+          data: question.options.map((option, optionIndex) => ({
+            questionId: questionRecord.id,
+            order: optionIndex + 1,
+            label: option.label,
+            isCorrect: option.isCorrect,
+          })),
+        })
+      }
+    }
+
+    for (const [index, article] of sprint.articles.entries()) {
+      const articleId = `${sprint.key}-article-${index + 1}`
+
+      await prisma.mission.create({
+        data: {
+          id: articleId,
+          moduleId: moduleRecord.id,
+          sprintId,
+          type: 'ARTICLE',
+          difficulty: 'BEGINNER',
+          title: article.title,
+          shortDesc: article.shortDesc,
+          description: article.description,
+          requirements: [],
+          hints: [],
+          etaMinutes: article.etaMinutes,
+          xp: article.xp,
+        },
+      })
+
+      await prisma.article.create({
+        data: {
+          missionId: articleId,
+          tags: article.tags,
+          blocks: article.blocks,
+          summary: article.summary,
+        },
+      })
+    }
+  }
+}
+
+const seedBuildingModules = async () => {
+  const modules = [
     {
-      id: 'pcep-1-task-1',
-      sprintId: 'pcep-1',
-      type: 'TASK',
-      title: 'Powiel znaki w tekście',
-      shortDesc: 'Napisz funkcję, która powiela każdy znak (np. "ab" → "aabb").',
-      description:
-        'Napisz funkcję `solve(text)`, która zwraca tekst, w którym każdy znak jest powtórzony. Zadbaj o poprawny wynik dla pustego tekstu i zwykłych słów.',
-      requirements: ['Zachowaj kolejność znaków.', 'Zwróć nowy string.', 'Bez bibliotek zewnętrznych.'],
-      hints: ['Najprościej: zbuduj wynik przez join.', 'Pamiętaj o pustym stringu.'],
-      etaMinutes: 8,
-      xp: 55,
-      timeLimitSeconds: 10 * 60,
-      task: {
-        starterCode: `"""Zadanie:
-Zaimplementuj funkcję solve(text), która zwraca tekst,
-w którym każdy znak jest powtórzony.
-
-Przykład:
-solve("ab") -> "aabb"
-"""
-
-
-def solve(text: str) -> str:
-    return ""
-
-
-if __name__ == "__main__":
-    print(solve(input().rstrip("\\n")))
-`,
-        tests: [
-          { order: 1, input: 'hellow', expectedOutput: 'hheellllooww', isPublic: true },
-          { order: 2, input: 'world', expectedOutput: 'wwoorrlldd', isPublic: true },
-          { order: 3, input: '', expectedOutput: '', isPublic: false },
-        ],
-      },
+      name: 'numpy',
+      code: 'NUMPY',
+      title: 'NumPy: obliczenia numeryczne',
+      description: 'Moduł w budowie — wkrótce ćwiczenia z tablic i obliczeń numerycznych.',
+      requirements: ['Podstawy Pythona'],
+      category: 'LIBRARIES',
+      difficulty: 'INTERMEDIATE',
+      imagePath: '/images/python-image.png',
+      isBuilding: true,
     },
     {
-      id: 'pcep-1-task-2',
-      sprintId: 'pcep-1',
-      type: 'TASK',
-      title: 'Sumowanie liczb',
-      shortDesc: 'Zwróć sumę liczb z listy wejściowej.',
-      description:
-        'Napisz funkcję `solve(nums)`, która zwraca sumę liczb. Wejściem jest lista intów w jednej linii (oddzielone spacją).',
-      requirements: ['Obsłuż pustą listę (wynik 0).', 'Nie używaj bibliotek zewnętrznych.'],
-      hints: ['Możesz użyć wbudowanego sum().'],
-      etaMinutes: 7,
-      xp: 45,
-      timeLimitSeconds: 8 * 60,
-      task: {
-        starterCode: `"""Zadanie:
-Zaimplementuj funkcję solve(nums), która zwraca sumę liczb.
-"""
-
-
-def solve(nums: list[int]) -> int:
-    return 0
-
-
-if __name__ == "__main__":
-    raw = input().strip()
-    nums = [int(x) for x in raw.split()] if raw else []
-    print(solve(nums))
-`,
-        tests: [
-          { order: 1, input: '1 2 3', expectedOutput: '6', isPublic: true },
-          { order: 2, input: '10 -5 2', expectedOutput: '7', isPublic: true },
-          { order: 3, input: '', expectedOutput: '0', isPublic: false },
-        ],
-      },
-    },
-    {
-      id: 'pcep-1-bugfix-1',
-      sprintId: 'pcep-1',
-      type: 'BUGFIX',
-      title: 'Zły warunek w porównaniu',
-      shortDesc: 'Napraw błąd w warunku, przez który wynik jest odwrotny.',
-      description:
-        'W kodzie jest błąd logiczny: warunek jest odwrócony. Popraw go tak, aby funkcja zwracała True tylko wtedy, gdy liczba jest dodatnia.',
-      requirements: ['Zmień tylko to, co konieczne.', 'Przejdź wszystkie testy.'],
-      hints: ['Sprawdź znak porównania w if.'],
-      etaMinutes: 6,
-      xp: 40,
-      timeLimitSeconds: 7 * 60,
-      task: {
-        starterCode: `"""Zadanie:
-Napraw funkcję is_positive(n), aby zwracała True dla n > 0.
-"""
-
-
-def is_positive(n: int) -> bool:
-    if n < 0:
-        return True
-    return False
-
-
-if __name__ == "__main__":
-    print(is_positive(int(input().strip())))
-`,
-        tests: [
-          { order: 1, input: '5', expectedOutput: 'True', isPublic: true },
-          { order: 2, input: '0', expectedOutput: 'False', isPublic: true },
-          { order: 3, input: '-3', expectedOutput: 'False', isPublic: false },
-        ],
-      },
-    },
-    {
-      id: 'pcep-2-task-1',
-      sprintId: 'pcep-2',
-      type: 'TASK',
-      title: 'Liczby parzyste',
-      shortDesc: 'Policz, ile liczb parzystych jest w wejściu.',
-      description:
-        'Napisz funkcję `solve(nums)`, która zwraca liczbę elementów parzystych w liście. Wejściem jest lista intów w jednej linii.',
-      requirements: ['Obsłuż pustą listę (wynik 0).'],
-      hints: ['Użyj operatora % 2.'],
-      etaMinutes: 8,
-      xp: 55,
-      timeLimitSeconds: 10 * 60,
-      task: {
-        starterCode: `"""Zadanie:
-Zaimplementuj funkcję solve(nums), która zwraca liczbę parzystych elementów.
-"""
-
-
-def solve(nums: list[int]) -> int:
-    return 0
-
-
-if __name__ == "__main__":
-    raw = input().strip()
-    nums = [int(x) for x in raw.split()] if raw else []
-    print(solve(nums))
-`,
-        tests: [
-          { order: 1, input: '1 2 3 4', expectedOutput: '2', isPublic: true },
-          { order: 2, input: '2 2 2', expectedOutput: '3', isPublic: true },
-          { order: 3, input: '', expectedOutput: '0', isPublic: false },
-        ],
-      },
-    },
-    {
-      id: 'pcep-2-bugfix-1',
-      sprintId: 'pcep-2',
-      type: 'BUGFIX',
-      title: 'Błąd w pętli',
-      shortDesc: 'Kod nie liczy poprawnie sumy — napraw pętlę.',
-      description:
-        'W kodzie jest błąd w iteracji: pętla omija jeden element. Popraw ją tak, aby sumowanie działało dla całej listy.',
-      requirements: ['Nie zmieniaj struktury programu bardziej niż trzeba.'],
-      hints: ['Sprawdź zakres pętli i indeksowanie.'],
-      etaMinutes: 7,
-      xp: 45,
-      timeLimitSeconds: 8 * 60,
-      task: {
-        starterCode: `"""Zadanie:
-Napraw funkcję solve(nums), aby zwracała poprawną sumę listy.
-"""
-
-
-def solve(nums: list[int]) -> int:
-    total = 0
-    for i in range(0, len(nums) - 1):
-        total += nums[i]
-    return total
-
-
-if __name__ == "__main__":
-    raw = input().strip()
-    nums = [int(x) for x in raw.split()] if raw else []
-    print(solve(nums))
-`,
-        tests: [
-          { order: 1, input: '1 2 3', expectedOutput: '6', isPublic: true },
-          { order: 2, input: '5', expectedOutput: '5', isPublic: true },
-          { order: 3, input: '', expectedOutput: '0', isPublic: false },
-        ],
-      },
-    },
-    {
-      id: 'pcep-2-task-2',
-      sprintId: 'pcep-2',
-      type: 'TASK',
-      title: 'Największa liczba',
-      shortDesc: 'Zwróć największą liczbę z wejścia.',
-      description:
-        'Napisz funkcję `solve(nums)`, która zwraca największą liczbę z listy. Jeśli lista jest pusta — zwróć 0.',
-      requirements: ['Obsłuż pustą listę.', 'Nie używaj bibliotek zewnętrznych.'],
-      hints: ['Możesz użyć max(), ale pamiętaj o pustej liście.'],
-      etaMinutes: 8,
-      xp: 55,
-      timeLimitSeconds: 10 * 60,
-      task: {
-        starterCode: `"""Zadanie:
-Zaimplementuj funkcję solve(nums), która zwraca max z listy lub 0, gdy lista jest pusta.
-"""
-
-
-def solve(nums: list[int]) -> int:
-    return 0
-
-
-if __name__ == "__main__":
-    raw = input().strip()
-    nums = [int(x) for x in raw.split()] if raw else []
-    print(solve(nums))
-`,
-        tests: [
-          { order: 1, input: '1 2 3', expectedOutput: '3', isPublic: true },
-          { order: 2, input: '-5 -2 -7', expectedOutput: '-2', isPublic: true },
-          { order: 3, input: '', expectedOutput: '0', isPublic: false },
-        ],
-      },
+      name: 'pcap',
+      code: 'PCAP',
+      title: 'PCAP: poziom zaawansowany',
+      description: 'Moduł w budowie — obiekty, wyjątki, moduły i dobre praktyki.',
+      requirements: ['PCEP lub solidne podstawy Pythona'],
+      category: 'CERTIFICATIONS',
+      difficulty: 'ADVANCED',
+      imagePath: '/images/python-image.png',
+      isBuilding: true,
     },
   ] as const
 
-  for (const mission of missions) {
-    const sprintId = sprintIdByName.get(mission.sprintId)
-    if (!sprintId) {
-      throw new Error(`Missing sprint for mission ${mission.id} (sprint key: ${mission.sprintId})`)
+  for (const moduleData of modules) {
+    const data = {
+      ...moduleData,
+      requirements: [...moduleData.requirements],
     }
 
-    await prisma.mission.upsert({
-      where: { id: mission.id },
+    await prisma.module.upsert({
+      where: { name: moduleData.name },
       update: {
-        moduleId: moduleRecord.id,
-        sprintId,
-        type: mission.type,
-        difficulty: 'BEGINNER',
-        title: mission.title,
-        shortDesc: mission.shortDesc,
-        description: mission.description,
-        requirements: [...mission.requirements],
-        hints: [...mission.hints],
-        etaMinutes: mission.etaMinutes,
-        xp: mission.xp,
-        timeLimitSeconds: mission.timeLimitSeconds,
+        ...data,
       },
       create: {
-        id: mission.id,
-        moduleId: moduleRecord.id,
-        sprintId,
-        type: mission.type,
-        difficulty: 'BEGINNER',
-        title: mission.title,
-        shortDesc: mission.shortDesc,
-        description: mission.description,
-        requirements: [...mission.requirements],
-        hints: [...mission.hints],
-        etaMinutes: mission.etaMinutes,
-        xp: mission.xp,
-        timeLimitSeconds: mission.timeLimitSeconds,
+        ...data,
       },
     })
-
-    await prisma.task.upsert({
-      where: { missionId: mission.id },
-      update: {
-        starterCode: mission.task.starterCode,
-        language: 'python',
-      },
-      create: {
-        missionId: mission.id,
-        starterCode: mission.task.starterCode,
-        language: 'python',
-      },
-    })
-
-    await prisma.taskTestCase.deleteMany({ where: { taskId: mission.id } })
-    await prisma.taskTestCase.createMany({
-      data: mission.task.tests.map((test) => ({
-        taskId: mission.id,
-        order: test.order,
-        input: test.input,
-        expectedOutput: test.expectedOutput,
-        isPublic: test.isPublic,
-      })),
-    })
   }
-
-  const quizMissionId = 'pcep-1-quiz-1'
-  const quizSprintId = sprintIdByName.get('pcep-1')
-  if (!quizSprintId) {
-    throw new Error('Missing sprint pcep-1 for quiz mission')
-  }
-
-  await prisma.mission.upsert({
-    where: { id: quizMissionId },
-    update: {
-      moduleId: moduleRecord.id,
-      sprintId: quizSprintId,
-      type: 'QUIZ',
-      difficulty: 'BEGINNER',
-      title: 'Quiz: podstawy składni',
-      shortDesc: 'Krótki quiz: komentarze, typy i proste operatory.',
-      description: 'Odpowiedz na pytania ABCD. Wynik poznasz od razu po zakończeniu.',
-      requirements: [],
-      hints: [],
-      etaMinutes: 6,
-      xp: 30,
-      timeLimitSeconds: 6 * 60,
-      passPercent: 80,
-    },
-    create: {
-      id: quizMissionId,
-      moduleId: moduleRecord.id,
-      sprintId: quizSprintId,
-      type: 'QUIZ',
-      difficulty: 'BEGINNER',
-      title: 'Quiz: podstawy składni',
-      shortDesc: 'Krótki quiz: komentarze, typy i proste operatory.',
-      description: 'Odpowiedz na pytania ABCD. Wynik poznasz od razu po zakończeniu.',
-      requirements: [],
-      hints: [],
-      etaMinutes: 6,
-      xp: 30,
-      timeLimitSeconds: 6 * 60,
-      passPercent: 80,
-    },
-  })
-
-  await prisma.quiz.upsert({
-    where: { missionId: quizMissionId },
-    update: {},
-    create: { missionId: quizMissionId },
-  })
-
-  await prisma.quizOption.deleteMany({
-    where: { question: { quizId: quizMissionId } },
-  })
-  await prisma.quizQuestion.deleteMany({ where: { quizId: quizMissionId } })
-
-  const q1 = await prisma.quizQuestion.create({
-    data: {
-      quizId: quizMissionId,
-      order: 1,
-      title: 'Pytanie 1',
-      prompt: 'Który zapis jest poprawnym komentarzem w Pythonie?',
-    },
-  })
-  await prisma.quizOption.createMany({
-    data: [
-      { questionId: q1.id, order: 1, label: '// komentarz', isCorrect: false },
-      { questionId: q1.id, order: 2, label: '# komentarz', isCorrect: true },
-      { questionId: q1.id, order: 3, label: '/* komentarz */', isCorrect: false },
-      { questionId: q1.id, order: 4, label: '<!-- komentarz -->', isCorrect: false },
-    ],
-  })
-
-  const q2 = await prisma.quizQuestion.create({
-    data: {
-      quizId: quizMissionId,
-      order: 2,
-      title: 'Pytanie 2',
-      prompt: 'Jaki będzie wynik wyrażenia: 3 * "ab" ?',
-    },
-  })
-  await prisma.quizOption.createMany({
-    data: [
-      { questionId: q2.id, order: 1, label: '"ababab"', isCorrect: true },
-      { questionId: q2.id, order: 2, label: '"ab3"', isCorrect: false },
-      { questionId: q2.id, order: 3, label: 'błąd typu', isCorrect: false },
-      { questionId: q2.id, order: 4, label: '"ab ab ab"', isCorrect: false },
-    ],
-  })
-
-  const q3 = await prisma.quizQuestion.create({
-    data: {
-      quizId: quizMissionId,
-      order: 3,
-      title: 'Pytanie 3',
-      prompt: 'Która wartość jest typu bool w Pythonie?',
-    },
-  })
-  await prisma.quizOption.createMany({
-    data: [
-      { questionId: q3.id, order: 1, label: '"True"', isCorrect: false },
-      { questionId: q3.id, order: 2, label: '1', isCorrect: false },
-      { questionId: q3.id, order: 3, label: 'True', isCorrect: true },
-      { questionId: q3.id, order: 4, label: 'None', isCorrect: false },
-    ],
-  })
-
-  const articleMissionId = 'pcep-1-article-1'
-  const articleSprintId = sprintIdByName.get('pcep-1')
-  if (!articleSprintId) {
-    throw new Error('Missing sprint pcep-1 for article mission')
-  }
-
-  await prisma.mission.upsert({
-    where: { id: articleMissionId },
-    update: {
-      moduleId: moduleRecord.id,
-      sprintId: articleSprintId,
-      type: 'ARTICLE',
-      difficulty: 'BEGINNER',
-      title: 'Artykuł: pierwsze kroki i składnia',
-      shortDesc: 'Zmienne, typy i podstawowe wejście/wyjście — szybki wstęp.',
-      description: 'Przeczytaj artykuł i zapamiętaj najważniejsze zasady. Przyda się w kolejnych zadaniach.',
-      requirements: [],
-      hints: [],
-      etaMinutes: 7,
-      xp: 20,
-    },
-    create: {
-      id: articleMissionId,
-      moduleId: moduleRecord.id,
-      sprintId: articleSprintId,
-      type: 'ARTICLE',
-      difficulty: 'BEGINNER',
-      title: 'Artykuł: pierwsze kroki i składnia',
-      shortDesc: 'Zmienne, typy i podstawowe wejście/wyjście — szybki wstęp.',
-      description: 'Przeczytaj artykuł i zapamiętaj najważniejsze zasady. Przyda się w kolejnych zadaniach.',
-      requirements: [],
-      hints: [],
-      etaMinutes: 7,
-      xp: 20,
-    },
-  })
-
-  await prisma.article.upsert({
-    where: { missionId: articleMissionId },
-    update: {
-      tags: ['PCEP', 'składnia', 'zmienne', 'wejście/wyjście'],
-      blocks: [
-        { type: 'heading', id: 'wstep', level: 2, text: 'Wstęp' },
-        {
-          type: 'paragraph',
-          text: 'Python to język, w którym czytelność jest bardzo ważna. Zacznij od podstaw: zmienne, typy danych oraz proste operacje na wartościach.',
-        },
-        { type: 'heading', id: 'zmienne', level: 2, text: 'Zmienne i typy' },
-        {
-          type: 'paragraph',
-          text: 'Zmienne w Pythonie nie wymagają deklarowania typu. Typ wynika z przypisanej wartości. To ułatwia start, ale wymaga uważności.',
-        },
-        { type: 'code', language: 'python', title: 'Przykład', code: 'name = \"Julia\"\\nage = 18\\nactive = True' },
-        {
-          type: 'callout',
-          tone: 'tip',
-          title: 'Tip',
-          text: 'Nazwy zmiennych powinny być czytelne. Unikaj skrótów typu x1, z2, tmp.',
-        },
-        { type: 'heading', id: 'io', level: 2, text: 'Wejście i wyjście' },
-        {
-          type: 'paragraph',
-          text: 'Do pobierania danych używasz input(), a do wypisywania print(). Pamiętaj, że input() zawsze zwraca string — liczby musisz zrzutować.',
-        },
-        { type: 'code', language: 'python', title: 'input / print', code: 'x = int(input())\\nprint(x * 2)' },
-        { type: 'list', items: ['input() zwraca string', 'int()/float() do konwersji', 'print() do outputu'] },
-      ],
-      summary: ['Zmienne nie wymagają deklaracji typu.', 'input() zwraca string.', 'Dbaj o czytelne nazwy i proste kroki.'],
-    },
-    create: {
-      missionId: articleMissionId,
-      tags: ['PCEP', 'składnia', 'zmienne', 'wejście/wyjście'],
-      blocks: [
-        { type: 'heading', id: 'wstep', level: 2, text: 'Wstęp' },
-        {
-          type: 'paragraph',
-          text: 'Python to język, w którym czytelność jest bardzo ważna. Zacznij od podstaw: zmienne, typy danych oraz proste operacje na wartościach.',
-        },
-        { type: 'heading', id: 'zmienne', level: 2, text: 'Zmienne i typy' },
-        {
-          type: 'paragraph',
-          text: 'Zmienne w Pythonie nie wymagają deklarowania typu. Typ wynika z przypisanej wartości. To ułatwia start, ale wymaga uważności.',
-        },
-        { type: 'code', language: 'python', title: 'Przykład', code: 'name = \"Julia\"\\nage = 18\\nactive = True' },
-        {
-          type: 'callout',
-          tone: 'tip',
-          title: 'Tip',
-          text: 'Nazwy zmiennych powinny być czytelne. Unikaj skrótów typu x1, z2, tmp.',
-        },
-        { type: 'heading', id: 'io', level: 2, text: 'Wejście i wyjście' },
-        {
-          type: 'paragraph',
-          text: 'Do pobierania danych używasz input(), a do wypisywania print(). Pamiętaj, że input() zawsze zwraca string — liczby musisz zrzutować.',
-        },
-        { type: 'code', language: 'python', title: 'input / print', code: 'x = int(input())\\nprint(x * 2)' },
-        { type: 'list', items: ['input() zwraca string', 'int()/float() do konwersji', 'print() do outputu'] },
-      ],
-      summary: ['Zmienne nie wymagają deklaracji typu.', 'input() zwraca string.', 'Dbaj o czytelne nazwy i proste kroki.'],
-    },
-  })
 }
 
 export async function main() {
   await seedUsers()
   await seedPcepModule()
+  await seedBuildingModules()
 }
 
 main()

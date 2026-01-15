@@ -522,7 +522,18 @@
       "reset": "Resetuj",
       "submit": "Wyślij rozwiązanie",
       "aiReview": "Oceń kod przez AI",
+      "aiReviewWithLimit": "Oceń przez AI {remaining}/{limit}",
       "clearConsole": "Wyczyść"
+    },
+    "aiReview": {
+      "labels": {
+        "grade": "Ocena AI",
+        "summary": "Podsumowanie",
+        "strengths": "Mocne strony",
+        "improvements": "Do poprawy",
+        "nextSteps": "Następne kroki",
+        "remaining": "Pozostało ocen na dziś"
+      }
     },
     "results": {
       "status": "{status, select, pending {Nie uruchomiono} passed {Zdane} failed {Niezdane} other {Nie uruchomiono}}",
@@ -547,7 +558,11 @@
       "saveSuccess": "Zapisano kod.",
       "saveFailed": "Nie udało się zapisać kodu.",
       "submitSuccess": "Rozwiązanie wysłane.",
-      "submitFailed": "Rozwiązanie nie przeszło wszystkich testów."
+      "submitFailed": "Rozwiązanie nie przeszło wszystkich testów.",
+      "aiReviewLimit": "Wyczerpano dzienny limit ocen AI.",
+      "aiReviewFailed": "Nie udało się wykonać oceny AI.",
+      "aiReviewEmpty": "Wpisz kod przed oceną AI.",
+      "aiReviewNotAvailable": "Ocena AI jest dostępna tylko dla zadań typu task."
     },
     "submitModal": {
       "message": "{status, select, passed {Gratulacje!} failed {Przykro mi — spróbuj ponownie.} other {}}"

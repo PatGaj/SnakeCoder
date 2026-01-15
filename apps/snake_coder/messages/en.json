@@ -522,7 +522,18 @@
       "reset": "Reset",
       "submit": "Submit solution",
       "aiReview": "Review code with AI",
+      "aiReviewWithLimit": "Review with AI {remaining}/{limit}",
       "clearConsole": "Clear"
+    },
+    "aiReview": {
+      "labels": {
+        "grade": "AI grade",
+        "summary": "Summary",
+        "strengths": "Strengths",
+        "improvements": "Improvements",
+        "nextSteps": "Next steps",
+        "remaining": "Remaining reviews today"
+      }
     },
     "results": {
       "status": "{status, select, pending {Not run} passed {Passed} failed {Failed} other {Not run}}",
@@ -547,7 +558,11 @@
       "saveSuccess": "Code saved.",
       "saveFailed": "Couldn’t save code.",
       "submitSuccess": "Solution submitted.",
-      "submitFailed": "Solution didn’t pass all tests."
+      "submitFailed": "Solution didn’t pass all tests.",
+      "aiReviewLimit": "You've reached today's AI review limit.",
+      "aiReviewFailed": "AI review failed.",
+      "aiReviewEmpty": "Write some code before requesting a review.",
+      "aiReviewNotAvailable": "AI review is available only for task missions."
     },
     "submitModal": {
       "message": "{status, select, passed {Congratulations!} failed {Sorry — try again.} other {}}"

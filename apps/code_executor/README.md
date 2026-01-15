@@ -32,6 +32,7 @@ pip install -r requirements.txt
 
 uvicorn app.main:app --reload
 uvicorn app.main:app --reload --env-file .env
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --env-file .env
 
 ## Environment
 

@@ -13,7 +13,14 @@ type GlobalLoaderProps = {
 const GlobalLoader: React.FC<GlobalLoaderProps> = ({ className }) => {
   const isFetching = useIsFetching()
   const isMutating = useIsMutating()
-  const isActive = isFetching + isMutating > 0
+  const executeMutations = useIsMutating({
+    predicate: (mutation) => {
+      const key = mutation.options.mutationKey
+      return Array.isArray(key) && key[0] === 'taskExecute'
+    },
+  })
+  const activeMutations = Math.max(0, isMutating - executeMutations)
+  const isActive = isFetching + activeMutations > 0
 
   return (
     <AnimatePresence>

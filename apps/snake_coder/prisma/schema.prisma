@@ -71,6 +71,7 @@ model User {
   moduleAccess  UserModuleAccess[]
   missionProgress UserMissionProgress[]
   taskSubmissions TaskSubmission[]
+  taskReviews  TaskReview[]
   quizAttempts  QuizAttempt[]
 
   createdAt     DateTime  @default(now())
@@ -205,6 +206,7 @@ model Task {
   mission    Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
   tests      TaskTestCase[]
   submissions TaskSubmission[]
+  reviews     TaskReview[]
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -243,6 +245,24 @@ model TaskSubmission {
   task            Task                @relation(fields: [taskId], references: [missionId], onDelete: Cascade)
 
   createdAt       DateTime            @default(now())
+
+  @@index([userId, createdAt])
+  @@index([taskId, createdAt])
+}
+
+model TaskReview {
+  id        String   @id @default(cuid())
+  userId    String
+  taskId    String
+  code      String   @db.Text
+  grade     String
+  feedback  String   @db.Text
+  model     String?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task      Task     @relation(fields: [taskId], references: [missionId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
   @@index([taskId, createdAt])

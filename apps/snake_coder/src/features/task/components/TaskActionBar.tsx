@@ -11,6 +11,10 @@ export type TaskActionBarProps = {
   submitLoading?: boolean
   aiLoading?: boolean
   submitDisabled?: boolean
+  aiDisabled?: boolean
+  showAiReview?: boolean
+  aiRemaining?: number | null
+  aiLimit?: number | null
 }
 
 const TaskActionBar: React.FC<TaskActionBarProps> = ({
@@ -21,8 +25,16 @@ const TaskActionBar: React.FC<TaskActionBarProps> = ({
   submitLoading,
   aiLoading,
   submitDisabled,
+  aiDisabled,
+  showAiReview = true,
+  aiRemaining,
+  aiLimit,
 }) => {
   const t = useTranslations('task')
+  const aiReviewLabel =
+    typeof aiRemaining === 'number' && typeof aiLimit === 'number'
+      ? t('actions.aiReviewWithLimit', { remaining: aiRemaining, limit: aiLimit })
+      : t('actions.aiReview')
 
   return (
     <Box
@@ -54,17 +66,20 @@ const TaskActionBar: React.FC<TaskActionBarProps> = ({
       >
         {t('actions.submit')}
       </Button>
-      <Button
-        variant="muted"
-        round="lg"
-        leftIcon={<RiRobot2Line size={18} />}
-        className="w-full md:flex-1"
-        loading={aiLoading}
-        onClick={onAiReview}
-        type="button"
-      >
-        {t('actions.aiReview')}
-      </Button>
+      {showAiReview && (
+        <Button
+          variant="muted"
+          round="lg"
+          leftIcon={<RiRobot2Line size={18} />}
+          className="w-full md:flex-1"
+          loading={aiLoading}
+          disabled={Boolean(aiDisabled || aiLoading)}
+          onClick={onAiReview}
+          type="button"
+        >
+          {aiReviewLabel}
+        </Button>
+      )}
     </Box>
   )
 }

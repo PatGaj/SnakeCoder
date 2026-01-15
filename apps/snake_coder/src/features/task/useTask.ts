@@ -22,6 +22,10 @@ export type UseTaskData = {
   saveLoading: boolean
   submitLoading: boolean
   aiLoading: boolean
+  aiReviewVisible: boolean
+  aiReviewDisabled: boolean
+  aiReviewRemaining: number | null
+  aiReviewLimit: number | null
   submitDisabled: boolean
   onRun: () => void
   onTest: () => void
@@ -50,6 +54,9 @@ type TaskApiResponse = {
   totalTestsCount: number
   timeLimitSeconds: number
   status: 'TODO' | 'IN_PROGRESS' | 'DONE'
+  missionType: 'TASK' | 'BUGFIX'
+  aiReviewRemaining: number | null
+  aiReviewLimit: number | null
 }
 
 type ExecuteCaseResult = {
@@ -70,6 +77,16 @@ type ExecuteCompleteResponse = {
 }
 
 type ExecuteResponse = ExecuteRunResponse | ExecuteCompleteResponse
+
+type AiReviewResponse = {
+  grade: string
+  summary: string
+  strengths: string[]
+  improvements: string[]
+  nextSteps: string[]
+  remaining: number
+  limit: number
+}
 
 const scoreToPercent = (score: SubmitScore) => (score.total > 0 ? Math.round((score.passed / score.total) * 100) : 0)
 
@@ -121,6 +138,31 @@ const executeTask = async (id: string, payload: { source: string; mode: ExecuteM
   }
 
   return response.json() as Promise<ExecuteResponse>
+}
+
+const reviewTask = async (id: string, source: string): Promise<AiReviewResponse> => {
+  const response = await fetch(`/api/missions/task/${encodeURIComponent(id)}/review`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ source }),
+  })
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => null)) as { error?: string; remaining?: number; limit?: number } | null
+    const error = new Error(payload?.error ?? 'Failed to review task') as Error & {
+      status?: number
+      remaining?: number
+      limit?: number
+    }
+
+    error.status = response.status
+    error.remaining = payload?.remaining
+    error.limit = payload?.limit
+
+    throw error
+  }
+
+  return response.json() as Promise<AiReviewResponse>
 }
 
 const formatConsoleFromRun = (results: ExecuteCaseResult[]) => {
@@ -193,21 +235,24 @@ const useTask = (id: string): UseTaskData => {
     queryKey: ['task', id],
     queryFn: () => fetchTask(id),
     enabled: Boolean(id),
-    onSuccess: async (response) => {
-      const nextStatus: SprintTaskStatus =
-        response.status === 'DONE' ? 'done' : response.status === 'IN_PROGRESS' ? 'inProgress' : 'todo'
-
-      if (nextStatus !== 'todo') {
-        updateSprintStatus(nextStatus)
-      }
-
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['modules'] }),
-        queryClient.invalidateQueries({ queryKey: ['module'] }),
-        queryClient.invalidateQueries({ queryKey: ['sprint'] }),
-      ])
-    },
   })
+
+  React.useEffect(() => {
+    if (!data) return
+
+    const nextStatus: SprintTaskStatus =
+      data.status === 'DONE' ? 'done' : data.status === 'IN_PROGRESS' ? 'inProgress' : 'todo'
+
+    if (nextStatus !== 'todo') {
+      updateSprintStatus(nextStatus)
+    }
+
+    void Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['modules'] }),
+      queryClient.invalidateQueries({ queryKey: ['module'] }),
+      queryClient.invalidateQueries({ queryKey: ['sprint'] }),
+    ])
+  }, [data, id, queryClient, updateSprintStatus])
 
   const task = data?.task
   const editor = data?.editor
@@ -217,8 +262,12 @@ const useTask = (id: string): UseTaskData => {
   const [code, setCode] = React.useState('')
   const [consoleValue, setConsoleValue] = React.useState('')
   const [results, setResults] = React.useState<TestResultsData>({ status: 'pending', tests: [] })
-  const [aiLoading, setAiLoading] = React.useState(false)
+  const [aiReviewRemaining, setAiReviewRemaining] = React.useState<number | null>(null)
+  const [aiReviewLimit, setAiReviewLimit] = React.useState<number | null>(null)
   const [submitScore, setSubmitScore] = React.useState<SubmitScore | null>(null)
+
+  const aiReviewVisible = data?.missionType === 'TASK'
+  const aiReviewDisabled = Boolean(aiReviewVisible && aiReviewRemaining === 0)
 
   React.useEffect(() => {
     if (!data) return
@@ -227,14 +276,17 @@ const useTask = (id: string): UseTaskData => {
     setConsoleValue('')
     setResults({ status: 'pending', tests: [] })
     setSubmitScore(null)
-    setAiLoading(false)
+    setAiReviewRemaining(data.aiReviewRemaining ?? null)
+    setAiReviewLimit(data.aiReviewLimit ?? null)
   }, [data, id])
 
   const runMutation = useMutation({
+    mutationKey: ['taskExecute', id, 'run'],
     mutationFn: (source: string) => executeTask(id, { source, mode: 'runCode' }),
   })
 
   const testMutation = useMutation({
+    mutationKey: ['taskExecute', id, 'test'],
     mutationFn: (source: string) => executeTask(id, { source, mode: 'fullTest' }),
   })
 
@@ -257,6 +309,7 @@ const useTask = (id: string): UseTaskData => {
   })
 
   const submitMutation = useMutation({
+    mutationKey: ['taskExecute', id, 'submit'],
     mutationFn: (source: string) => executeTask(id, { source, mode: 'completeTask' }),
     onSuccess: async (response) => {
       if (response.mode === 'completeTask') {
@@ -274,6 +327,39 @@ const useTask = (id: string): UseTaskData => {
       ])
     },
   })
+
+  const aiReviewMutation = useMutation({
+    mutationFn: (source: string) => reviewTask(id, source),
+  })
+
+  const formatAiReview = React.useCallback(
+    (review: AiReviewResponse) => {
+      const blocks: string[] = [`${t('aiReview.labels.grade')}: ${review.grade}`]
+
+      if (review.summary) {
+        blocks.push(`${t('aiReview.labels.summary')}: ${review.summary}`)
+      }
+
+      if (review.strengths.length) {
+        blocks.push(`${t('aiReview.labels.strengths')}:\n- ${review.strengths.join('\n- ')}`)
+      }
+
+      if (review.improvements.length) {
+        blocks.push(`${t('aiReview.labels.improvements')}:\n- ${review.improvements.join('\n- ')}`)
+      }
+
+      if (review.nextSteps.length) {
+        blocks.push(`${t('aiReview.labels.nextSteps')}:\n- ${review.nextSteps.join('\n- ')}`)
+      }
+
+      if (Number.isFinite(review.remaining) && Number.isFinite(review.limit)) {
+        blocks.push(`${t('aiReview.labels.remaining')}: ${review.remaining}/${review.limit}`)
+      }
+
+      return blocks.join('\n\n')
+    },
+    [t]
+  )
 
   const onRun = () => {
     if (!task) return
@@ -384,34 +470,68 @@ const useTask = (id: string): UseTaskData => {
   }
 
   const onAiReview = () => {
-    setAiLoading(true)
+    if (!aiReviewVisible) {
+      const message = t('toast.aiReviewNotAvailable')
+      setConsoleValue(t('console.error', { message }))
+      toast.error(message)
+      return
+    }
+
+    if (aiReviewDisabled) {
+      const message = t('toast.aiReviewLimit')
+      setConsoleValue(t('console.error', { message }))
+      toast.error(message)
+      return
+    }
+
+    if (!code.trim().length) {
+      const message = t('toast.aiReviewEmpty')
+      setConsoleValue(t('console.error', { message }))
+      toast.error(message)
+      return
+    }
+
     setConsoleValue(t('console.aiReviewing'))
 
-    window.setTimeout(() => {
-      setConsoleValue(
-        [
-          'Ocena AI (mock): B',
-          '',
-          'Mocne strony:',
-          '- czytelna struktura funkcji',
-          '- poprawna obsługa typowych przypadków',
-          '',
-          'Do poprawy:',
-          '- dopisz walidację wejścia (typ / None)',
-          '- uprość składanie stringa (np. użyj join)',
-          '',
-          'Sugestia:',
-          'Zadbaj o czytelne nazwy i testy edge-case.',
-        ].join('\n')
-      )
-      setAiLoading(false)
-    }, 950)
+    void aiReviewMutation
+      .mutateAsync(code)
+      .then(async (review) => {
+        setConsoleValue(formatAiReview(review))
+        setAiReviewRemaining(review.remaining)
+        setAiReviewLimit(review.limit)
+
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+          queryClient.invalidateQueries({ queryKey: ['user'] }),
+          queryClient.invalidateQueries({ queryKey: ['userStats'] }),
+          queryClient.invalidateQueries({ queryKey: ['ranking'] }),
+        ])
+      })
+      .catch((error: Error & { status?: number; remaining?: number; limit?: number }) => {
+        const status = error.status
+
+        if (status === 429) {
+          setAiReviewRemaining(0)
+          setAiReviewLimit(error.limit ?? aiReviewLimit)
+        }
+
+        const message =
+          status === 429
+            ? t('toast.aiReviewLimit')
+            : status === 403
+              ? t('toast.aiReviewNotAvailable')
+              : t('toast.aiReviewFailed')
+
+        setConsoleValue(t('console.error', { message }))
+        toast.error(message)
+      })
   }
 
   const runLoading = runMutation.isPending
   const testLoading = testMutation.isPending
   const saveLoading = saveMutation.isPending
   const submitLoading = submitMutation.isPending
+  const aiLoading = aiReviewMutation.isPending
 
   const submitDisabled = Boolean(submitLoading || !code.trim().length)
   const submitPercent = submitScore ? scoreToPercent(submitScore) : 0
@@ -434,6 +554,10 @@ const useTask = (id: string): UseTaskData => {
     saveLoading,
     submitLoading,
     aiLoading,
+    aiReviewVisible,
+    aiReviewDisabled,
+    aiReviewRemaining,
+    aiReviewLimit,
     submitDisabled,
     onRun,
     onTest,

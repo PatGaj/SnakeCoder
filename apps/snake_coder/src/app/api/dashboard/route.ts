@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth/next'
 import prisma from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import { PUBLIC_MODULE_CODES_LIST } from '@/lib/moduleAccess'
+import { ModuleCategory } from '@/generated/prisma/client'
 
 type DashboardModuleCode = 'PCEP' | 'PCAP' | 'BASICS'
 
@@ -65,11 +66,11 @@ const speedPercentFromTime = ({ timeSeconds, avgSeconds }: { timeSeconds?: numbe
   return 50
 }
 
-const MISSION_TYPES = ['TASK', 'BUGFIX', 'QUIZ', 'ARTICLE'] as const
+const MISSION_TYPES: Array<'TASK' | 'BUGFIX' | 'QUIZ' | 'ARTICLE'> = ['TASK', 'BUGFIX', 'QUIZ', 'ARTICLE']
 
 const moduleAccessFilter = (userId: string) => ({
   isBuilding: false,
-  category: 'CERTIFICATIONS',
+  category: ModuleCategory.CERTIFICATIONS,
   OR: [
     {
       access: {
@@ -224,8 +225,8 @@ export async function GET() {
   }
 
   const lastGraded = await prisma.userMissionProgress.findFirst({
-    where: { userId, status: 'DONE', grade: { not: null } },
-    orderBy: [{ completedAt: 'desc' }, { lastOpenedAt: 'desc' }],
+    where: { userId, grade: { not: null } },
+    orderBy: [{ lastOpenedAt: 'desc' }, { completedAt: 'desc' }],
     select: { grade: true },
   })
 

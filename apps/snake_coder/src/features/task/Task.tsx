@@ -28,6 +28,10 @@ const Task: React.FC<TaskProps> = ({ id }) => {
     saveLoading,
     submitLoading,
     aiLoading,
+    aiReviewVisible,
+    aiReviewDisabled,
+    aiReviewRemaining,
+    aiReviewLimit,
     submitDisabled,
     onRun,
     onTest,
@@ -122,6 +126,10 @@ const Task: React.FC<TaskProps> = ({ id }) => {
               submitLoading={submitLoading}
               aiLoading={aiLoading}
               submitDisabled={submitDisabled}
+              aiDisabled={aiReviewDisabled}
+              showAiReview={aiReviewVisible}
+              aiRemaining={aiReviewRemaining}
+              aiLimit={aiReviewLimit}
             />
           </div>
           <Console value={consoleValue} />

@@ -5,6 +5,8 @@ import prisma from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import { PUBLIC_MODULE_CODES_LIST } from '@/lib/moduleAccess'
 
+const REVIEW_LIMIT_PER_DAY = 3
+
 type Params = {
   params: Promise<{
     id: string
@@ -67,6 +69,24 @@ export async function GET(_: Request, { params }: Params) {
   const totalTestsCount = await prisma.taskTestCase.count({ where: { taskId: mission.id } })
   const progress = mission.progress[0]
 
+  let aiReviewRemaining: number | null = null
+  let aiReviewLimit: number | null = null
+
+  if (mission.type === 'TASK') {
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
+
+    const reviewsToday = await prisma.taskReview.count({
+      where: {
+        userId,
+        createdAt: { gte: todayStart },
+      },
+    })
+
+    aiReviewLimit = REVIEW_LIMIT_PER_DAY
+    aiReviewRemaining = Math.max(0, REVIEW_LIMIT_PER_DAY - reviewsToday)
+  }
+
   if (progress) {
     await prisma.userMissionProgress.update({
       where: { userId_missionId: { userId, missionId: mission.id } },
@@ -96,6 +116,9 @@ export async function GET(_: Request, { params }: Params) {
     totalTestsCount,
     timeLimitSeconds: mission.timeLimitSeconds ?? mission.etaMinutes * 60,
     status: progress?.status ?? 'TODO',
+    missionType: mission.type,
+    aiReviewRemaining,
+    aiReviewLimit,
   })
 }
 

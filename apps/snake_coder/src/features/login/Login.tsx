@@ -138,8 +138,7 @@ const Login = () => {
             leftIcon={<RiGithubFill size={18} />}
             onClick={() => handleOAuth('github')}
             loading={oauthLoading === 'github'}
-            // disabled={isSubmitting || oauthLoading !== null}
-            disabled={true}
+            disabled={isSubmitting || oauthLoading !== null}
           >
             {t('oauth.github')}
           </Button>

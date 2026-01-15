@@ -60,7 +60,7 @@ const Dashboard = () => {
         className={showPlan || showNoSprint ? 'grid gap-6 lg:grid-cols-[1fr_0.95fr]' : 'grid gap-6'}
         variants={itemVariants}
       >
-        {showPlan && <PlanCard plan={plan} />}
+        {showPlan && plan ? <PlanCard plan={plan} /> : null}
         {!showPlan && showNoSprint && <NoSprintCard onGoToModules={() => router.push('/modules')} />}
         <LastResultCard lastResult={lastResult} />
       </motion.section>

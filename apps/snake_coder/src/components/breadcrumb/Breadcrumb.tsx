@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 
 const breadcrumbStyles = tv({
   slots: {
-    nav: 'flex items-center gap-2 text-sm text-snowWhite-200 pb-4',
+    nav: 'hidden items-center gap-2 text-sm text-snowWhite-200 pb-4 lg:flex',
     item: 'inline-flex items-center gap-2',
     link: 'text-primary-100 hover:text-secondary-400 transition-colors',
     current: 'text-snowWhite-50 font-semibold',

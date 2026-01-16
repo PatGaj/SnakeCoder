@@ -11,11 +11,9 @@ const StatTopBar = () => {
   const { streakDays, xpGained, rank, grade, leagueName } = useStatTopBar()
 
   return (
-    <div className="fixed right-10 top-0 z-90 w-fit max-w-none">
-      <div className="relative overflow-hidden rounded-b-2xl border border-primary-800/70 border-r-0 border-t-0 bg-primary-950/70 px-4 py-3 shadow-[0_26px_70px_#00000085]">
-        <div className="pointer-events-none absolute -left-12 -top-14 h-44 w-44 rounded-full bg-secondary-500/15 blur-3xl" />
-        <div className="pointer-events-none absolute -right-8 -top-10 h-44 w-44 rounded-full bg-aquaBlue-500/10 blur-3xl" />
-        <div className="flex items-center gap-3">
+    <div className="sticky top-0 z-90 w-full lg:fixed lg:right-10 lg:left-auto lg:top-0 lg:w-fit lg:px-0">
+      <div className="relative w-full overflow-hidden border-b border-primary-800/70 bg-primary-950 px-3 py-3 shadow-[0_26px_70px_#00000085] lg:rounded-b-2xl lg:border-r-0 lg:border-t-0 lg:px-4">
+        <div className="flex items-center justify-center gap-2 overflow-x-auto pb-1 lg:justify-start">
           <StatTopBarItem
             tooltip={t('streak.tooltip')}
             label={t('streak.label')}
@@ -29,7 +27,7 @@ const StatTopBar = () => {
             label="Rank XP"
             value={`${xpGained} XP`}
             icon={<RiStarSmileLine className="text-aquaBlue-200" size={18} />}
-            className="min-w-[9rem] border-aquaBlue-400/25 bg-linear-to-br from-aquaBlue-500/16 to-primary-950/70"
+            className="border-aquaBlue-400/25 bg-linear-to-br from-aquaBlue-500/16 to-primary-950/70"
             iconWrapperClassName="bg-aquaBlue-500/12"
           />
           <StatTopBarItem
@@ -37,7 +35,7 @@ const StatTopBar = () => {
             label={t('league.label')}
             value={`${leagueName} #${rank}`}
             icon={<RiTrophyLine className="text-yellow-200" size={18} />}
-            className="min-w-[10rem] border-yellow-400/25 bg-linear-to-br from-yellow-500/16 to-primary-950/70"
+            className="border-yellow-400/25 bg-linear-to-br from-yellow-500/16 to-primary-950/70"
             iconWrapperClassName="bg-yellow-500/12"
           />
           <StatTopBarItem

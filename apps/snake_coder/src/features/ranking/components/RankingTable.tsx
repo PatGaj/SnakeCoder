@@ -146,7 +146,12 @@ const RankingTable: React.FC<RankingTableProps> = ({ users, perPage = 7 }) => {
       </div>
 
       <div className={clsx('mt-5 flex justify-end', { invisible: totalPages <= 1 })}>
-        <Pagination totalPages={totalPages} currentPage={safePage} onPageChange={setPage} />
+        <Pagination
+          totalPages={totalPages}
+          currentPage={safePage}
+          onPageChange={setPage}
+          className="origin-right scale-90 lg:scale-100"
+        />
       </div>
     </Box>
   )

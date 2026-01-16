@@ -8,10 +8,12 @@ type SignInLayoutProps = {
 
 const SignInLayout: React.FC<SignInLayoutProps> = ({ children }) => {
   return (
-    <div className="relative flex min-h-screen">
+    <div className="relative flex min-h-screen flex-col">
       <StatTopBar />
-      <SideBar />
-      <SignInLayoutContent>{children}</SignInLayoutContent>
+      <div className="flex min-h-0 flex-1">
+        <SideBar />
+        <SignInLayoutContent>{children}</SignInLayoutContent>
+      </div>
     </div>
   )
 }

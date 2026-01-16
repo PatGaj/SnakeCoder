@@ -51,7 +51,7 @@ const SprintTabsCard: React.FC<SprintTabsCardProps> = ({ sprints, onOpen }) => {
   return (
     <div className="w-full">
       <div className="relative">
-        <div className="relative top-1 left-5 z-10 flex max-w-full gap-2 overflow-x-auto pb-1">
+        <div className="relative top-1 z-10 mx-4 flex max-w-full gap-0.5 overflow-x-auto px-1 pb-1 lg:left-5 lg:mx-0 lg:gap-2 lg:px-2">
           {tabs.map((tab) => {
             const showDot = tab.status === 'inProgress' || tab.status === 'done'
 
@@ -61,7 +61,8 @@ const SprintTabsCard: React.FC<SprintTabsCardProps> = ({ sprints, onOpen }) => {
                 type="button"
                 onClick={() => setActiveId(tab.id)}
                 className={clsx(
-                  'shrink-0 select-none rounded-t-xl border px-4 py-2 text-[11px] cursor-pointer font-semibold uppercase tracking-wide transition-colors',
+                  'shrink-0 snap-start select-none rounded-t-lg border px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.14em] transition-colors',
+                  'lg:rounded-t-xl lg:px-4 lg:py-2 lg:text-[11px] lg:tracking-wide',
                   {
                     'opacity-55': tab.isLocked && !tab.isActive,
                     'relative -mb-px border-primary-800/70 bg-white/5 text-snowWhite-50': tab.isActive,
@@ -86,7 +87,7 @@ const SprintTabsCard: React.FC<SprintTabsCardProps> = ({ sprints, onOpen }) => {
           })}
         </div>
         <Box variant="glass" size="xl" round="3xl" className="w-full border-primary-800/70">
-          <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 {(isDone || isInProgress) && (
@@ -104,14 +105,14 @@ const SprintTabsCard: React.FC<SprintTabsCardProps> = ({ sprints, onOpen }) => {
               <p className="text-2xl font-semibold text-snowWhite-50">{active.title}</p>
               <p className="text-sm text-snowWhite-300 md:text-base">{active.desc}</p>
             </div>
-            <div className="flex flex-col items-end">
+            <div className="flex w-full flex-col items-start lg:w-auto lg:items-end">
               <Button
                 variant={isAvailable ? 'gradient' : isLocked ? 'muted' : 'ghost'}
                 size="md"
                 round="lg"
                 rightIcon={isLocked ? <RiLock2Line size={18} /> : <RiArrowRightLine size={18} />}
                 disabled={isLocked}
-                className="px-6"
+                className="w-full px-6 sm:w-auto"
                 onClick={() => onOpen(active.route)}
               >
                 {t('sprints.cta', { status: active.status })}

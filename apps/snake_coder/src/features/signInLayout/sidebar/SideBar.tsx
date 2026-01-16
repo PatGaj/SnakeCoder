@@ -38,6 +38,8 @@ const fetchUser = async (): Promise<UserApiResponse> => {
 
 const SideBar = () => {
   const [collapsed, setCollapsed] = React.useState<boolean>(false)
+  const [isMobile, setIsMobile] = React.useState<boolean>(false)
+  const desktopCollapsedRef = React.useRef<boolean>(false)
 
   const t = useTranslations('sidebar')
   const locale = useLocale()
@@ -58,15 +60,44 @@ const SideBar = () => {
 
   const email = session?.user?.email
 
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    const query = window.matchMedia('(max-width: 1023px)')
+    const update = () => setIsMobile(query.matches)
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+
+  React.useEffect(() => {
+    if (!isMobile) {
+      desktopCollapsedRef.current = collapsed
+    }
+  }, [collapsed, isMobile])
+
+  React.useEffect(() => {
+    if (isMobile) {
+      setCollapsed(true)
+      return
+    }
+    setCollapsed(desktopCollapsedRef.current)
+  }, [isMobile])
+
   return (
     <aside
       className={clsx(
-        'h-screen sticky border-r border-primary-800/70 bg-primary-950/40',
-        'transition-[width] duration-300',
-        { 'w-70': !collapsed, 'w-21 duration-500 ease-out': collapsed }
+        'h-screen border-r border-primary-800/70 bg-primary-950/40',
+        isMobile
+          ? 'fixed inset-y-0 left-0 z-[110] w-70 -translate-x-full bg-primary-950/90 shadow-[0_30px_80px_#00000085] backdrop-blur transition-transform duration-300'
+          : 'sticky top-0 transition-[width] duration-300',
+        {
+          'translate-x-0': isMobile && !collapsed,
+          'w-70': !isMobile && !collapsed,
+          'w-21 duration-500 ease-out': !isMobile && collapsed,
+        }
       )}
     >
-      <div className="absolute left-full top-4 z-60 ">
+      <div className={clsx('absolute left-full top-20 z-60', isMobile && 'fixed left-3 top-24 z-[120]')}>
         <SideBarToggle
           toggled={collapsed}
           onToggle={() => setCollapsed((prev) => !prev)}

@@ -46,7 +46,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, tone, count, childre
         </span>
       </div>
       <div className="mt-4 flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-primary-800/70 scrollbar-track-transparent">
-        <div className="space-y-3 pb-1">{children}</div>
+        <div className="space-y-2 pb-1 lg:space-y-3">{children}</div>
       </div>
     </Box>
   )

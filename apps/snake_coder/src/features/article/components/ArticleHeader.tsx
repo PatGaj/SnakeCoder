@@ -22,8 +22,8 @@ const ArticleHeader: React.FC<ArticleHeaderProps> = ({ header, onBack, onMarkRea
 
   return (
     <header className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap items-center gap-3">
           <Badge variant="secondary" className="px-3 py-1 text-nightBlack-900">
             {t('badge')}
           </Badge>
@@ -34,13 +34,13 @@ const ArticleHeader: React.FC<ArticleHeaderProps> = ({ header, onBack, onMarkRea
             </span>
           </Badge>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
           <Button
             type="button"
             variant="ghost"
             size="md"
             round="lg"
-            className="border border-primary-800/70"
+            className="w-full border border-primary-800/70 sm:w-auto"
             leftIcon={<RiArrowLeftLine size={18} />}
             onClick={onBack}
           >
@@ -52,6 +52,7 @@ const ArticleHeader: React.FC<ArticleHeaderProps> = ({ header, onBack, onMarkRea
             size="md"
             round="lg"
             leftIcon={<RiCheckLine size={18} />}
+            className="w-full sm:w-auto"
             loading={markReadLoading}
             onClick={onMarkRead}
           >

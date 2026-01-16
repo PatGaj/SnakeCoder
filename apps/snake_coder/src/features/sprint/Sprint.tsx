@@ -47,8 +47,8 @@ const Sprint: React.FC<SprintProps> = ({ moduleId, sprintId }) => {
   const sprintTitle = sprints.find((sprint) => sprint.id === sprintId)?.title ?? sprintId
 
   return (
-    <main className="mx-auto flex h-screen max-w-400 flex-col overflow-hidden px-6 py-10 md:px-12">
-      <header className="shrink-0 space-y-2">
+    <main className="mx-auto flex min-h-screen max-w-400 flex-col px-3 py-6 md:px-10 lg:h-screen lg:overflow-hidden">
+      <header className="shrink-0 space-y-2 pl-6 sm:pl-4">
         <Breadcrumb
           items={[
             { href: '/modules', label: 'Modules' },
@@ -67,13 +67,17 @@ const Sprint: React.FC<SprintProps> = ({ moduleId, sprintId }) => {
         </div>
       ) : (
         <motion.section
-          className="mt-8 grid flex-1 min-h-0 gap-6 overflow-hidden lg:grid-cols-3"
+          className="mt-8 grid gap-6 lg:grid-cols-3 lg:flex-1 lg:min-h-0 lg:overflow-hidden"
           variants={boardVariants}
           initial="hidden"
           animate="visible"
         >
           {columns.map((column) => (
-            <motion.div key={column.id} variants={columnVariants} className="h-full min-h-0">
+            <motion.div
+              key={column.id}
+              variants={columnVariants}
+              className="h-[22rem] min-h-0 w-full max-w-[95%] mx-auto sm:h-[26rem] lg:h-full lg:max-w-none lg:mx-0"
+            >
               <KanbanColumn title={column.title} tone={column.tone} count={column.count}>
                 {column.tasks.map((task) => (
                   <motion.div key={task.id} variants={cardVariants}>

@@ -35,6 +35,8 @@ type Column<T> = {
   label: React.ReactNode
   render?: (value: T[keyof T], row: T) => React.ReactNode
   align?: 'left' | 'right' | 'center'
+  headerClassName?: string
+  cellClassName?: string
 }
 
 type RowAction<T> = {
@@ -50,6 +52,7 @@ type TableProps<T extends Record<string, unknown>> = VariantProps<typeof tableSt
   data: T[]
   emptyLabel?: React.ReactNode
   className?: string
+  tableClassName?: string
   actions?: RowAction<T>[]
   actionsLabel?: React.ReactNode
   actionsAlign?: 'left' | 'right' | 'center'
@@ -62,6 +65,7 @@ function Table<T extends Record<string, unknown>>({
   dense,
   zebra,
   className,
+  tableClassName,
   actions,
   actionsLabel = 'Akcje',
   actionsAlign = 'center',
@@ -107,7 +111,7 @@ function Table<T extends Record<string, unknown>>({
 
   return (
     <div className={cn(styles.wrapper(), className)}>
-      <table className={styles.table()}>
+      <table className={cn(styles.table(), tableClassName)}>
         <thead className={styles.head()}>
           <tr>
             {computedColumns.map((col) => (
@@ -116,7 +120,8 @@ function Table<T extends Record<string, unknown>>({
                 className={cn(
                   styles.headerCell(),
                   col.align === 'right' && 'text-right',
-                  col.align === 'center' && 'text-center'
+                  col.align === 'center' && 'text-center',
+                  col.headerClassName
                 )}
               >
                 {col.label}
@@ -140,7 +145,8 @@ function Table<T extends Record<string, unknown>>({
                     className={cn(
                       styles.cell(),
                       col.align === 'right' && 'text-right',
-                      col.align === 'center' && 'text-center'
+                      col.align === 'center' && 'text-center',
+                      col.cellClassName
                     )}
                   >
                     {col.render ? col.render(row[col.key], row) : (row[col.key] as React.ReactNode)}

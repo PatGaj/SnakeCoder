@@ -13,7 +13,7 @@ const SignInLayoutContent: React.FC<SignInLayoutContentProps> = ({ children }) =
   const pathname = usePathname()
 
   return (
-    <div className="min-w-0 flex-1 h-screen overflow-y-auto scrollbar-thumb-secondary-500 scrollbar-track-primary-500 scrollbar-thin">
+    <div className="min-w-0 flex-1 min-h-0 overflow-y-auto scrollbar-thumb-secondary-500 scrollbar-track-primary-500 scrollbar-thin">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={pathname}

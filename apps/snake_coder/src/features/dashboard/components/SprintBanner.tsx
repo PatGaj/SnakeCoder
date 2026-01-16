@@ -47,9 +47,9 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
       <div className="pointer-events-none absolute -left-10 -top-16 h-64 w-64 rounded-full bg-secondary-500/15 blur-3xl" />
       <div className="pointer-events-none absolute -right-10 -bottom-16 h-64 w-64 rounded-full bg-aquaBlue-500/10 blur-3xl" />
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-col items-center gap-4 text-center lg:flex-row lg:items-start lg:justify-between lg:text-left">
         <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <Badge variant="muted" className="px-3 py-1">
               {sprint.module} • Sprint {sprint.sprintNo}
             </Badge>
@@ -61,21 +61,28 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
             </Badge>
           </div>
           <p className="text-2xl font-semibold text-snowWhite-50">{sprint.title}</p>
-          <p className="max-w-3xl text-sm text-snowWhite-300 md:text-base">{sprint.desc}</p>
+          <p className="mx-auto max-w-3xl text-sm text-snowWhite-300 md:text-base lg:mx-0">{sprint.desc}</p>
         </div>
 
-        <div className="flex shrink-0 flex-col gap-2">
+        <div className="flex w-full shrink-0 flex-col items-center gap-2 lg:w-auto lg:items-end">
           <Button
             variant="gradient"
             size="lg"
             round="lg"
             rightIcon={<RiArrowRightLine size={18} />}
-            className="px-7"
+            className="w-full px-7 sm:w-auto"
             onClick={onContinue}
           >
             {ctaLabel}
           </Button>
-          <Button variant="ghost" size="md" round="lg" leftIcon={<RiListCheck3 size={18} />} onClick={onGoToSprint}>
+          <Button
+            variant="ghost"
+            size="md"
+            round="lg"
+            leftIcon={<RiListCheck3 size={18} />}
+            className="w-full sm:w-auto"
+            onClick={onGoToSprint}
+          >
             {t('sprint.goToSprint')}
           </Button>
         </div>
@@ -84,7 +91,7 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
       <Separator className="my-5" />
 
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
-        <div className="space-y-2">
+        <div className="space-y-2 text-center lg:text-left">
           <div className="rounded-2xl border border-primary-800/70 bg-primary-950/55 px-4 py-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary-300">
               {taskLabel}
@@ -97,9 +104,9 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
             {t('sprint.progressDesc', { tasksDone: sprint.tasksDone, tasksTotal: sprint.tasksTotal })}
           </p>
         </div>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+        <div className="grid gap-2 justify-items-center sm:grid-cols-2 lg:justify-items-stretch lg:grid-cols-1">
           <ItemRow
-            className="w-65"
+            className="w-full sm:w-65"
             icon={<RiFlagLine className="text-secondary-400" size={18} />}
             label={t('sprint.items.tasks')}
             right={
@@ -109,7 +116,7 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
             }
           />
           <ItemRow
-            className="w-65"
+            className="w-full sm:w-65"
             icon={<RiBookOpenLine className="text-secondary-400" size={18} />}
             label={t('sprint.items.article')}
             right={
@@ -119,7 +126,7 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
             }
           />
           <ItemRow
-            className="w-65"
+            className="w-full sm:w-65"
             icon={<RiTestTubeLine className="text-secondary-400" size={18} />}
             label={t('sprint.items.quiz')}
             right={

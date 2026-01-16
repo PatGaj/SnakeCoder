@@ -64,68 +64,102 @@ const Missions = () => {
 
   const { pageMissions, totalPages, page, perPage, setPage, setPerPage, filters, setFilter, filterOptions } =
     useMissions()
+  const [isMobile, setIsMobile] = React.useState(false)
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    const query = window.matchMedia('(max-width: 1023px)')
+    const update = () => setIsMobile(query.matches)
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
 
   const columns = React.useMemo<TableColumn<MissionData>[]>(() => {
-    return [
+    const baseColumns: TableColumn<MissionData>[] = [
       {
         key: 'title',
         label: t('table.title'),
-        render: (_value, row) => <span className="font-semibold text-snowWhite-50">{row.title}</span>,
+        headerClassName: 'w-28 sm:w-40 lg:w-auto',
+        cellClassName: 'max-w-[7rem] sm:max-w-[10rem] lg:max-w-none',
+        render: (_value, row) => (
+          <span className="block truncate font-semibold text-snowWhite-50">{row.title}</span>
+        ),
       },
       {
         key: 'moduleId',
         label: t('table.module'),
-        render: (_value, row) => <span className="text-snowWhite-200">{row.moduleTitle}</span>,
+        headerClassName: 'w-24 sm:w-32 lg:w-auto',
+        cellClassName: 'max-w-[6rem] sm:max-w-[8rem] lg:max-w-none',
+        render: (_value, row) => <span className="block truncate text-snowWhite-200">{row.moduleTitle}</span>,
       },
-      {
-        key: 'difficulty',
-        label: t('table.difficulty'),
-        render: (_value, row) => (
-          <Badge variant={DIFFICULTY_BADGE_VARIANT[row.difficulty]} size="sm" className="px-3 py-1 whitespace-nowrap">
-            {t('difficulty', { difficulty: row.difficulty })}
-          </Badge>
-        ),
-      },
-      {
-        key: 'type',
-        label: t('table.type'),
-        render: (_value, row) => {
-          const TypeIcon = ICON_BY_TYPE[row.type]
-          return (
-            <Badge variant="muted" size="sm" className="px-3 py-1 whitespace-nowrap">
-              <span className="inline-flex items-center gap-2">
-                <TypeIcon size={16} />
-                {t('type', { type: row.type })}
-              </span>
+    ]
+
+    if (!isMobile) {
+      baseColumns.push(
+        {
+          key: 'difficulty',
+          label: t('table.difficulty'),
+          render: (_value, row) => (
+            <Badge
+              variant={DIFFICULTY_BADGE_VARIANT[row.difficulty]}
+              size="sm"
+              className="px-3 py-1 whitespace-nowrap"
+            >
+              {t('difficulty', { difficulty: row.difficulty })}
             </Badge>
-          )
+          ),
         },
-      },
-      {
+        {
+          key: 'type',
+          label: t('table.type'),
+          render: (_value, row) => {
+            const TypeIcon = ICON_BY_TYPE[row.type]
+            return (
+              <Badge variant="muted" size="sm" className="px-3 py-1 whitespace-nowrap">
+                <span className="inline-flex items-center gap-2">
+                  <TypeIcon size={16} />
+                  {t('type', { type: row.type })}
+                </span>
+              </Badge>
+            )
+          },
+        }
+      )
+    }
+
+    if (!isMobile) {
+      baseColumns.push({
         key: 'xp',
         label: t('table.xp'),
+        headerClassName: 'w-16 sm:w-20 lg:w-auto',
+        cellClassName: 'whitespace-nowrap',
         render: (_value, row) => <span className="font-semibold text-secondary-300">+{row.xp} XP</span>,
         align: 'right',
-      },
-      {
-        key: '__actions',
-        label: t('table.action'),
-        align: 'center',
-        render: (_value, row) => (
-          <Button
-            variant={CTA_BUTTON_VARIANT[row.status]}
-            size="sm"
-            round="lg"
-            rightIcon={<RiArrowRightLine size={18} />}
-            className="w-36 whitespace-nowrap text-xs px-3 py-1"
-            onClick={() => router.push(row.route)}
-          >
-            {t('table.cta', { status: row.status })}
-          </Button>
-        ),
-      },
-    ] as const
-  }, [router, t])
+      })
+    }
+
+    baseColumns.push({
+      key: '__actions',
+      label: t('table.action'),
+      align: 'center',
+      headerClassName: 'w-24 sm:w-28 lg:w-auto',
+      render: (_value, row) => (
+        <Button
+          variant={CTA_BUTTON_VARIANT[row.status]}
+          size="sm"
+          round="lg"
+          rightIcon={<RiArrowRightLine size={18} />}
+          className="w-24 px-3 py-1 text-[11px] sm:w-28 lg:w-36"
+          onClick={() => router.push(row.route)}
+        >
+          {t('table.cta', { status: row.status })}
+        </Button>
+      ),
+    })
+
+    return baseColumns
+  }, [isMobile, router, t])
 
   const canClear = Boolean(filters.difficulty || filters.moduleId || filters.type || filters.status)
   const tableKey = [
@@ -253,12 +287,24 @@ const Missions = () => {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
-          <Table columns={columns} data={pageMissions} zebra emptyLabel={t('table.empty')} />
+          <Table
+            columns={columns}
+            data={pageMissions}
+            zebra
+            dense={isMobile}
+            tableClassName="table-fixed lg:table-auto"
+            emptyLabel={t('table.empty')}
+          />
         </motion.div>
       </AnimatePresence>
 
       <motion.div className={clsx('flex justify-end', { invisible: totalPages <= 1 })} variants={itemVariants}>
-        <Pagination totalPages={totalPages} currentPage={page} onPageChange={setPage} />
+        <Pagination
+          totalPages={totalPages}
+          currentPage={page}
+          onPageChange={setPage}
+          className="origin-right scale-90 lg:scale-100"
+        />
       </motion.div>
     </motion.main>
   )

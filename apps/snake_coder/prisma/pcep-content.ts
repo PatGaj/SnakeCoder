@@ -159,7 +159,7 @@ export const pcepSprints: SprintSeedInput[] = [
         xp: 40,
         starterCode: starterCode.textToText,
         publicTests: [
-          ['pcep', 'PCEP'],
+          ['pcep', 'Podstawy Pythona'],
           ['Snake Coder', 'SNAKE CODER'],
           ['abc', 'ABC'],
         ],
@@ -454,7 +454,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Wprowadzenie do składni Pythona, zmiennych, typów i pracy z input/print.',
         etaMinutes: 10,
         xp: 24,
-        tags: ['PCEP', 'składnia', 'zmienne', 'wejście/wyjście'],
+        tags: ['Podstawy Pythona', 'składnia', 'zmienne', 'wejście/wyjście'],
         blocks: [
           { type: 'heading', id: 'wciecia', level: 2, text: 'Wcięcia i czytelność' },
           {
@@ -566,7 +566,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Poznaj podstawy pracy ze stringami i przygotuj się do zadań.',
         etaMinutes: 10,
         xp: 24,
-        tags: ['PCEP', 'napisy', 'len', 'indeksy'],
+        tags: ['Podstawy Pythona', 'napisy', 'len', 'indeksy'],
         blocks: [
           { type: 'heading', id: 'string', level: 2, text: 'Czym jest string' },
           {
@@ -647,7 +647,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Krótki kontekst historyczny i ekosystem narzędzi.',
         etaMinutes: 7,
         xp: 18,
-        tags: ['PCEP', 'historia', 'ekosystem'],
+        tags: ['Podstawy Pythona', 'historia', 'ekosystem'],
         blocks: [
           { type: 'heading', id: 'historia', level: 2, text: 'Historia' },
           {
@@ -1071,7 +1071,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Wprowadzenie do instrukcji warunkowych i logiki.',
         etaMinutes: 10,
         xp: 24,
-        tags: ['PCEP', 'warunki', 'logika'],
+        tags: ['Podstawy Pythona', 'warunki', 'logika'],
         blocks: [
           { type: 'heading', id: 'porownania', level: 2, text: 'Porównania' },
           { type: 'list', items: ['== != < <= > >=', 'Wynikiem porównania jest True/False'] },
@@ -1149,7 +1149,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Naucz się iteracji i budowania liczników.',
         etaMinutes: 10,
         xp: 24,
-        tags: ['PCEP', 'pętle', 'range'],
+        tags: ['Podstawy Pythona', 'pętle', 'range'],
         blocks: [
           { type: 'heading', id: 'for', level: 2, text: 'Pętla for' },
           {
@@ -1166,7 +1166,7 @@ export const pcepSprints: SprintSeedInput[] = [
             title: 'Suma od 1 do n',
             code: 'total = 0\nfor i in range(1, n + 1):\n    total += i',
           },
-          { type: 'heading', id: 'range', level: 2, text: 'range() — podstawy' },
+          { type: 'heading', id: 'range', level: 2, text: 'range(), podstawy' },
           {
             type: 'paragraph',
             text: 'range() zwraca obiekt range, który generuje kolejne liczby. Nie jest to lista, ale można go z niej stworzyć.',
@@ -1174,9 +1174,9 @@ export const pcepSprints: SprintSeedInput[] = [
           {
             type: 'list',
             items: [
-              'range(stop) — start=0, krok=1',
-              'range(start, stop) — krok=1',
-              'range(start, stop, step) — krok może być dodatni lub ujemny',
+              'range(stop), start=0, krok=1',
+              'range(start, stop), krok=1',
+              'range(start, stop, step), krok może być dodatni lub ujemny',
             ],
           },
           {
@@ -1237,7 +1237,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Dowiedz się, jak przechodzić po listach liczb i liczyć wyniki.',
         etaMinutes: 9,
         xp: 22,
-        tags: ['PCEP', 'listy', 'iteracja'],
+        tags: ['Podstawy Pythona', 'listy', 'iteracja'],
         blocks: [
           { type: 'heading', id: 'listy', level: 2, text: 'Listy jako kolekcja liczb' },
           {
@@ -1668,7 +1668,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Poznaj podstawy list i sposoby pracy z unikalnymi elementami.',
         etaMinutes: 10,
         xp: 24,
-        tags: ['PCEP', 'listy', 'set', 'sortowanie'],
+        tags: ['Podstawy Pythona', 'listy', 'set', 'sortowanie'],
         blocks: [
           { type: 'heading', id: 'indeksy', level: 2, text: 'Indeksy i duplikaty' },
           {
@@ -1738,7 +1738,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Naucz się pracować z tekstem przy pomocy metod string.',
         etaMinutes: 10,
         xp: 24,
-        tags: ['PCEP', 'napisy', 'split', 'join', 'replace'],
+        tags: ['Podstawy Pythona', 'napisy', 'split', 'join', 'replace'],
         blocks: [
           { type: 'heading', id: 'split', level: 2, text: 'split() i białe znaki' },
           {
@@ -1854,7 +1854,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Poznaj slicing i wykorzystaj go do palindromów.',
         etaMinutes: 9,
         xp: 22,
-        tags: ['PCEP', 'napisy', 'slicing', 'palindrom'],
+        tags: ['Podstawy Pythona', 'napisy', 'slicing', 'palindrom'],
         blocks: [
           { type: 'heading', id: 'slicing', level: 2, text: 'Slicing' },
           {
@@ -1864,9 +1864,9 @@ export const pcepSprints: SprintSeedInput[] = [
           {
             type: 'list',
             items: [
-              'start — indeks początkowy (domyślnie 0)',
-              'stop — indeks końcowy (nie jest włączony)',
-              'step — krok (domyślnie 1)',
+              'start, indeks początkowy (domyślnie 0)',
+              'stop, indeks końcowy (nie jest włączony)',
+              'step, krok (domyślnie 1)',
             ],
           },
           {
@@ -2274,7 +2274,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Dowiedz się, jak definiować funkcje i zwracać wyniki.',
         etaMinutes: 10,
         xp: 24,
-        tags: ['PCEP', 'funkcje', 'return'],
+        tags: ['Podstawy Pythona', 'funkcje', 'return'],
         blocks: [
           { type: 'heading', id: 'def', level: 2, text: 'Definicja funkcji' },
           {
@@ -2338,7 +2338,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Poznaj klasyczne algorytmy i ich implementację w pętli.',
         etaMinutes: 10,
         xp: 24,
-        tags: ['PCEP', 'algorytmy', 'pętle'],
+        tags: ['Podstawy Pythona', 'algorytmy', 'pętle'],
         blocks: [
           { type: 'heading', id: 'silnia', level: 2, text: 'Silnia' },
           {
@@ -2385,7 +2385,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Naucz się zliczać litery i znajdować najdłuższe słowo.',
         etaMinutes: 9,
         xp: 22,
-        tags: ['PCEP', 'napisy', 'split', 'lower'],
+        tags: ['Podstawy Pythona', 'napisy', 'split', 'lower'],
         blocks: [
           { type: 'heading', id: 'zliczanie', level: 2, text: 'Zliczanie liter' },
           {
@@ -2428,7 +2428,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Przećwicz formatowanie danych liczbowych na tekst.',
         etaMinutes: 8,
         xp: 20,
-        tags: ['PCEP', 'formatowanie', 'f-string'],
+        tags: ['Podstawy Pythona', 'formatowanie', 'f-string'],
         blocks: [
           { type: 'heading', id: 'divmod', level: 2, text: 'Rozbijanie minut' },
           {
@@ -2642,7 +2642,7 @@ export const pcepSprints: SprintSeedInput[] = [
     return text.upper()
 `,
         publicTests: [
-          ['PCEP', 'pcep'],
+          ['Podstawy Pythona', 'pcep'],
           ['Snake Coder', 'snake coder'],
           ['abc', 'abc'],
         ],
@@ -2838,12 +2838,12 @@ export const pcepSprints: SprintSeedInput[] = [
     ],
     articles: [
       {
-        title: 'Artykuł: powtórka — liczby i listy',
+        title: 'Artykuł: powtórka, liczby i listy',
         shortDesc: 'Utrwalenie pracy z listami liczb.',
         description: 'Przećwicz liczenie, sumowanie i iloczyny.',
         etaMinutes: 9,
         xp: 22,
-        tags: ['PCEP', 'powtórka', 'listy'],
+        tags: ['Podstawy Pythona', 'powtórka', 'listy'],
         blocks: [
           { type: 'heading', id: 'ujemne', level: 2, text: 'Zliczanie ujemnych' },
           {
@@ -2892,7 +2892,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Naucz się filtrować znaki w stringu.',
         etaMinutes: 8,
         xp: 20,
-        tags: ['PCEP', 'napisy', 'filtracja'],
+        tags: ['Podstawy Pythona', 'napisy', 'filtracja'],
         blocks: [
           { type: 'heading', id: 'samogloski', level: 2, text: 'Usuwanie samogłosek' },
           {
@@ -2935,7 +2935,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Poznaj algorytm sprawdzania liczby pierwszej.',
         etaMinutes: 9,
         xp: 22,
-        tags: ['PCEP', 'liczby pierwsze'],
+        tags: ['Podstawy Pythona', 'liczby pierwsze'],
         blocks: [
           { type: 'heading', id: 'prime', level: 2, text: 'Test pierwszości' },
           {
@@ -2967,7 +2967,7 @@ export const pcepSprints: SprintSeedInput[] = [
         description: 'Krótki wstęp do obsługi wyjątków.',
         etaMinutes: 8,
         xp: 20,
-        tags: ['PCEP', 'wyjątki'],
+        tags: ['Podstawy Pythona', 'wyjątki'],
         blocks: [
           { type: 'heading', id: 'try', level: 2, text: 'try / except' },
           {

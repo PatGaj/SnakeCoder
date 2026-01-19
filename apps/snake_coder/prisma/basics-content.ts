@@ -166,7 +166,7 @@ export const basicsSprints: BasicsSprintSeedInput[] = [
           { type: 'heading', id: 'wstep', level: 2, text: 'Czym jest programowanie' },
           {
             type: 'paragraph',
-            text: 'Programowanie to tworzenie instrukcji, które komputer wykonuje krok po kroku. Komputer nie zgaduje intencji — realizuje dokładnie to, co mu zlecisz.',
+            text: 'Programowanie to tworzenie instrukcji, które komputer wykonuje krok po kroku. Komputer nie zgaduje intencji, realizuje dokładnie to, co mu zlecisz.',
           },
           { type: 'heading', id: 'algorytm', level: 2, text: 'Algorytm' },
           {
@@ -212,7 +212,7 @@ export const basicsSprints: BasicsSprintSeedInput[] = [
           },
           {
             type: 'list',
-            items: ['int – liczby całkowite', 'float – liczby z przecinkiem', 'str – tekst', 'bool – True/False'],
+            items: ['int, liczby całkowite', 'float, liczby z przecinkiem', 'str, tekst', 'bool, True/False'],
           },
           { type: 'heading', id: 'zmienne', level: 2, text: 'Zmienne' },
           {
@@ -250,7 +250,7 @@ export const basicsSprints: BasicsSprintSeedInput[] = [
             type: 'callout',
             tone: 'info',
             title: 'Uwaga',
-            text: 'Program nie zgaduje typu danych — musisz go świadomie ustawić.',
+            text: 'Program nie zgaduje typu danych, musisz go świadomie ustawić.',
           },
         ],
         summary: ['Dane mają typy (int, float, str, bool).', 'Zmienne przechowują wartości.', 'input() zwraca tekst i wymaga konwersji.'],

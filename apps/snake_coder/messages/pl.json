@@ -8,18 +8,18 @@
   "landing": {
     "hero": {
       "badge2": "Grywalizacja + ocena AI",
-      "title": "Ucz się <highlight>Pythona</highlight> przez misje — od zera do praktycznego kodu",
+      "title": "Ucz się <highlight>Pythona</highlight> przez misje, od zera do praktycznego kodu",
       "subtitle": "Krótkie zadania z testami, punkty doświadczenia i ocena kodu przez LLM. Uczysz się praktycznie, z modułami i sprintami.",
       "primaryCta": "Zacznij za darmo",
       "secondaryCta": "Zobacz jak to działa",
       "points": {
         "missions": {
-          "title": "Misje 6–10 minut",
+          "title": "Misje 6-10 minut",
           "desc": "Małe kroki, szybkie zwycięstwa, realny progres."
         },
         "gamification": {
           "title": "Poziomy, streaki, odznaki",
-          "desc": "Motywacja bez presji — grasz i uczysz się jednocześnie."
+          "desc": "Motywacja bez presji, grasz i uczysz się jednocześnie."
         },
         "llm": {
           "title": "Ocena kodu przez LLM + testy",
@@ -94,8 +94,9 @@
       "title": "Ścieżki nauki",
       "subtitle": "Zaczynasz od zera, budujesz solidne podstawy, a potem wybierasz moduły i sprinty.",
       "pcep": {
+        "badge": "Podstawy Pythona",
         "tag": "Start od zera",
-        "title": "Fundamenty Pythona (zakres PCEP)",
+        "title": "Podstawy Pythona",
         "desc": "Składnia, typy, przepływ sterowania i podstawowe struktury danych.",
         "topics": {
           "syntax": "Składnia i zmienne",
@@ -138,7 +139,7 @@
     }
   },
   "logo": {
-    "banerText": "Szybciej opanuj Pythona"
+    "banerText": "Opanuj Pythona"
   },
   "sidebar": {
     "collapse": "Zwiń",
@@ -181,7 +182,7 @@
     "hint": "Najbliższe kroki i szybki podgląd postępu.",
     "error": "Nie udało się wczytać danych dashboardu.",
     "title": "Cześć, {name}!",
-    "subtitle": "Kontynuuj sprint i utrzymaj streak — reszta jest kliknięcie dalej.",
+    "subtitle": "Kontynuuj sprint i utrzymaj streak, reszta jest kliknięcie dalej.",
     "fallbackUser": "Użytkowniku",
     "empty": {
       "badge": "Start",
@@ -209,14 +210,14 @@
     },
     "common": {
       "done": "✓",
-      "todo": "—",
+      "todo": "-",
       "locked": "Zablokowany",
       "unlocked": "Odblokowany"
     },
     "sprint": {
       "eta": "~{minutes} min",
       "title": "Funkcje: argumenty i zwracanie",
-      "nextStep": "Następny krok: zadanie 3/6 — walidacja danych wejściowych.",
+      "nextStep": "Następny krok: zadanie 3/6, walidacja danych wejściowych.",
       "nextTaskLabel": "Następne zadanie",
       "currentTaskLabel": "Aktualne zadanie",
       "goToSprint": "Przejdź do sprintu",
@@ -236,9 +237,11 @@
       }
     },
     "plan": {
-      "desc": "Trzy małe kroki na dziś — utrzymaj rytm i progres.",
+      "desc": "Trzy małe kroki na dziś, utrzymaj rytm i progres.",
       "bonusHint": "Ukończ wszystkie 3 kroki, aby zgarnąć bonus XP.",
       "bonusReady": "Gratulacje! Bonus XP za dziś jest Twój!",
+      "claimBonus": "Odbierz bonus XP",
+      "bonusClaimed": "Bonus odebrany",
       "items": {
         "tasks": "Zrób 1 zadanie",
         "article": "Przeczytaj 1 artykuł",
@@ -255,7 +258,7 @@
     },
     "skillTest": {
       "title": "Test umiejętności",
-      "desc": "Zalicza sprint i odblokowuje kolejny — najpierw spełnij wymagania.",
+      "desc": "Zalicza sprint i odblokowuje kolejny, najpierw spełnij wymagania.",
       "requirementsTitle": "Wymagania",
       "requirements": {
         "tasks": "Ukończ zadania sprintu",
@@ -298,14 +301,14 @@
     "milestones": {
       "title": "Kamienie milowe",
       "subtitle": "Ścieżki nauki",
-      "desc": "Od 0 przez PCEP do PCAP — krok po kroku.",
+      "desc": "Od 0 przez Podstawy Pythona do kursu Python średniozaawansowany, krok po kroku.",
       "badge": "Progres",
       "pcep": {
-        "title": "PCEP",
+        "title": "Podstawy Pythona",
         "desc": "Podstawy składni, typów, warunków i pętli."
       },
       "pcap": {
-        "title": "PCAP",
+        "title": "Python średniozaawansowany",
         "desc": "OOP, moduły, wyjątki, pliki i testowanie."
       }
     },
@@ -314,8 +317,8 @@
       "subtitle": "Co robiłeś ostatnio",
       "desc": "Wróć do rozpoczętych tematów i domknij zadania.",
       "meta": {
-        "pcep": "PCEP • podstawy",
-        "pcap": "PCAP • poziom wyżej"
+        "pcep": "Podstawy Pythona • start",
+        "pcap": "Python średniozaawansowany • poziom wyżej"
       },
       "items": {
         "files": "Praca z plikami: odczyt i zapis",
@@ -358,7 +361,7 @@
       },
       "libraries": {
         "title": "Biblioteki i frameworki",
-        "subtitle": "Nauka narzędzi do pracy z danymi i webem — moduły w przygotowaniu."
+        "subtitle": "Nauka narzędzi do pracy z danymi i webem, moduły w przygotowaniu."
       }
     },
     "card": {
@@ -389,7 +392,7 @@
       "badge": "Dostęp do modułu",
       "title": "Uzyskaj dostęp",
       "desc": "Ten moduł jest zablokowany. Odblokuj go, aby rozpocząć sprinty i misje.",
-      "note": "To jest makieta — na razie symulujemy zakup i odblokowanie dostępu.",
+      "note": "To jest makieta, na razie symulujemy zakup i odblokowanie dostępu.",
       "actions": {
         "cancel": "Anuluj",
         "unlock": "Odblokuj"
@@ -408,7 +411,7 @@
       "progress": "Ukończone sprinty: {done}/{total}"
     },
     "sprints": {
-      "empty": "Ten moduł jest w przygotowaniu — sprinty pojawią się wkrótce.",
+      "empty": "Ten moduł jest w przygotowaniu, sprinty pojawią się wkrótce.",
       "eta": "~{minutes} min",
       "sprintNo": "Sprint {no}",
       "progress": "Postęp sprintu",
@@ -420,15 +423,15 @@
         "quiz": "Quiz {score}/{total}"
       },
       "fallbackTitle": "Sprint",
-      "fallbackDesc": "Opis sprintu — w przygotowaniu."
+      "fallbackDesc": "Opis sprintu, w przygotowaniu."
     },
     "common": {
       "done": "✓",
-      "todo": "—"
+      "todo": "-"
     },
     "fallback": {
       "title": "Moduł",
-      "desc": "Nie znaleziono modułu — sprawdź listę modułów."
+      "desc": "Nie znaleziono modułu, sprawdź listę modułów."
     }
   },
   "sprint": {
@@ -436,7 +439,7 @@
     "fallback": {
       "desc": "Krótki kanban z zadaniami sprintu. Kliknij kartę, aby zobaczyć szczegóły i przejść do zadania."
     },
-    "empty": "Brak zadań dla tego sprintu — wkrótce uzupełnimy.",
+    "empty": "Brak zadań dla tego sprintu, wkrótce uzupełnimy.",
     "columns": {
       "todo": "Do zrobienia",
       "inProgress": "W trakcie",
@@ -565,7 +568,7 @@
       "aiReviewNotAvailable": "Ocena AI jest dostępna tylko dla zadań typu task."
     },
     "submitModal": {
-      "message": "{status, select, passed {Gratulacje!} failed {Przykro mi — spróbuj ponownie.} other {}}"
+      "message": "{status, select, passed {Gratulacje!} failed {Przykro mi, spróbuj ponownie.} other {}}"
     }
   },
   "article": {

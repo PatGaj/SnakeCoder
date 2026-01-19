@@ -13,7 +13,7 @@ const LearningPathsSection = () => {
       <SectionHeader title={t('paths.title')} subtitle={t('paths.subtitle')} />
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
         <PathCard
-          badgeText="PCEP"
+          badgeText={t('paths.pcep.badge')}
           tagText={t('paths.pcep.tag')}
           title={t('paths.pcep.title')}
           desc={t('paths.pcep.desc')}

@@ -15,7 +15,7 @@ type RankingUser = {
 }
 
 const gradeLabelFromAvg = (avg: number | null) => {
-  if (avg == null) return '—'
+  if (avg == null) return ''
   if (avg >= 4.75) return 'A'
   if (avg >= 4.25) return 'A-'
   if (avg >= 4.0) return 'B+'
@@ -62,4 +62,3 @@ export async function GET() {
     users: ranked.slice(3),
   })
 }
-

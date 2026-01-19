@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 
 const paginationStyles = tv({
   slots: {
-    root: ' inline-flex items-center gap-2 text-snowWhite-50',
+    root: ' inline-flex items-center gap-1 text-snowWhite-50 sm:gap-2',
     button:
       'h-9 cursor-pointer min-w-9 rounded-md border px-2 text-sm font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50 hover:-translate-y-px',
   },

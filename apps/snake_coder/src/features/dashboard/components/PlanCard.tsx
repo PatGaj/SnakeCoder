@@ -1,11 +1,14 @@
+import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { RiBookOpenLine, RiFlagLine, RiTestTubeLine } from 'react-icons/ri'
+import { useQueryClient } from '@tanstack/react-query'
 
-import { Badge, Box, ItemRow, Separator } from '@/components'
+import { Badge, Box, Button, ItemRow, Separator } from '@/components'
 
 export type PlanCardData = {
   bonusXp: number
   complete: boolean
+  bonusClaimed: boolean
   tasksDone: number
   tasksTotal: number
   articleDone: boolean
@@ -22,6 +25,23 @@ export type PlanCardProps = {
 
 const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
   const t = useTranslations('dashboard')
+  const queryClient = useQueryClient()
+  const [claiming, setClaiming] = useState(false)
+
+  const handleClaimBonus = async () => {
+    if (!plan.complete || plan.bonusClaimed || claiming) return
+    setClaiming(true)
+    try {
+      const response = await fetch('/api/dashboard/plan/claim', { method: 'POST' })
+      if (!response.ok) {
+        throw new Error('Failed to claim bonus')
+      }
+      await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      await queryClient.invalidateQueries({ queryKey: ['userStats'] })
+    } finally {
+      setClaiming(false)
+    }
+  }
 
   return (
     <Box variant="outline" size="lg" round="2xl" className="w-full border-primary-800 text-snowWhite-100">
@@ -78,7 +98,22 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
         )}
       </div>
 
-      <p className="mt-4 text-xs text-snowWhite-300">{plan.complete ? t('plan.bonusReady') : t('plan.bonusHint')}</p>
+      <p className="mt-4 text-xs text-snowWhite-300">
+        {plan.complete ? (plan.bonusClaimed ? t('plan.bonusClaimed') : t('plan.bonusReady')) : t('plan.bonusHint')}
+      </p>
+      {plan.complete && (
+        <Button
+          variant="gradient"
+          size="sm"
+          round="lg"
+          className="mt-4 w-full sm:w-auto"
+          onClick={handleClaimBonus}
+          loading={claiming}
+          disabled={plan.bonusClaimed}
+        >
+          {plan.bonusClaimed ? t('plan.bonusClaimed') : t('plan.claimBonus')}
+        </Button>
+      )}
     </Box>
   )
 }

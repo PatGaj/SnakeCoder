@@ -39,7 +39,7 @@ const fetchProfile = async (): Promise<ProfileApiResponse> => {
 }
 
 const gradeLabelFromAvg = (avg: number | null) => {
-  if (avg == null) return '—'
+  if (avg == null) return ''
   if (avg >= 4.75) return 'A'
   if (avg >= 4.25) return 'A-'
   if (avg >= 4.0) return 'B+'

@@ -53,6 +53,7 @@ const ProfileUnlockedModulesCard: React.FC<ProfileUnlockedModulesCardProps> = ({
           {modules.map((module) => {
             const unlockedAt = formatDate(locale, module.unlockedAt)
             const completedAt = formatDate(locale, module.completedAt ?? null)
+            const showCodeBadge = module.code !== 'PCEP' && module.code !== 'PCAP'
 
             return (
               <div
@@ -61,12 +62,12 @@ const ProfileUnlockedModulesCard: React.FC<ProfileUnlockedModulesCardProps> = ({
               >
                 <div className="min-w-0 space-y-1">
                   <p className="text-sm font-semibold text-snowWhite-50">
-                    <span className="text-secondary-300">{module.code}</span> — {module.title}
+                    {module.title}
                   </p>
                   <div className="flex flex-wrap items-center gap-3 text-xs text-snowWhite-300">
                     <span className="inline-flex items-center gap-2">
                       <RiCalendar2Line size={14} className="text-secondary-300" />
-                      {t('modules.unlockedAt', { date: unlockedAt ?? '—' })}
+                      {t('modules.unlockedAt', { date: unlockedAt ?? '' })}
                     </span>
                     {completedAt && (
                       <span className="inline-flex items-center gap-2">
@@ -77,9 +78,11 @@ const ProfileUnlockedModulesCard: React.FC<ProfileUnlockedModulesCardProps> = ({
                   </div>
                 </div>
 
-                <Badge variant="muted" size="sm" className="px-3 py-1">
-                  {module.code}
-                </Badge>
+                {showCodeBadge && (
+                  <Badge variant="muted" size="sm" className="px-3 py-1">
+                    {module.code}
+                  </Badge>
+                )}
               </div>
             )
           })}
@@ -90,4 +93,3 @@ const ProfileUnlockedModulesCard: React.FC<ProfileUnlockedModulesCardProps> = ({
 }
 
 export default ProfileUnlockedModulesCard
-

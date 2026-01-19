@@ -20,10 +20,10 @@ const HeroSection = () => {
 
   return (
     <section className="relative">
-      <div className="pointer-events-none absolute -right-10 top-10 h-64 w-64 rounded-full bg-aquaBlue-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-10 h-64 w-64 rounded-full bg-aquaBlue-500/10 blur-3xl md:-right-10" />
       <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-6">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="space-y-6 text-center sm:text-left">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
             <Badge variant="secondary">
               <LearningRange />
             </Badge>
@@ -38,8 +38,8 @@ const HeroSection = () => {
               ),
             })}
           </h1>
-          <p className="max-w-2xl text-sm text-snowWhite-300 md:text-base">{t('hero.subtitle')}</p>
-          <div className="flex flex-wrap items-center gap-3">
+          <p className="mx-auto max-w-2xl text-sm text-snowWhite-300 md:text-base sm:mx-0">{t('hero.subtitle')}</p>
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-start">
             <Button
               variant="gradient"
               size="lg"
@@ -79,7 +79,7 @@ const HeroSection = () => {
             />
           </ul>
         </div>
-        <Box variant="glass" size="lg" round="2xl" className="w-full border-primary-800/70">
+        <Box variant="glass" size="lg" round="2xl" className="w-full border-primary-800/70 px-4 py-4 sm:px-6 sm:py-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Badge variant="secondary">{t('hero.preview.badge')}</Badge>
@@ -102,4 +102,3 @@ const HeroSection = () => {
 }
 
 export default HeroSection
-

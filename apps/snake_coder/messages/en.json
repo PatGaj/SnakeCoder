@@ -8,18 +8,18 @@
   "landing": {
     "hero": {
       "badge2": "Gamification + AI grading",
-      "title": "Learn <highlight>Python</highlight> through missions — from zero to practical coding",
+      "title": "Learn <highlight>Python</highlight> through missions, from zero to practical coding",
       "subtitle": "Short tasks with tests, XP, and code reviews by an LLM. Learn by doing, with modules and learning paths.",
       "primaryCta": "Start for free",
       "secondaryCta": "See how it works",
       "points": {
         "missions": {
-          "title": "Missions in 6–10 minutes",
+          "title": "Missions in 6-10 minutes",
           "desc": "Small steps, quick wins, real progress."
         },
         "gamification": {
           "title": "Levels, streaks, badges",
-          "desc": "Motivation without pressure — you play and learn at the same time."
+          "desc": "Motivation without pressure, you play and learn at the same time."
         },
         "llm": {
           "title": "LLM code review + tests",
@@ -94,8 +94,9 @@
       "title": "Learning paths",
       "subtitle": "Start from zero, build solid foundations, then pick modules and paths.",
       "pcep": {
+        "badge": "Python basics",
         "tag": "Start from zero",
-        "title": "Python foundations (PCEP scope)",
+        "title": "Python basics",
         "desc": "Syntax, types, control flow, and basic data structures.",
         "topics": {
           "syntax": "Syntax and variables",
@@ -120,7 +121,7 @@
         },
         "time": {
           "q": "How much time do I need per day?",
-          "a": "Just 10–15 minutes. Missions are short and designed for fast feedback."
+          "a": "Just 10-15 minutes. Missions are short and designed for fast feedback."
         },
         "level": {
           "q": "Who is SnakeCoder for?",
@@ -138,7 +139,7 @@
     }
   },
   "logo": {
-    "banerText": "Master Python faster"
+    "banerText": "Master Python"
   },
   "sidebar": {
     "collapse": "Collapse",
@@ -161,7 +162,7 @@
   "statTopBar": {
     "streak": {
       "label": "Streak",
-      "tooltip": "You’re learning consistently — keep the streak going.",
+      "tooltip": "You’re learning consistently, keep the streak going.",
       "days": "{days} days"
     },
     "xp": {
@@ -181,7 +182,7 @@
     "hint": "Next steps and a quick progress overview.",
     "error": "Failed to load dashboard data.",
     "title": "Hi, {name}!",
-    "subtitle": "Continue your sprint and keep your streak — the rest is one click away.",
+    "subtitle": "Continue your sprint and keep your streak, the rest is one click away.",
     "fallbackUser": "there",
     "empty": {
       "badge": "Start",
@@ -209,14 +210,14 @@
     },
     "common": {
       "done": "✓",
-      "todo": "—",
+      "todo": "-",
       "locked": "Locked",
       "unlocked": "Unlocked"
     },
     "sprint": {
       "eta": "~{minutes} min",
       "title": "Functions: arguments and returns",
-      "nextStep": "Next step: task 3/6 — input validation.",
+      "nextStep": "Next step: task 3/6, input validation.",
       "nextTaskLabel": "Next task",
       "currentTaskLabel": "Current task",
       "goToSprint": "Go to sprint",
@@ -236,9 +237,11 @@
       }
     },
     "plan": {
-      "desc": "Three small steps for today — keep the rhythm and progress.",
+      "desc": "Three small steps for today, keep the rhythm and progress.",
       "bonusHint": "Complete all 3 steps to claim bonus XP.",
       "bonusReady": "Congratulations! Today’s bonus XP is yours!",
+      "claimBonus": "Claim bonus XP",
+      "bonusClaimed": "Bonus claimed",
       "items": {
         "tasks": "Complete 1 task",
         "article": "Read 1 article",
@@ -255,7 +258,7 @@
     },
     "skillTest": {
       "title": "Skill test",
-      "desc": "Passes the sprint and unlocks the next one — meet the requirements first.",
+      "desc": "Passes the sprint and unlocks the next one, meet the requirements first.",
       "requirementsTitle": "Requirements",
       "requirements": {
         "tasks": "Complete sprint tasks",
@@ -298,14 +301,14 @@
     "milestones": {
       "title": "Milestones",
       "subtitle": "Learning paths",
-      "desc": "From 0 through PCEP to PCAP — step by step.",
+      "desc": "From 0 through Python basics to Intermediate Python, step by step.",
       "badge": "Progress",
       "pcep": {
-        "title": "PCEP",
+        "title": "Python basics",
         "desc": "Basics of syntax, types, conditions, and loops."
       },
       "pcap": {
-        "title": "PCAP",
+        "title": "Intermediate Python",
         "desc": "OOP, modules, exceptions, files, and testing."
       }
     },
@@ -314,8 +317,8 @@
       "subtitle": "What you did recently",
       "desc": "Return to started topics and finish tasks.",
       "meta": {
-        "pcep": "PCEP • basics",
-        "pcap": "PCAP • next level"
+        "pcep": "Python basics • fundamentals",
+        "pcap": "Intermediate Python • next level"
       },
       "items": {
         "files": "Working with files: reading and writing",
@@ -358,7 +361,7 @@
       },
       "libraries": {
         "title": "Libraries and frameworks",
-        "subtitle": "Learn tools for data and web work — modules coming soon."
+        "subtitle": "Learn tools for data and web work, modules coming soon."
       }
     },
     "card": {
@@ -389,7 +392,7 @@
       "badge": "Module access",
       "title": "Get access",
       "desc": "This module is locked. Unlock it to start sprints and missions.",
-      "note": "Mock only — for now we simulate purchase and unlocking.",
+      "note": "Mock only, for now we simulate purchase and unlocking.",
       "actions": {
         "cancel": "Cancel",
         "unlock": "Unlock"
@@ -408,7 +411,7 @@
       "progress": "Completed sprints: {done}/{total}"
     },
     "sprints": {
-      "empty": "This module is being prepared — sprints will appear soon.",
+      "empty": "This module is being prepared, sprints will appear soon.",
       "eta": "~{minutes} min",
       "sprintNo": "Sprint {no}",
       "progress": "Sprint progress",
@@ -420,15 +423,15 @@
         "quiz": "Quiz {score}/{total}"
       },
       "fallbackTitle": "Sprint",
-      "fallbackDesc": "Sprint description — coming soon."
+      "fallbackDesc": "Sprint description, coming soon."
     },
     "common": {
       "done": "✓",
-      "todo": "—"
+      "todo": "-"
     },
     "fallback": {
       "title": "Module",
-      "desc": "Module not found — check the module list."
+      "desc": "Module not found, check the module list."
     }
   },
   "sprint": {
@@ -436,7 +439,7 @@
     "fallback": {
       "desc": "A quick sprint kanban. Click a card to see details and go to the task."
     },
-    "empty": "No tasks for this sprint — we’ll add them soon.",
+    "empty": "No tasks for this sprint, we’ll add them soon.",
     "columns": {
       "todo": "To do",
       "inProgress": "In progress",
@@ -565,7 +568,7 @@
       "aiReviewNotAvailable": "AI review is available only for task missions."
     },
     "submitModal": {
-      "message": "{status, select, passed {Congratulations!} failed {Sorry — try again.} other {}}"
+      "message": "{status, select, passed {Congratulations!} failed {Sorry, try again.} other {}}"
     }
   },
   "article": {

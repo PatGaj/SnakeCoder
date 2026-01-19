@@ -384,9 +384,9 @@ const seedPcepModule = async () => {
     update: {
       name: 'pcep',
       code: 'PCEP',
-      title: 'PCEP: fundamenty Pythona',
+      title: 'Podstawy Pythona',
       description:
-        'Kompletny kurs PCEP w 5 sprintach: składnia, typy, warunki, pętle, listy, napisy, funkcje, algorytmy i praktyka.',
+        'Kompletny kurs podstaw Pythona w 5 sprintach: składnia, typy, warunki, pętle, listy, napisy, funkcje, algorytmy i praktyka.',
       requirements: ['Start od zera', 'Podstawy komputera', 'Regularność'],
       category: 'CERTIFICATIONS',
       difficulty: 'BEGINNER',
@@ -396,9 +396,9 @@ const seedPcepModule = async () => {
     create: {
       name: 'pcep',
       code: 'PCEP',
-      title: 'PCEP: fundamenty Pythona',
+      title: 'Podstawy Pythona',
       description:
-        'Kompletny kurs PCEP w 5 sprintach: składnia, typy, warunki, pętle, listy, napisy, funkcje, algorytmy i praktyka.',
+        'Kompletny kurs podstaw Pythona w 5 sprintach: składnia, typy, warunki, pętle, listy, napisy, funkcje, algorytmy i praktyka.',
       requirements: ['Start od zera', 'Podstawy komputera', 'Regularność'],
       category: 'CERTIFICATIONS',
       difficulty: 'BEGINNER',
@@ -438,7 +438,7 @@ const seedPcepModule = async () => {
     {
       name: 'pcep-5',
       order: 5,
-      title: 'Powtórka PCEP',
+      title: 'Powtórka podstaw Pythona',
       description: 'Mieszane zadania i utrwalenie kluczowych tematów.',
     },
   ] as const
@@ -632,7 +632,7 @@ const seedBuildingModules = async () => {
       name: 'numpy',
       code: 'NUMPY',
       title: 'NumPy: obliczenia numeryczne',
-      description: 'Moduł w budowie — wkrótce ćwiczenia z tablic i obliczeń numerycznych.',
+      description: 'Moduł w budowie, wkrótce ćwiczenia z tablic i obliczeń numerycznych.',
       requirements: ['Podstawy Pythona'],
       category: 'LIBRARIES',
       difficulty: 'INTERMEDIATE',
@@ -642,9 +642,9 @@ const seedBuildingModules = async () => {
     {
       name: 'pcap',
       code: 'PCAP',
-      title: 'PCAP: poziom zaawansowany',
-      description: 'Moduł w budowie — obiekty, wyjątki, moduły i dobre praktyki.',
-      requirements: ['PCEP lub solidne podstawy Pythona'],
+      title: 'Python średniozaawansowany',
+      description: 'Moduł w budowie, obiekty, wyjątki, moduły i dobre praktyki.',
+      requirements: ['Podstawy Pythona lub solidne podstawy'],
       category: 'CERTIFICATIONS',
       difficulty: 'ADVANCED',
       imagePath: '/images/python-image.png',

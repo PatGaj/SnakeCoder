@@ -4,12 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { useQuery } from '@tanstack/react-query'
 
-import type {
-  LastResultBadgeVariant,
-  LastResultCardData,
-  PlanCardData,
-  SprintBannerData,
-} from './components'
+import type { LastResultCardData, PlanCardData, SprintBannerData } from './components'
 
 export type UseDashboardData = {
   name: string
@@ -46,11 +41,11 @@ type DashboardApiResponse = {
         route: string
       }
     | null
+  planBonusClaimed: boolean
   lastResult: {
     todayXp: number
     yesterdayXp: number
     grade: string
-    speedPercent: number
   }
 }
 
@@ -73,20 +68,10 @@ const useDashboard = (): UseDashboardData => {
 
   const name = data?.name || session?.user?.name || t('fallbackUser')
 
-  const speedBadgeVariant: LastResultBadgeVariant = (() => {
-    const percent = data?.lastResult.speedPercent ?? 100
-    if (percent >= 120) return 'success'
-    if (percent >= 100) return 'secondary'
-    if (percent >= 80) return 'muted'
-    return 'warning'
-  })()
-
   const lastResult: LastResultCardData = {
     todayXp: data?.lastResult.todayXp ?? 0,
     yesterdayXp: data?.lastResult.yesterdayXp ?? 0,
-    grade: data?.lastResult.grade ?? '—',
-    speedPercent: data?.lastResult.speedPercent ?? 100,
-    speedBadgeVariant,
+    grade: data?.lastResult.grade ?? '',
   }
 
   if (!data?.sprint) {
@@ -151,6 +136,7 @@ const useDashboard = (): UseDashboardData => {
       ? {
           bonusXp: 120,
           complete: planComplete,
+          bonusClaimed: data?.planBonusClaimed ?? false,
           tasksDone: planTasksDone,
           tasksTotal: planTasksTotal,
           articleDone: planArticleDone,

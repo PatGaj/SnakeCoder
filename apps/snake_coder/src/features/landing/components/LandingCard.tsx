@@ -14,7 +14,7 @@ type LandingCardProps = {
 
 const LandingCard: React.FC<LandingCardProps> = ({ icon, title, desc, right, bodyClassName, className }) => {
   return (
-    <Box variant="glass" size="lg" round="2xl" className={clsx('w-full border-primary-800/70', className)}>
+    <Box variant="glass" size="sm" round="2xl" className={clsx('w-full border-primary-800/70', className)}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="rounded-xl border border-primary-800/70 bg-primary-950/60 p-2">{icon}</div>

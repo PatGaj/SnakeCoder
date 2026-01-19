@@ -6,54 +6,13 @@ import { authOptions } from '@/lib/auth'
 import { PUBLIC_MODULE_CODES_LIST } from '@/lib/moduleAccess'
 import { ModuleCategory } from '@/generated/prisma/client'
 
-type DashboardModuleCode = 'PCEP' | 'PCAP' | 'BASICS'
-
-type DashboardSprintData = {
-  module: DashboardModuleCode
-  moduleId: string
-  sprintId: string
-  sprintNo: number
-  etaMinutes: number
-  hasActiveTask: boolean
-  tasksDone: number
-  tasksTotal: number
-  articleDone: boolean
-  articleDoneCount: number
-  articleTotal: number
-  quizScore: number
-  quizTotal: number
-  nextTaskTitle: string
-  nextTaskDesc: string
-  title: string
-  desc: string
-  taskRoute: string
-  route: string
-}
-
-type DashboardResponse = {
-  name: string | null
-  sprint: DashboardSprintData | null
-  planBonusClaimed: boolean
-  lastResult: {
-    todayXp: number
-    yesterdayXp: number
-    grade: string
-  }
-}
-
-const missionRoute = (type: string, id: string) => {
-  if (type === 'QUIZ') return `/missions/quiz/${id}`
-  if (type === 'ARTICLE') return `/missions/article/${id}`
-  return `/missions/task/${id}`
-}
-
-const mapModuleCode = (code: string): DashboardModuleCode => {
-  if (code === 'PCAP') return 'PCAP'
-  if (code === 'BASICS') return 'BASICS'
-  return 'PCEP'
-}
-
 const PLAN_BONUS_XP = 120
+
+const startOfDay = (value: Date) => {
+  const date = new Date(value)
+  date.setHours(0, 0, 0, 0)
+  return date
+}
 
 const MISSION_TYPES: Array<'TASK' | 'BUGFIX' | 'QUIZ' | 'ARTICLE'> = ['TASK', 'BUGFIX', 'QUIZ', 'ARTICLE']
 
@@ -121,8 +80,6 @@ const fetchLastProgressRef = async (userId: string, status: ProgressRef['status'
 type MissionWithProgress = {
   id: string
   type: string
-  title: string
-  shortDesc: string
   etaMinutes: number
   progress: Array<{ status: string | null }>
 }
@@ -131,8 +88,6 @@ type SprintWithMissions = {
   id: string
   name: string
   order: number
-  title: string
-  description: string
   missions: MissionWithProgress[]
 }
 
@@ -194,7 +149,43 @@ const pickNextMission = ({
   return null
 }
 
-export async function GET() {
+const isPlanComplete = (sprint: SprintWithMissions) => {
+  const tasks = sprint.missions.filter((m) => m.type === 'TASK' || m.type === 'BUGFIX')
+  const tasksTotal = tasks.length
+  const tasksDone = tasks.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
+
+  const articles = sprint.missions.filter((m) => m.type === 'ARTICLE')
+  const articleTotal = articles.length
+  const articleDoneCount = articles.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
+
+  const quizzes = sprint.missions.filter((m) => m.type === 'QUIZ')
+  const quizTotal = quizzes.length
+  const quizScore = quizzes.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
+
+  const tasksRemaining = tasksTotal - tasksDone
+  const articleRemaining = articleTotal - articleDoneCount
+  const quizRemaining = quizTotal - quizScore
+
+  const showTasks = tasksRemaining > 0
+  const showArticle = articleRemaining > 0
+  const showQuiz = quizRemaining > 0
+
+  const planTasksTotal = showTasks ? 1 : 0
+  const planTasksDone = showTasks ? (tasksDone > 0 ? 1 : 0) : 0
+
+  const planArticleDone = showArticle ? articleDoneCount > 0 : false
+
+  const planQuizPercent = showQuiz ? (quizScore > 0 ? 100 : 0) : 0
+  const planQuizOk = showQuiz ? planQuizPercent >= 80 : true
+
+  return (
+    (!showTasks || planTasksDone >= planTasksTotal) &&
+    (!showArticle || planArticleDone) &&
+    (!showQuiz || planQuizOk)
+  )
+}
+
+export async function POST() {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
 
@@ -204,67 +195,28 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: {
-      name: true,
-      planBonusClaimedAt: true,
-    },
+    select: { planBonusClaimedAt: true },
   })
 
   if (!user) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  const lastGraded = await prisma.userMissionProgress.findFirst({
-    where: { userId, grade: { not: null } },
-    orderBy: [{ lastOpenedAt: 'desc' }, { completedAt: 'desc' }],
-    select: { grade: true },
-  })
-
   const now = new Date()
-  const todayStart = new Date(now)
-  todayStart.setHours(0, 0, 0, 0)
-  const yesterdayStart = new Date(todayStart)
-  yesterdayStart.setDate(todayStart.getDate() - 1)
+  const todayStart = startOfDay(now)
 
-  const planBonusClaimed = Boolean(user.planBonusClaimedAt && user.planBonusClaimedAt >= todayStart)
-  const planBonusToday = planBonusClaimed ? PLAN_BONUS_XP : 0
-  const planBonusYesterday =
-    user.planBonusClaimedAt && user.planBonusClaimedAt >= yesterdayStart && user.planBonusClaimedAt < todayStart
-      ? PLAN_BONUS_XP
-      : 0
-
-  const [todayAgg, yesterdayAgg] = await Promise.all([
-    prisma.userMissionProgress.aggregate({
-      where: { userId, completedAt: { gte: todayStart } },
-      _sum: { xpEarned: true },
-    }),
-    prisma.userMissionProgress.aggregate({
-      where: { userId, completedAt: { gte: yesterdayStart, lt: todayStart } },
-      _sum: { xpEarned: true },
-    }),
-  ])
-
-  const todayXp = (todayAgg._sum.xpEarned ?? 0) + planBonusToday
-  const yesterdayXp = (yesterdayAgg._sum.xpEarned ?? 0) + planBonusYesterday
+  if (user.planBonusClaimedAt && user.planBonusClaimedAt >= todayStart) {
+    return NextResponse.json({ error: 'Already claimed' }, { status: 409 })
+  }
 
   const modules = await prisma.module.findMany({
     where: moduleAccessFilter(userId),
     orderBy: { createdAt: 'asc' },
-    select: { id: true, name: true, code: true },
+    select: { id: true, name: true },
   })
 
   if (modules.length === 0) {
-    const payload: DashboardResponse = {
-      name: user.name,
-      sprint: null,
-      planBonusClaimed,
-      lastResult: {
-        todayXp,
-        yesterdayXp,
-        grade: lastGraded?.grade ?? '',
-      },
-    }
-    return NextResponse.json(payload)
+    return NextResponse.json({ error: 'No modules' }, { status: 400 })
   }
 
   const baseProgress =
@@ -273,8 +225,7 @@ export async function GET() {
   const startModuleIndex = baseProgress ? modules.findIndex((item) => item.id === baseProgress.moduleId) : 0
   const firstModuleIndex = startModuleIndex >= 0 ? startModuleIndex : 0
 
-  let selection: { module: (typeof modules)[number]; sprint: SprintWithMissions; mission: MissionWithProgress } | null =
-    null
+  let selection: { sprint: SprintWithMissions; mission: MissionWithProgress } | null = null
 
   for (let i = firstModuleIndex; i < modules.length; i += 1) {
     const moduleItem = modules[i]
@@ -285,16 +236,12 @@ export async function GET() {
         id: true,
         name: true,
         order: true,
-        title: true,
-        description: true,
         missions: {
           where: { type: { in: MISSION_TYPES } },
           orderBy: { createdAt: 'asc' },
           select: {
             id: true,
             type: true,
-            title: true,
-            shortDesc: true,
             etaMinutes: true,
             progress: {
               where: { userId },
@@ -317,77 +264,28 @@ export async function GET() {
     })
 
     if (nextSelection) {
-      selection = { module: moduleItem, ...nextSelection }
+      selection = nextSelection
       break
     }
   }
 
   if (!selection) {
-    const payload: DashboardResponse = {
-      name: user.name,
-      sprint: null,
-      planBonusClaimed,
-      lastResult: {
-        todayXp,
-        yesterdayXp,
-        grade: lastGraded?.grade ?? '',
-      },
-    }
-    return NextResponse.json(payload)
+    return NextResponse.json({ error: 'No sprint' }, { status: 400 })
   }
 
-  const { module: moduleItem, sprint, mission: nextMission } = selection
-
-  const tasks = sprint.missions.filter((m) => m.type === 'TASK' || m.type === 'BUGFIX')
-  const tasksTotal = tasks.length
-  const tasksDone = tasks.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
-
-  const articles = sprint.missions.filter((m) => m.type === 'ARTICLE')
-  const articleTotal = articles.length
-  const articleDoneCount = articles.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
-  const articleDone = articleTotal === 0 || articleDoneCount >= articleTotal
-
-  const quizzes = sprint.missions.filter((m) => m.type === 'QUIZ')
-  const quizTotal = quizzes.length
-  const quizScore = quizzes.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)
-
-  const hasActiveTask = nextMission.progress[0]?.status === 'IN_PROGRESS'
-
-  const etaMinutes = sprint.missions.reduce((acc, mission) => acc + mission.etaMinutes, 0)
-
-  const sprintRoute = `/modules/${moduleItem.name}/${sprint.name}`
-  const taskRoute = missionRoute(nextMission.type, nextMission.id)
-
-  const payload: DashboardResponse = {
-    name: user.name,
-    sprint: {
-      module: mapModuleCode(moduleItem.code),
-      moduleId: moduleItem.name,
-      sprintId: sprint.name,
-      sprintNo: sprint.order,
-      etaMinutes,
-      hasActiveTask,
-      tasksDone,
-      tasksTotal,
-      articleDone,
-      articleDoneCount,
-      articleTotal,
-      quizScore,
-      quizTotal,
-      nextTaskTitle: nextMission.title,
-      nextTaskDesc: nextMission.shortDesc,
-      title: sprint.title,
-      desc: sprint.description,
-      taskRoute,
-      route: sprintRoute,
-    },
-    planBonusClaimed,
-    lastResult: {
-      todayXp,
-      yesterdayXp,
-      grade: lastGraded?.grade ?? '',
-    },
+  if (!isPlanComplete(selection.sprint)) {
+    return NextResponse.json({ error: 'Plan incomplete' }, { status: 400 })
   }
 
-  return NextResponse.json(payload)
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      xpTotal: { increment: PLAN_BONUS_XP },
+      xpMonth: { increment: PLAN_BONUS_XP },
+      xpToday: { increment: PLAN_BONUS_XP },
+      planBonusClaimedAt: now,
+    },
+  })
+
+  return NextResponse.json({ ok: true, bonusXp: PLAN_BONUS_XP })
 }

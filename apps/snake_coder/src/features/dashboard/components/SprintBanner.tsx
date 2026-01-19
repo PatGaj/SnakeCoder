@@ -41,6 +41,12 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
   const ctaLabel = sprint.hasActiveTask ? t('sprint.ctaContinueTask') : t('sprint.ctaStartTask')
   const quizPercent = sprint.quizTotal > 0 ? (sprint.quizScore / sprint.quizTotal) * 100 : 100
   const quizDone = sprint.quizTotal > 0 ? quizPercent >= 80 : true
+  const moduleLabel =
+    sprint.module === 'PCEP'
+      ? t('milestones.pcep.title')
+      : sprint.module === 'PCAP'
+        ? t('milestones.pcap.title')
+        : sprint.module
 
   return (
     <Box variant="glass" size="xl" round="3xl" className="relative w-full overflow-hidden border-primary-800/70">
@@ -51,7 +57,7 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
         <div className="space-y-2">
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <Badge variant="muted" className="px-3 py-1">
-              {sprint.module} • Sprint {sprint.sprintNo}
+              {moduleLabel} • Sprint {sprint.sprintNo}
             </Badge>
             <Badge variant="muted" className="px-3 py-1">
               <span className="inline-flex items-center gap-2">

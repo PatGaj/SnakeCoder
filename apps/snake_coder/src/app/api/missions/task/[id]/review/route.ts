@@ -237,7 +237,7 @@ const requestReview = async (params: {
   })
 
   const systemPrompt =
-    'You are an expert Python code reviewer for PCEP-level tasks. Provide detailed, structured, actionable feedback. Respond in Polish.'
+    'You are an expert Python code reviewer for basic Python tasks. Provide detailed, structured, actionable feedback. Respond in Polish.'
   const userPrompt = ['Return JSON.', buildPrompt(params)].join('\n')
 
   let response: Awaited<ReturnType<typeof openai.responses.create>> | null = null

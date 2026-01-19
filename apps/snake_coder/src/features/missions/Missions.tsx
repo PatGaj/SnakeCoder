@@ -217,7 +217,7 @@ const Missions = () => {
             <option value="">{t('filters.all')}</option>
             {filterOptions.module.map((module) => (
               <option key={module.id} value={module.id}>
-                {module.code} — {module.title}
+                {module.title}
               </option>
             ))}
           </Select>

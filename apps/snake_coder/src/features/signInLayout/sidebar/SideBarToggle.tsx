@@ -8,11 +8,12 @@ type SideBarToggleProps = {
   label: string
   onToggle: () => void
   icon: React.ReactNode
+  disableTooltip?: boolean
 }
 
-const SideBarToggle: React.FC<SideBarToggleProps> = ({ toggled, label, onToggle, icon }) => {
+const SideBarToggle: React.FC<SideBarToggleProps> = ({ toggled, label, onToggle, icon, disableTooltip }) => {
   return (
-    <Tooltip content={label} side="right" variant="muted">
+    <Tooltip content={label} side="right" variant="muted" disabled={disableTooltip}>
       <button
         type="button"
         className={clsx(

@@ -16,14 +16,19 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ title, subtitle, align = 
       className={cn(
         clsx('space-y-3', {
           'text-center': align === 'center',
-          'text-left': align !== 'center',
+          'text-center md:text-left': align !== 'center',
         }),
         className
       )}
     >
       <h2 className="text-2xl font-semibold text-snowWhite-50 md:text-3xl">{title}</h2>
       {subtitle && (
-        <p className={clsx('text-sm text-snowWhite-300 md:text-base', { 'mx-auto max-w-2xl': align === 'center' })}>
+        <p
+          className={clsx('text-sm text-snowWhite-300 md:text-base', {
+            'mx-auto max-w-2xl': align === 'center',
+            'mx-auto md:mx-0': align !== 'center',
+          })}
+        >
           {subtitle}
         </p>
       )}

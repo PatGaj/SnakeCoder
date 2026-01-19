@@ -83,6 +83,12 @@ const SideBar = () => {
     setCollapsed(desktopCollapsedRef.current)
   }, [isMobile])
 
+  React.useEffect(() => {
+    if (isMobile) {
+      setCollapsed(true)
+    }
+  }, [isMobile, pathname])
+
   return (
     <aside
       className={clsx(
@@ -103,6 +109,7 @@ const SideBar = () => {
           onToggle={() => setCollapsed((prev) => !prev)}
           label={collapsed ? t('expand') : t('collapse')}
           icon={<RiArrowRightSLine size={25} />}
+          disableTooltip={isMobile}
         />
       </div>
       <div className={clsx('flex h-full flex-col px-3 py-4', { 'overflow-hidden': !collapsed })}>
@@ -116,6 +123,7 @@ const SideBar = () => {
             icon={<RiHome4Line size={20} />}
             label={t('nav.dashboard')}
             collapsed={collapsed}
+            disableTooltip={isMobile}
             active={pathname === '/dashboard' || pathname.startsWith('/dashboard/')}
           />
           <SideBarNavItem
@@ -123,6 +131,7 @@ const SideBar = () => {
             icon={<RiRoadMapLine size={20} />}
             label={t('nav.modules')}
             collapsed={collapsed}
+            disableTooltip={isMobile}
             active={pathname === '/modules' || pathname.startsWith('/modules/')}
           />
           <SideBarNavItem
@@ -130,6 +139,7 @@ const SideBar = () => {
             icon={<RiFlagLine size={20} />}
             label={t('nav.missions')}
             collapsed={collapsed}
+            disableTooltip={isMobile}
             active={pathname === '/missions' || pathname.startsWith('/missions/')}
           />
           <SideBarNavItem
@@ -137,6 +147,7 @@ const SideBar = () => {
             icon={<RiTrophyLine size={20} />}
             label={t('nav.ranking')}
             collapsed={collapsed}
+            disableTooltip={isMobile}
             active={pathname === '/ranking' || pathname.startsWith('/ranking/')}
           />
         </nav>
@@ -144,8 +155,14 @@ const SideBar = () => {
           <Separator className="my-4" />
           <section className="mb-3">
             {collapsed ? (
-              <Tooltip content={t('profile')} side="right" variant="muted">
-                <Avatar size="md" tone="secondary" userName={displayName} src={session?.user?.image} />
+              <Tooltip content={t('profile')} side="right" variant="muted" disabled={isMobile}>
+                <Avatar
+                  size="md"
+                  tone="secondary"
+                  userName={displayName}
+                  src={session?.user?.image}
+                  onClick={() => router.push('/profile')}
+                />
               </Tooltip>
             ) : (
               <div
@@ -160,7 +177,13 @@ const SideBar = () => {
               </div>
             )}
           </section>
-          <Tooltip content={t('logout')} side="right" variant="muted" className="w-full" disabled={!collapsed}>
+          <Tooltip
+            content={t('logout')}
+            side="right"
+            variant="muted"
+            className="w-full"
+            disabled={!collapsed || isMobile}
+          >
             <Button
               type="button"
               variant="ghost"

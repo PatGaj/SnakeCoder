@@ -10,11 +10,12 @@ type SideBarNavItemProps = {
   label: string
   collapsed: boolean
   active?: boolean
+  disableTooltip?: boolean
 }
 
-const SideBarNavItem: React.FC<SideBarNavItemProps> = ({ href, icon, label, collapsed, active }) => {
+const SideBarNavItem: React.FC<SideBarNavItemProps> = ({ href, icon, label, collapsed, active, disableTooltip }) => {
   return (
-    <Tooltip content={label} side="right" variant="muted" disabled={!collapsed} className="w-full">
+    <Tooltip content={label} side="right" variant="muted" disabled={!collapsed || disableTooltip} className="w-full">
       <Link
         href={href}
         className={clsx(

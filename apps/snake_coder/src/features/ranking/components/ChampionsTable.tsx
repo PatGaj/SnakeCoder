@@ -28,11 +28,16 @@ const ChampionsTable: React.FC<ChampionsTableProps> = ({ champions }) => {
   const t = useTranslations('ranking')
 
   return (
-    <Box variant="glass" size="xl" round="3xl" className="w-full border-primary-800/70">
+    <Box
+      variant="glass"
+      size="xl"
+      round="3xl"
+      className="w-full border-primary-800/70 px-4 py-5 sm:px-9 sm:py-7"
+    >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-secondary-300">{t('tiers.champions')}</p>
         <Badge variant="secondary" size="sm" className="px-3 py-1">
-          1–3
+          1, 3
         </Badge>
       </div>
 
@@ -51,7 +56,7 @@ const ChampionsTable: React.FC<ChampionsTableProps> = ({ champions }) => {
               <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
                 {t('columns.xp')}
               </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
+              <th className="hidden px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap lg:table-cell">
                 {t('columns.streak')}
               </th>
             </tr>
@@ -83,6 +88,7 @@ const ChampionsTable: React.FC<ChampionsTableProps> = ({ champions }) => {
                         tone={user.rank === 1 ? 'secondary' : 'muted'}
                         userName={user.name}
                         src={user.avatarUrl}
+                        className="hidden lg:inline-flex"
                       />
                       <span className="min-w-0">
                         <span className="block truncate font-semibold text-snowWhite-50">{user.name}</span>
@@ -95,7 +101,7 @@ const ChampionsTable: React.FC<ChampionsTableProps> = ({ champions }) => {
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     <span className="font-semibold text-secondary-300">{t('row.xp', { xp: user.xp })}</span>
                   </td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap">
+                  <td className="hidden px-4 py-3 text-right whitespace-nowrap lg:table-cell">
                     <span className="text-snowWhite-200">{t('row.streak', { days: user.streakDays })}</span>
                   </td>
                 </tr>

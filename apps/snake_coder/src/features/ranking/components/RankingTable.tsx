@@ -41,7 +41,12 @@ const RankingTable: React.FC<RankingTableProps> = ({ users, perPage = 7 }) => {
   }, [page, safePage])
 
   return (
-    <Box variant="glass" size="xl" round="3xl" className="w-full border-primary-800/70">
+    <Box
+      variant="glass"
+      size="xl"
+      round="3xl"
+      className="w-full border-primary-800/70 px-4 py-5 sm:px-9 sm:py-7"
+    >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-secondary-300">
@@ -49,14 +54,14 @@ const RankingTable: React.FC<RankingTableProps> = ({ users, perPage = 7 }) => {
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="warning" size="sm" className="px-3 py-1">
-              {t('tiers.gold')} 4–10
+              {t('tiers.gold')} 4, 10
             </Badge>
             <Badge
               variant="muted"
               size="sm"
               className="px-3 py-1 bg-snowWhite-50/8 border-snowWhite-50/18 text-snowWhite-200"
             >
-              {t('tiers.silver')} 11–50
+              {t('tiers.silver')} 11, 50
             </Badge>
             <Badge variant="muted" size="sm" className="px-3 py-1 border-primary-700/70 bg-primary-900/55">
               {t('tiers.bronze')} 51+
@@ -91,7 +96,7 @@ const RankingTable: React.FC<RankingTableProps> = ({ users, perPage = 7 }) => {
                 <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
                   {t('columns.xp')}
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap">
+                <th className="hidden px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-snowWhite-300 whitespace-nowrap lg:table-cell">
                   {t('columns.streak')}
                 </th>
               </tr>
@@ -122,7 +127,7 @@ const RankingTable: React.FC<RankingTableProps> = ({ users, perPage = 7 }) => {
                     </td>
                     <td className="px-4 py-3">
                       <span className="inline-flex items-center gap-3">
-                        <Avatar size="sm" tone="muted" userName={user.name} src={user.avatarUrl} />
+                        <Avatar size="sm" tone="muted" userName={user.name} src={user.avatarUrl} className="hidden lg:inline-flex" />
                         <span className="min-w-0">
                           <span className="block truncate font-semibold text-snowWhite-50">{user.name}</span>
                           <span className="block text-xs text-snowWhite-300">{t('row.grade', { grade: user.grade })}</span>
@@ -134,7 +139,7 @@ const RankingTable: React.FC<RankingTableProps> = ({ users, perPage = 7 }) => {
                         {t('row.xp', { xp: user.xp })}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                    <td className="hidden px-4 py-3 text-right whitespace-nowrap lg:table-cell">
                       <span className="text-snowWhite-200">{t('row.streak', { days: user.streakDays })}</span>
                     </td>
                   </tr>

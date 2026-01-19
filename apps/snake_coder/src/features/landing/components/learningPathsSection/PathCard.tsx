@@ -13,7 +13,7 @@ type PathCardProps = {
 
 const PathCard: React.FC<PathCardProps> = ({ badgeText, tagText, title, desc, icon, children }) => {
   return (
-    <Box variant="glass" size="lg" round="2xl" className="w-full border-primary-800/70">
+    <Box variant="glass" size="sm" round="2xl" className="w-full border-primary-800/70">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="rounded-xl border border-primary-800/70 bg-primary-950/60 p-2">{icon}</div>

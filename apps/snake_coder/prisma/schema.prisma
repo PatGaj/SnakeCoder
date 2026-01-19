@@ -66,6 +66,7 @@ model User {
   xpToday       Int       @default(0)
   streakCurrent Int       @default(0)
   streakBest    Int       @default(0)
+  streakUpdatedAt DateTime?
   gradeAvg      Float?
 
   moduleAccess  UserModuleAccess[]

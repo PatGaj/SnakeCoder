@@ -67,6 +67,7 @@ model User {
   streakCurrent Int       @default(0)
   streakBest    Int       @default(0)
   streakUpdatedAt DateTime?
+  planBonusClaimedAt DateTime?
   gradeAvg      Float?
 
   moduleAccess  UserModuleAccess[]

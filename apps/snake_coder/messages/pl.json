@@ -239,6 +239,8 @@
       "desc": "Trzy małe kroki na dziś — utrzymaj rytm i progres.",
       "bonusHint": "Ukończ wszystkie 3 kroki, aby zgarnąć bonus XP.",
       "bonusReady": "Gratulacje! Bonus XP za dziś jest Twój!",
+      "claimBonus": "Odbierz bonus XP",
+      "bonusClaimed": "Bonus odebrany",
       "items": {
         "tasks": "Zrób 1 zadanie",
         "article": "Przeczytaj 1 artykuł",

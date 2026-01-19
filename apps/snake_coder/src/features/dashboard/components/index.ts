@@ -5,7 +5,7 @@ export { default as PlanCard } from './PlanCard'
 export { default as SprintBanner } from './SprintBanner'
 
 export type { DashboardHeaderProps } from './DashboardHeader'
-export type { LastResultBadgeVariant, LastResultCardData, LastResultCardProps } from './lastResultCard'
+export type { LastResultCardData, LastResultCardProps } from './lastResultCard'
 export type { NoSprintCardProps } from './NoSprintCard'
 export type { PlanCardData, PlanCardProps } from './PlanCard'
 export type { SprintBannerData, SprintBannerProps } from './SprintBanner'

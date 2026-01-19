@@ -1,18 +1,14 @@
 import { useTranslations } from 'next-intl'
-import { RiFlashlightLine, RiStarLine, RiTrophyLine } from 'react-icons/ri'
+import { RiStarLine, RiTrophyLine } from 'react-icons/ri'
 
 import { Box, Separator } from '@/components'
 
 import LastResultTile from './LastResultTile'
 
-export type LastResultBadgeVariant = 'success' | 'secondary' | 'muted' | 'warning'
-
 export type LastResultCardData = {
   todayXp: number
   yesterdayXp: number
   grade: string
-  speedPercent: number
-  speedBadgeVariant: LastResultBadgeVariant
 }
 
 export type LastResultCardProps = {
@@ -21,6 +17,7 @@ export type LastResultCardProps = {
 
 const LastResultCard: React.FC<LastResultCardProps> = ({ lastResult }) => {
   const t = useTranslations('dashboard')
+  const gradeValue = lastResult.grade ? lastResult.grade : '-'
 
   return (
     <Box variant="glass" size="lg" round="2xl" className="relative w-full overflow-hidden border-primary-800/70">
@@ -32,7 +29,7 @@ const LastResultCard: React.FC<LastResultCardProps> = ({ lastResult }) => {
         <p className="mt-2 text-sm text-snowWhite-300">{t('lastRun.subtitle')}</p>
       </div>
       <Separator className="my-4" />
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <LastResultTile
           title={t('lastRun.xpToday')}
           value={`+${lastResult.todayXp || '0'} XP`}
@@ -41,15 +38,9 @@ const LastResultCard: React.FC<LastResultCardProps> = ({ lastResult }) => {
         />
         <LastResultTile
           title={t('lastRun.lastGrade')}
-          value={lastResult.grade}
+          value={gradeValue}
           hint={t('lastRun.gradeHint')}
           icon={<RiStarLine className="text-secondary-400" size={22} />}
-        />
-        <LastResultTile
-          title={t('lastRun.speed')}
-          value={`${lastResult.speedPercent}%`}
-          hint={t('lastRun.speedHint')}
-          icon={<RiFlashlightLine className="text-aquaBlue-200" size={20} />}
         />
       </div>
     </Box>

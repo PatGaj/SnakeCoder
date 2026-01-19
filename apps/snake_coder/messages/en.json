@@ -239,6 +239,8 @@
       "desc": "Three small steps for today — keep the rhythm and progress.",
       "bonusHint": "Complete all 3 steps to claim bonus XP.",
       "bonusReady": "Congratulations! Today’s bonus XP is yours!",
+      "claimBonus": "Claim bonus XP",
+      "bonusClaimed": "Bonus claimed",
       "items": {
         "tasks": "Complete 1 task",
         "article": "Read 1 article",

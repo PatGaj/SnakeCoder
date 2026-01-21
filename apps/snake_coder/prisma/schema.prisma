@@ -353,6 +353,7 @@ model UserMissionProgress {
   xpEarned        Int?
   grade           String?
   timeSpentSeconds Int?
+  testAttemptsCount Int              @default(0)
   userCode        String? @db.Text @map("user_code")
 
   user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)

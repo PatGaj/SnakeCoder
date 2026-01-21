@@ -116,6 +116,7 @@ export async function GET(_: Request, { params }: Params) {
     totalTestsCount,
     timeLimitSeconds: mission.timeLimitSeconds ?? mission.etaMinutes * 60,
     status: progress?.status ?? 'TODO',
+    startedAt: progress?.startedAt ? progress.startedAt.toISOString() : null,
     missionType: mission.type,
     aiReviewRemaining,
     aiReviewLimit,

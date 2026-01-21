@@ -54,6 +54,7 @@ type TaskApiResponse = {
   totalTestsCount: number
   timeLimitSeconds: number
   status: 'TODO' | 'IN_PROGRESS' | 'DONE'
+  startedAt: string | null
   missionType: 'TASK' | 'BUGFIX'
   aiReviewRemaining: number | null
   aiReviewLimit: number | null
@@ -126,7 +127,10 @@ const saveTask = async (id: string, userCode: string) => {
   return response.json() as Promise<{ ok: true }>
 }
 
-const executeTask = async (id: string, payload: { source: string; mode: ExecuteMode }): Promise<ExecuteResponse> => {
+const executeTask = async (
+  id: string,
+  payload: { source: string; mode: ExecuteMode; timeSpentSeconds?: number }
+): Promise<ExecuteResponse> => {
   const response = await fetch(`/api/missions/task/${encodeURIComponent(id)}/execute`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -199,6 +203,7 @@ const formatFailedOutput = (result?: ExecuteCaseResult) => {
 const useTask = (id: string): UseTaskData => {
   const t = useTranslations('task')
   const queryClient = useQueryClient()
+  const taskStartedAtRef = React.useRef<number | null>(null)
 
   const updateSprintStatus = React.useCallback(
     (nextStatus: SprintTaskStatus) => {
@@ -280,6 +285,22 @@ const useTask = (id: string): UseTaskData => {
     setAiReviewLimit(data.aiReviewLimit ?? null)
   }, [data, id])
 
+  React.useEffect(() => {
+    taskStartedAtRef.current = null
+  }, [id])
+
+  React.useEffect(() => {
+    if (!data) return
+    if (data.status === 'DONE') {
+      taskStartedAtRef.current = null
+      return
+    }
+    if (taskStartedAtRef.current) return
+
+    const parsed = data.startedAt ? Date.parse(data.startedAt) : Number.NaN
+    taskStartedAtRef.current = Number.isNaN(parsed) ? Date.now() : parsed
+  }, [data])
+
   const runMutation = useMutation({
     mutationKey: ['taskExecute', id, 'run'],
     mutationFn: (source: string) => executeTask(id, { source, mode: 'runCode' }),
@@ -310,7 +331,8 @@ const useTask = (id: string): UseTaskData => {
 
   const submitMutation = useMutation({
     mutationKey: ['taskExecute', id, 'submit'],
-    mutationFn: (source: string) => executeTask(id, { source, mode: 'completeTask' }),
+    mutationFn: ({ source, timeSpentSeconds }: { source: string; timeSpentSeconds?: number }) =>
+      executeTask(id, { source, mode: 'completeTask', timeSpentSeconds }),
     onSuccess: async (response) => {
       if (response.mode === 'completeTask') {
         updateSprintStatus(response.isTaskPassed ? 'done' : 'inProgress')
@@ -451,8 +473,12 @@ const useTask = (id: string): UseTaskData => {
   const onSubmit = () => {
     setConsoleValue(t('console.submitting'))
 
+    const startedAt = taskStartedAtRef.current
+    const timeSpentSeconds =
+      startedAt && Number.isFinite(startedAt) ? Math.max(1, Math.round((Date.now() - startedAt) / 1000)) : undefined
+
     void submitMutation
-      .mutateAsync(code)
+      .mutateAsync({ source: code, timeSpentSeconds })
       .then((data) => {
         if (data.mode !== 'completeTask') return
 

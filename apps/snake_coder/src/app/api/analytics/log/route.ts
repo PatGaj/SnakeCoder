@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 
+import { Prisma } from '@/generated/prisma/client'
+
 import prisma from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 
@@ -33,7 +35,10 @@ export async function POST(req: Request) {
   }
 
   const sessionId = clampString(body?.sessionId, 120)
-  const payload = typeof body?.payload === 'object' ? body?.payload : null
+  const payload =
+    body?.payload === null || body?.payload === undefined
+      ? Prisma.JsonNull
+      : (body.payload as Prisma.InputJsonValue)
 
   await prisma.analyticsLog.create({
     data: {

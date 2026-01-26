@@ -3,11 +3,12 @@ import { useTranslations } from 'next-intl'
 import { RiTestTubeLine } from 'react-icons/ri'
 
 import { Box, Button, Separator } from '@/components'
+import formatTestValue from '../utils/formatTestValue'
 
 export type PublicTestCase = {
   id: string
-  input: string
-  output: string
+  input: unknown
+  output: unknown
 }
 
 export type PublicTestsData = {
@@ -49,7 +50,7 @@ const PublicTests: React.FC<PublicTestsProps> = ({ publicTests, onTest, loading,
               <div className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-wide text-snowWhite-300">{t('results.fields.input')}</p>
                 <pre className="whitespace-pre-wrap wrap-break-words rounded-xl bg-primary-950/40 px-3 py-2 text-xs text-snowWhite-50">
-                  {testCase.input}
+                  {formatTestValue(testCase.input)}
                 </pre>
               </div>
               <div className="space-y-1">
@@ -57,7 +58,7 @@ const PublicTests: React.FC<PublicTestsProps> = ({ publicTests, onTest, loading,
                   {t('results.fields.expected')}
                 </p>
                 <pre className="whitespace-nowrap overflow-x-auto rounded-xl bg-primary-950/40 px-3 py-2 text-xs text-snowWhite-50">
-                  {testCase.output}
+                  {formatTestValue(testCase.output)}
                 </pre>
               </div>
             </div>

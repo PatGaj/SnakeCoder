@@ -15,10 +15,33 @@ const oauthNickName = (seed: string) => {
   return `USER_${digits}`
 }
 
+const recordDailyLogin = async (userId: string) => {
+  const now = new Date()
+  const loginDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+
+  await prisma.userDailyLogin.upsert({
+    where: {
+      userId_loginDate: {
+        userId,
+        loginDate,
+      },
+    },
+    update: {
+      loggedAt: now,
+    },
+    create: {
+      userId,
+      loginDate,
+      loggedAt: now,
+    },
+  })
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt',
+    maxAge: 60 * 60 * 48,
   },
   jwt: {
     async encode({ token, secret }) {
@@ -105,7 +128,14 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      if (session.user && token.id) session.user.id = token.id
+      if (session.user && token.id) {
+        session.user.id = token.id
+        try {
+          await recordDailyLogin(token.id)
+        } catch {
+          // no-op: login tracking should not block sessions
+        }
+      }
       return session
     },
   },

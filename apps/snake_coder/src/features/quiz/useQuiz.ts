@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 import toast from 'react-hot-toast'
 
+import { getSessionId } from '@/lib/analytics'
 import { useRouter } from '@/i18n/navigation'
 
 import type { QuizHeaderData, QuizQuestionData, QuizResultItem } from './components'
@@ -58,7 +59,7 @@ type QuizApiResponse = {
   timeLimitSeconds: number
 }
 
-type QuizSubmitPayload = { answers: Record<string, string | null>; timeSpentSeconds: number }
+type QuizSubmitPayload = { answers: Record<string, string | null>; timeSpentSeconds: number; sessionId?: string }
 
 const createAttemptId = () => {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -180,7 +181,11 @@ const useQuiz = (id: string): UseQuizData => {
       startedAtRef.current != null ? Math.max(0, Math.round((Date.now() - startedAtRef.current) / 1000)) : 0
 
     try {
-      const data = await submitMutation.mutateAsync({ answers, timeSpentSeconds })
+      const data = await submitMutation.mutateAsync({
+        answers,
+        timeSpentSeconds,
+        sessionId: getSessionId() ?? undefined,
+      })
       setResult(data)
       setResultOpen(true)
     } catch {

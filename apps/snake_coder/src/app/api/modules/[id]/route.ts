@@ -45,7 +45,6 @@ export async function GET(_: Request, { params }: Params) {
               },
               quiz: {
                 include: {
-                  questions: { select: { id: true } },
                   attempts: {
                     where: { userId },
                     orderBy: { score: "desc" },
@@ -74,7 +73,7 @@ export async function GET(_: Request, { params }: Params) {
   const sprints = moduleRecord.sprints.map((sprint) => {
     const etaMinutes = sprint.missions.reduce((acc, mission) => acc + mission.etaMinutes, 0);
 
-    const tasks = sprint.missions.filter((m) => m.type === "TASK" || m.type === "BUGFIX" || m.type === "SKILL_TEST");
+    const tasks = sprint.missions.filter((m) => m.type === "TASK" || m.type === "BUGFIX");
     const tasksDone = tasks.reduce((acc, m) => acc + (m.progress[0]?.status === "DONE" ? 1 : 0), 0);
 
     const articles = sprint.missions.filter((m) => m.type === "ARTICLE");

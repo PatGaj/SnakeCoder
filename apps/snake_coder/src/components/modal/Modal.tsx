@@ -1,15 +1,16 @@
 'use client'
 
 import React, { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { tv, type VariantProps } from 'tailwind-variants'
 
 const modalStyles = tv({
   slots: {
     overlay:
-      'fixed inset-0 z-1000 flex items-start justify-center overflow-y-auto bg-nightBlack-900/70 px-4 py-6 backdrop-blur-sm transition-opacity duration-150 lg:items-center',
+      'fixed inset-0 z-[10000] flex items-start justify-center overflow-y-auto bg-nightBlack-900/70 px-4 py-6 backdrop-blur-sm transition-opacity duration-150 lg:items-center',
     dialog:
-      'relative z-50 w-full max-w-[92vw] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-xl border border-primary-700/80 bg-primary-950/95 text-snowWhite-50 shadow-[0_24px_64px_#07204d96] flex flex-col sm:max-h-[calc(100dvh-3rem)]',
+      'relative z-[10001] w-full max-w-[92vw] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-xl border border-primary-700/80 bg-primary-950/90 text-snowWhite-50 shadow-[0_24px_64px_#07204d96] flex flex-col sm:max-h-[calc(100dvh-3rem)]',
     header: 'shrink-0 flex items-start justify-between gap-4 border-b border-primary-800/70 px-4 py-3 sm:px-5 sm:py-4',
     title: 'text-lg font-semibold',
     body: 'flex-1 min-h-0 px-4 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-secondary-500 scrollbar-track-primary-900/50 sm:px-5',
@@ -41,6 +42,7 @@ type ModalProps = VariantProps<typeof modalStyles> & {
 
 const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, footer, hideCloseButton = false, size }) => {
   const styles = modalStyles({ size })
+  const [mounted, setMounted] = React.useState(false)
 
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
@@ -52,7 +54,13 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, footer, h
     return () => document.removeEventListener('keydown', handleKey)
   }, [open, onClose])
 
-  return (
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -89,7 +97,7 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, footer, h
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  , document.body)
 }
 
 Modal.displayName = 'Modal'

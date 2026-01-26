@@ -40,7 +40,7 @@ export async function GET() {
 
   const missions = await prisma.mission.findMany({
     where: {
-      type: { in: ["TASK", "BUGFIX", "QUIZ", "ARTICLE", "SKILL_TEST"] },
+      type: { in: ["TASK", "BUGFIX", "QUIZ", "ARTICLE"] },
       module: {
         isBuilding: false,
         OR: [

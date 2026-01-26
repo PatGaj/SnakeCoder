@@ -18,6 +18,12 @@ type ExecutePayload = {
   source?: string
   mode?: ExecuteMode
   timeSpentSeconds?: number
+  sessionId?: string
+}
+
+type TaskTestCasePayload = {
+  input: unknown
+  expectedOutput: unknown
 }
 
 const executorBaseUrl = () => (process.env.EXECUTOR_BASE_URL || 'http://localhost:8000').replace(/\/$/, '')
@@ -59,6 +65,33 @@ const computeAwardedXp = (
   const timeMultiplier = computeTimeBonusMultiplier(etaMinutes, timeSpentSeconds)
   const attemptsMultiplier = computeAttemptsMultiplier(testAttemptsCount)
   return Math.round(baseXp * timeMultiplier * attemptsMultiplier)
+}
+
+const normalizeTaskTests = (value: unknown): TaskTestCasePayload[] => {
+  if (!Array.isArray(value)) return []
+
+  return value
+    .map((entry) => {
+      if (!entry || typeof entry !== 'object') return null
+      const record = entry as Record<string, unknown>
+      const input = record.input
+      const expectedOutput = record.expectedOutput ?? record.output ?? record.expected
+
+      if (input === undefined && expectedOutput === undefined) return null
+
+      return {
+        input: input ?? '',
+        expectedOutput: expectedOutput ?? '',
+      }
+    })
+    .filter((entry): entry is TaskTestCasePayload => Boolean(entry))
+}
+
+const clampString = (value: unknown, max = 120) => {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  return trimmed.length > max ? trimmed.slice(0, max) : trimmed
 }
 
 const signExecutorJwt = (userId: string) => {
@@ -136,6 +169,7 @@ export async function POST(req: Request, { params }: Params) {
   const source = body?.source
   const mode = body?.mode
   const timeSpentSeconds = typeof body?.timeSpentSeconds === 'number' ? body.timeSpentSeconds : undefined
+  const sessionId = clampString(body?.sessionId)
 
   if (typeof source !== 'string' || !source.trim().length) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
@@ -162,6 +196,9 @@ export async function POST(req: Request, { params }: Params) {
       },
     },
     include: {
+      task: {
+        select: { tests: true },
+      },
       progress: {
         where: { userId },
         select: { status: true, startedAt: true, testAttemptsCount: true },
@@ -172,6 +209,9 @@ export async function POST(req: Request, { params }: Params) {
   if (!mission) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
+
+  const taskTests = normalizeTaskTests(mission.task?.tests)
+  const publicTestsCount = Math.min(3, taskTests.length)
 
   const healthy = await isExecutorHealthy()
   if (!healthy) {
@@ -241,15 +281,14 @@ export async function POST(req: Request, { params }: Params) {
 
   if (mode !== 'completeTask') {
     if (mode === 'fullTest' && Array.isArray(data.results)) {
-      const publicCount = await prisma.taskTestCase.count({ where: { taskId: mission.id, isPublic: true } })
-      data.results = data.results.slice(0, publicCount)
+      data.results = data.results.slice(0, publicTestsCount)
     }
     return NextResponse.json(data)
   }
 
   const isTaskPassed = Boolean(data.isTaskPassed)
   const passedCount = typeof data.passedCount === 'number' ? data.passedCount : 0
-  const totalCount = await prisma.taskTestCase.count({ where: { taskId: mission.id } })
+  const totalCount = taskTests.length
 
   const isAlreadyCompleted = mission.progress[0]?.status === 'DONE'
   const startedAt = mission.progress[0]?.startedAt ?? now
@@ -260,6 +299,10 @@ export async function POST(req: Request, { params }: Params) {
     : 0
 
   await prisma.$transaction(async (tx) => {
+    let streakSnapshot: number | null = null
+    const shouldLogCompletion = isTaskPassed
+    const xpAwardedValue = shouldAwardXp ? xpAwarded : 0
+
     await tx.taskSubmission.create({
       data: {
         userId,
@@ -301,14 +344,45 @@ export async function POST(req: Request, { params }: Params) {
     })
 
     if (shouldAwardXp) {
-      await tx.user.update({
+      const updatedUser = await tx.user.update({
         where: { id: userId },
         data: {
           xpTotal: { increment: xpAwarded },
           xpMonth: { increment: xpAwarded },
           xpToday: { increment: xpAwarded },
         },
+        select: { streakCurrent: true },
       })
+      streakSnapshot = updatedUser?.streakCurrent ?? null
+    } else if (shouldLogCompletion) {
+      const existingUser = await tx.user.findUnique({
+        where: { id: userId },
+        select: { streakCurrent: true },
+      })
+      streakSnapshot = existingUser?.streakCurrent ?? null
+    }
+
+    if (shouldLogCompletion) {
+      await tx.analyticsLog.create({
+        data: {
+          event: 'mission_completed',
+          userId,
+          sessionId,
+          missionId: mission.id,
+          missionType: mission.type,
+          xpAwarded: xpAwardedValue,
+          timeSpentSeconds,
+          attemptsCount: testAttemptsCount,
+          streakCurrent: streakSnapshot,
+          payload: {
+            passedCount,
+            totalCount,
+            etaMinutes: mission.etaMinutes,
+            alreadyCompleted: isAlreadyCompleted,
+          },
+        },
+      })
+
     }
   })
 
@@ -316,5 +390,8 @@ export async function POST(req: Request, { params }: Params) {
     ...data,
     passedCount,
     totalCount,
+    xpAwarded,
+    timeSpentSeconds: timeSpentSeconds ?? null,
+    testAttemptsCount,
   })
 }

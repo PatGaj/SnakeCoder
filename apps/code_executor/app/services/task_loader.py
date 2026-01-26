@@ -1,10 +1,8 @@
 import ast
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import select
-
 from ..db import get_db_session
-from ..models import Task, TaskTestCase
+from ..models import Task
 from ..schemas import ExecutionMode
 
 
@@ -23,27 +21,41 @@ def _extract_entry_point(starter_code: str) -> Optional[str]:
     return None
 
 
-def load_task_by_id(task_id: str, mode: ExecutionMode) -> Optional[TaskDefinition]:
-    """Loads task test cases from the SnakeCoder database (TaskTestCase table)."""
+def _normalize_stdin(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, list):
+        return " ".join(str(item) for item in value)
+    return str(value)
 
-    public_only = mode == ExecutionMode.full_test
+
+def load_task_by_id(task_id: str, mode: ExecutionMode) -> Optional[TaskDefinition]:
+    """Loads task test cases from the SnakeCoder database (Task.tests JSON)."""
 
     with get_db_session() as session:
         task_row = session.get(Task, task_id)
         entry_point = _extract_entry_point(task_row.starter_code) if task_row else None
+        tests = task_row.tests if task_row else None
 
-        stmt = select(TaskTestCase).where(TaskTestCase.task_id == task_id)
-        if public_only:
-            stmt = stmt.where(TaskTestCase.is_public.is_(True))
-        stmt = stmt.order_by(TaskTestCase.order)
-        rows = session.scalars(stmt).all()
-
-    if not rows:
+    if not tests or not isinstance(tests, list):
         return None
 
-    test_cases: List[Dict[str, Any]] = [
-        {"stdin": row.input, "expected": row.expected_output} for row in rows
-    ]
+    visible_tests = tests[:3] if mode == ExecutionMode.full_test else tests
+    test_cases: List[Dict[str, Any]] = []
+    for test in visible_tests:
+        if not isinstance(test, dict):
+            continue
+        stdin_value = test.get("input")
+        expected = test.get("expectedOutput", test.get("output", test.get("expected")))
+        test_cases.append(
+            {
+                "stdin": _normalize_stdin(stdin_value),
+                "expected": expected,
+            }
+        )
+
+    if not test_cases:
+        return None
 
     return {
         "description": f"DB task: {task_id}",

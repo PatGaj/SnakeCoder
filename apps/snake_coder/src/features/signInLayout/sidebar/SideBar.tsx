@@ -20,7 +20,6 @@ import { normalizeUrlPath } from '@/lib/normalize'
 
 import SideBarNavItem from './SideBarNavItem'
 import SideBarToggle from './SideBarToggle'
-
 type UserApiResponse = {
   account: {
     userName: string | null

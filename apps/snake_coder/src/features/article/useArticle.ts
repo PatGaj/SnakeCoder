@@ -1,9 +1,11 @@
 'use client'
 
+import React from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 import toast from 'react-hot-toast'
 
+import { getSessionId } from '@/lib/analytics'
 import { useRouter } from '@/i18n/navigation'
 
 import type { ArticleContentData, ArticleHeaderData, ArticleTocItem } from './components'
@@ -39,8 +41,12 @@ const fetchArticle = async (id: string): Promise<ArticleApiResponse> => {
   return response.json() as Promise<ArticleApiResponse>
 }
 
-const markRead = async (id: string) => {
-  const response = await fetch(`/api/missions/article/${encodeURIComponent(id)}`, { method: 'POST' })
+const markRead = async (id: string, payload: { timeSpentSeconds?: number; sessionId?: string }) => {
+  const response = await fetch(`/api/missions/article/${encodeURIComponent(id)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
   if (!response.ok) {
     throw new Error('Failed to mark article as read')
   }
@@ -51,6 +57,7 @@ const useArticle = (id: string): UseArticleData => {
   const t = useTranslations('article')
   const router = useRouter()
   const queryClient = useQueryClient()
+  const startedAtRef = React.useRef<number | null>(null)
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['article', id],
@@ -58,8 +65,17 @@ const useArticle = (id: string): UseArticleData => {
     enabled: Boolean(id),
   })
 
+  React.useEffect(() => {
+    startedAtRef.current = null
+  }, [id])
+
+  React.useEffect(() => {
+    if (!data || startedAtRef.current) return
+    startedAtRef.current = Date.now()
+  }, [data])
+
   const mutation = useMutation({
-    mutationFn: () => markRead(id),
+    mutationFn: (payload: { timeSpentSeconds?: number; sessionId?: string }) => markRead(id, payload),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['missions'] }),
@@ -88,7 +104,14 @@ const useArticle = (id: string): UseArticleData => {
     isError,
     errorLabel: t('error'),
     onBack: () => router.push('/missions'),
-    onMarkRead: () => void mutation.mutateAsync(),
+    onMarkRead: () => {
+      const timeSpentSeconds =
+        startedAtRef.current != null ? Math.max(0, Math.round((Date.now() - startedAtRef.current) / 1000)) : 0
+      void mutation.mutateAsync({
+        timeSpentSeconds,
+        sessionId: getSessionId() ?? undefined,
+      })
+    },
     markReadPending: mutation.isPending,
   }
 }

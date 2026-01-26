@@ -568,7 +568,15 @@
       "aiReviewNotAvailable": "Ocena AI jest dostępna tylko dla zadań typu task."
     },
     "submitModal": {
-      "message": "{status, select, passed {Gratulacje!} failed {Przykro mi, spróbuj ponownie.} other {}}"
+      "message": "{status, select, passed {Gratulacje!} failed {Przykro mi, spróbuj ponownie.} other {}}",
+      "labels": {
+        "time": "Czas",
+        "attempts": "Próby",
+        "xp": "Zdobyte XP"
+      },
+      "timeValue": "{minutes} min {seconds} s",
+      "secondsValue": "{seconds} s",
+      "unknown": "-"
     }
   },
   "article": {

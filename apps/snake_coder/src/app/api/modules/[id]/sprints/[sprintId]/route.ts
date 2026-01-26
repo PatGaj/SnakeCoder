@@ -70,7 +70,7 @@ export async function GET(_: Request, { params }: Params) {
       description: true,
       missions: {
         where: {
-          type: { in: ["TASK", "BUGFIX", "QUIZ", "ARTICLE", "SKILL_TEST"] },
+          type: { in: ["TASK", "BUGFIX", "QUIZ", "ARTICLE"] },
         },
         orderBy: { createdAt: "asc" },
         select: {

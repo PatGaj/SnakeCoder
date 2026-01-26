@@ -2,8 +2,10 @@
 
 import React from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import toast from 'react-hot-toast'
+
+import { getSessionId } from '@/lib/analytics'
 
 import type { CodeEditorData, PublicTestsData, TaskDescriptionData, TestResultsData } from './components'
 
@@ -36,12 +38,24 @@ export type UseTaskData = {
   submitModalOpen: boolean
   submitPercent: number
   submitModalMessage: string
+  submitStats: {
+    timeSpentSeconds: number | null
+    attemptsCount: number | null
+    xpAwarded: number
+  } | null
   closeSubmitModal: () => void
   saveLabel: string
   resetLabel: string
 }
 
-type SubmitScore = { passed: number; total: number }
+type SubmitScore = {
+  passed: number
+  total: number
+  isPassed: boolean
+  xpAwarded: number
+  timeSpentSeconds: number | null
+  testAttemptsCount: number | null
+}
 
 type ExecuteMode = 'runCode' | 'fullTest' | 'completeTask'
 
@@ -56,6 +70,7 @@ type TaskApiResponse = {
   status: 'TODO' | 'IN_PROGRESS' | 'DONE'
   startedAt: string | null
   missionType: 'TASK' | 'BUGFIX'
+  aiReviewEnabled?: boolean
   aiReviewRemaining: number | null
   aiReviewLimit: number | null
 }
@@ -75,9 +90,24 @@ type ExecuteCompleteResponse = {
   isTaskPassed: boolean
   passedCount: number
   totalCount: number
+  xpAwarded: number
+  timeSpentSeconds: number | null
+  testAttemptsCount: number
 }
 
 type ExecuteResponse = ExecuteRunResponse | ExecuteCompleteResponse
+
+type ExecuteCaseResultRaw = {
+  expected?: unknown | null
+  actual?: unknown | null
+  passed?: boolean
+  stdout?: unknown | null
+  stderr?: unknown | null
+  error?: unknown | null
+}
+
+type ExecuteRunResponseRaw = { mode: 'runCode' | 'fullTest'; results: ExecuteCaseResultRaw[] }
+type ExecuteResponseRaw = ExecuteRunResponseRaw | ExecuteCompleteResponse
 
 type AiReviewResponse = {
   grade: string
@@ -129,7 +159,7 @@ const saveTask = async (id: string, userCode: string) => {
 
 const executeTask = async (
   id: string,
-  payload: { source: string; mode: ExecuteMode; timeSpentSeconds?: number }
+  payload: { source: string; mode: ExecuteMode; timeSpentSeconds?: number; sessionId?: string }
 ): Promise<ExecuteResponse> => {
   const response = await fetch(`/api/missions/task/${encodeURIComponent(id)}/execute`, {
     method: 'POST',
@@ -141,14 +171,30 @@ const executeTask = async (
     throw new Error('Failed to execute task')
   }
 
-  return response.json() as Promise<ExecuteResponse>
+  const data = (await response.json()) as ExecuteResponseRaw
+
+  if ('results' in data && Array.isArray(data.results)) {
+    return {
+      ...data,
+      results: data.results.map((result) => ({
+        expected: normalizeExecuteValue(result.expected),
+        actual: normalizeExecuteValue(result.actual),
+        passed: result.passed,
+        stdout: normalizeExecuteValue(result.stdout),
+        stderr: normalizeExecuteValue(result.stderr),
+        error: normalizeExecuteValue(result.error),
+      })),
+    }
+  }
+
+  return data
 }
 
-const reviewTask = async (id: string, source: string): Promise<AiReviewResponse> => {
+const reviewTask = async (id: string, source: string, locale: string): Promise<AiReviewResponse> => {
   const response = await fetch(`/api/missions/task/${encodeURIComponent(id)}/review`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ source }),
+    body: JSON.stringify({ source, locale }),
   })
 
   if (!response.ok) {
@@ -169,15 +215,27 @@ const reviewTask = async (id: string, source: string): Promise<AiReviewResponse>
   return response.json() as Promise<AiReviewResponse>
 }
 
+const normalizeExecuteValue = (value: unknown): string | null => {
+  if (value === null || value === undefined) return null
+  if (typeof value === 'string') return value
+  try {
+    return JSON.stringify(value)
+  } catch {
+    return String(value)
+  }
+}
+
+const toDisplayText = (value: string | null | undefined) => value ?? ''
+
 const formatConsoleFromRun = (results: ExecuteCaseResult[]) => {
   if (!results.length) return ''
 
   return results
     .map((result, index) => {
-      const stdout = result.stdout?.trim() ?? ''
-      const stderr = result.stderr?.trim() ?? ''
-      const error = result.error?.trim() ?? ''
-      const actual = result.actual?.toString().trim() ?? ''
+      const stdout = toDisplayText(result.stdout).trim()
+      const stderr = toDisplayText(result.stderr).trim()
+      const error = toDisplayText(result.error).trim()
+      const actual = toDisplayText(result.actual).trim()
 
       const blocks = [stdout, actual, stderr, error].filter((block) => block.length)
       if (!blocks.length) return null
@@ -190,18 +248,13 @@ const formatConsoleFromRun = (results: ExecuteCaseResult[]) => {
 }
 
 const formatFailedOutput = (result?: ExecuteCaseResult) => {
-  if (!result) return ''
-  return (
-    result.actual?.toString() ??
-    result.stdout?.toString() ??
-    result.stderr?.toString() ??
-    result.error?.toString() ??
-    ''
-  )
+  if (!result) return null
+  return result.actual ?? result.stdout ?? result.stderr ?? result.error ?? null
 }
 
 const useTask = (id: string): UseTaskData => {
   const t = useTranslations('task')
+  const locale = useLocale()
   const queryClient = useQueryClient()
   const taskStartedAtRef = React.useRef<number | null>(null)
 
@@ -271,7 +324,7 @@ const useTask = (id: string): UseTaskData => {
   const [aiReviewLimit, setAiReviewLimit] = React.useState<number | null>(null)
   const [submitScore, setSubmitScore] = React.useState<SubmitScore | null>(null)
 
-  const aiReviewVisible = data?.missionType === 'TASK'
+  const aiReviewVisible = Boolean(data?.aiReviewEnabled ?? data?.missionType === 'TASK')
   const aiReviewDisabled = Boolean(aiReviewVisible && aiReviewRemaining === 0)
 
   React.useEffect(() => {
@@ -332,7 +385,12 @@ const useTask = (id: string): UseTaskData => {
   const submitMutation = useMutation({
     mutationKey: ['taskExecute', id, 'submit'],
     mutationFn: ({ source, timeSpentSeconds }: { source: string; timeSpentSeconds?: number }) =>
-      executeTask(id, { source, mode: 'completeTask', timeSpentSeconds }),
+      executeTask(id, {
+        source,
+        mode: 'completeTask',
+        timeSpentSeconds,
+        sessionId: getSessionId() ?? undefined,
+      }),
     onSuccess: async (response) => {
       if (response.mode === 'completeTask') {
         updateSprintStatus(response.isTaskPassed ? 'done' : 'inProgress')
@@ -351,7 +409,7 @@ const useTask = (id: string): UseTaskData => {
   })
 
   const aiReviewMutation = useMutation({
-    mutationFn: (source: string) => reviewTask(id, source),
+    mutationFn: (source: string) => reviewTask(id, source, locale),
   })
 
   const formatAiReview = React.useCallback(
@@ -480,10 +538,17 @@ const useTask = (id: string): UseTaskData => {
     void submitMutation
       .mutateAsync({ source: code, timeSpentSeconds })
       .then((data) => {
-        if (data.mode !== 'completeTask') return
+      if (data.mode !== 'completeTask') return
 
-        setConsoleValue(t('console.done'))
-        setSubmitScore({ passed: data.passedCount, total: data.totalCount || totalTestsCount })
+      setConsoleValue(t('console.done'))
+      setSubmitScore({
+        passed: data.passedCount,
+        total: data.totalCount || totalTestsCount,
+        isPassed: data.isTaskPassed,
+        xpAwarded: data.xpAwarded ?? 0,
+        timeSpentSeconds: data.timeSpentSeconds ?? null,
+        testAttemptsCount: Number.isFinite(data.testAttemptsCount) ? data.testAttemptsCount : null,
+      })
         if (data.isTaskPassed) {
           toast.success(t('toast.submitSuccess'))
         } else {
@@ -562,8 +627,15 @@ const useTask = (id: string): UseTaskData => {
   const submitDisabled = Boolean(submitLoading || !code.trim().length)
   const submitPercent = submitScore ? scoreToPercent(submitScore) : 0
   const submitModalMessage = submitScore
-    ? t('submitModal.message', { status: submitScore.passed === submitScore.total ? 'passed' : 'failed' })
+    ? t('submitModal.message', { status: submitScore.isPassed ? 'passed' : 'failed' })
     : ''
+  const submitStats = submitScore
+    ? {
+        timeSpentSeconds: submitScore.timeSpentSeconds ?? null,
+        attemptsCount: submitScore.testAttemptsCount ?? null,
+        xpAwarded: submitScore.xpAwarded ?? 0,
+      }
+    : null
 
   return {
     errorLabel: t('error'),
@@ -594,6 +666,7 @@ const useTask = (id: string): UseTaskData => {
     submitModalOpen: Boolean(submitScore),
     submitPercent,
     submitModalMessage,
+    submitStats,
     closeSubmitModal: () => setSubmitScore(null),
     saveLabel: t('actions.save'),
     resetLabel: t('actions.reset'),

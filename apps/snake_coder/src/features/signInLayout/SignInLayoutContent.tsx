@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import React from 'react'
 
 import { usePathname } from '@/i18n/navigation'
+import { ensureSessionStartLogged } from '@/lib/analytics'
 
 type SignInLayoutContentProps = {
   children: React.ReactNode
@@ -11,6 +12,11 @@ type SignInLayoutContentProps = {
 
 const SignInLayoutContent: React.FC<SignInLayoutContentProps> = ({ children }) => {
   const pathname = usePathname()
+
+  React.useEffect(() => {
+    if (!pathname) return
+    ensureSessionStartLogged(pathname)
+  }, [pathname])
 
   return (
     <div className="min-w-0 flex-1 min-h-0 overflow-y-auto scrollbar-thumb-secondary-500 scrollbar-track-primary-500 scrollbar-thin">

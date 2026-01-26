@@ -12,7 +12,29 @@ type Params = {
 }
 
 type AnswerMap = Record<string, string | null | undefined>
-type QuizSubmitPayload = { answers?: AnswerMap; timeSpentSeconds?: number }
+type QuizSubmitPayload = { answers?: AnswerMap; timeSpentSeconds?: number; sessionId?: string }
+
+type QuizOptionPayload = {
+  id: string
+  label: string
+  isCorrect: boolean
+  order: number
+}
+
+type QuizQuestionPayload = {
+  id: string
+  title: string
+  prompt: string
+  order: number
+  options: QuizOptionPayload[]
+}
+
+const clampString = (value: unknown, max = 120) => {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  return trimmed.length > max ? trimmed.slice(0, max) : trimmed
+}
 
 const hashString = (value: string) => {
   let hash = 2166136261
@@ -39,6 +61,51 @@ const shuffleWithSeed = <T,>(items: T[], seed: number) => {
     ;[result[i], result[j]] = [result[j], result[i]]
   }
   return result
+}
+
+const normalizeQuizOptions = (value: unknown): QuizOptionPayload[] => {
+  if (!Array.isArray(value)) return []
+  const options: QuizOptionPayload[] = []
+
+  value.forEach((entry, index) => {
+    if (!entry || typeof entry !== 'object') return
+    const record = entry as Record<string, unknown>
+    const label = typeof record.label === 'string' ? record.label.trim() : ''
+    if (!label) return
+
+    const id =
+      typeof record.id === 'string' && record.id.trim() ? record.id.trim() : String(index + 1)
+    const order =
+      typeof record.order === 'number' && Number.isFinite(record.order) ? record.order : index + 1
+    const isCorrect = typeof record.isCorrect === 'boolean' ? record.isCorrect : false
+
+    options.push({ id, label, order, isCorrect })
+  })
+
+  return options.sort((a, b) => a.order - b.order)
+}
+
+const normalizeQuizQuestions = (value: unknown): QuizQuestionPayload[] => {
+  if (!Array.isArray(value)) return []
+  const questions: QuizQuestionPayload[] = []
+
+  value.forEach((entry, index) => {
+    if (!entry || typeof entry !== 'object') return
+    const record = entry as Record<string, unknown>
+    const title = typeof record.title === 'string' ? record.title.trim() : ''
+    const prompt = typeof record.prompt === 'string' ? record.prompt.trim() : ''
+    if (!title || !prompt) return
+
+    const id =
+      typeof record.id === 'string' && record.id.trim() ? record.id.trim() : `q-${index + 1}`
+    const order =
+      typeof record.order === 'number' && Number.isFinite(record.order) ? record.order : index + 1
+    const options = normalizeQuizOptions(record.options)
+
+    questions.push({ id, title, prompt, order, options })
+  })
+
+  return questions.sort((a, b) => a.order - b.order)
 }
 
 export async function GET(req: Request, { params }: Params) {
@@ -69,19 +136,8 @@ export async function GET(req: Request, { params }: Params) {
     },
     include: {
       quiz: {
-        include: {
-          questions: {
-            orderBy: { order: 'asc' },
-            select: {
-              id: true,
-              title: true,
-              prompt: true,
-              options: {
-                orderBy: { order: 'asc' },
-                select: { id: true, label: true },
-              },
-            },
-          },
+        select: {
+          questions: true,
         },
       },
       progress: {
@@ -118,6 +174,8 @@ export async function GET(req: Request, { params }: Params) {
   const passPercent = mission.passPercent ?? 80
   const attempt = new URL(req.url).searchParams.get('attempt') ?? ''
 
+  const questions = normalizeQuizQuestions(mission.quiz.questions)
+
   return NextResponse.json({
     header: {
       title: mission.title,
@@ -125,13 +183,16 @@ export async function GET(req: Request, { params }: Params) {
       xp: mission.xp,
       passPercent,
     },
-    questions: mission.quiz.questions.map((q) => ({
+    questions: questions.map((q) => ({
       id: q.id,
       title: q.title,
       prompt: q.prompt,
-      options: shuffleWithSeed(q.options, hashString(`${userId}:${mission.id}:${q.id}:${attempt}`)).map((o) => ({
-        id: o.id,
-        label: o.label,
+      options: shuffleWithSeed(
+        normalizeQuizOptions(q.options),
+        hashString(`${userId}:${mission.id}:${q.id}:${attempt}`)
+      ).map((option) => ({
+        id: option.id,
+        label: option.label,
       })),
     })),
     timeLimitSeconds,
@@ -172,19 +233,8 @@ export async function POST(req: Request, { params }: Params) {
     },
     include: {
       quiz: {
-        include: {
-          questions: {
-            orderBy: { order: 'asc' },
-            select: {
-              id: true,
-              title: true,
-              prompt: true,
-              options: {
-                orderBy: { order: 'asc' },
-                select: { id: true, label: true, isCorrect: true },
-              },
-            },
-          },
+        select: {
+          questions: true,
         },
       },
       progress: {
@@ -200,12 +250,13 @@ export async function POST(req: Request, { params }: Params) {
 
   const passPercent = mission.passPercent ?? 80
   const answers = body.answers
-  const questions = mission.quiz.questions
+  const questions = normalizeQuizQuestions(mission.quiz.questions)
 
   const results = questions.map((q) => {
+    const questionOptions = normalizeQuizOptions(q.options)
     const selectedId = answers[q.id] ?? null
-    const selected = selectedId ? q.options.find((o) => o.id === selectedId) : null
-    const correct = q.options.find((o) => o.isCorrect) ?? null
+    const selected = selectedId ? questionOptions.find((o) => o.id === selectedId) : null
+    const correct = questionOptions.find((o) => o.isCorrect) ?? null
 
     const isCorrect = Boolean(selected && correct && selected.id === correct.id)
 
@@ -224,12 +275,16 @@ export async function POST(req: Request, { params }: Params) {
   const passed = percent >= passPercent
 
   const timeSpentSeconds = typeof body.timeSpentSeconds === 'number' ? body.timeSpentSeconds : undefined
+  const sessionId = clampString(body.sessionId)
 
   const isAlreadyCompleted = mission.progress[0]?.status === 'DONE'
   const now = new Date()
   const startedAt = mission.progress[0]?.startedAt ?? now
 
   await prisma.$transaction(async (tx) => {
+    let streakSnapshot: number | null = null
+    const shouldLogCompletion = passed
+    const xpAwardedValue = !isAlreadyCompleted && passed ? mission.xp : 0
     await tx.quizAttempt.create({
       data: {
         userId,
@@ -270,12 +325,45 @@ export async function POST(req: Request, { params }: Params) {
     })
 
     if (!isAlreadyCompleted && passed) {
-      await tx.user.update({
+      const updatedUser = await tx.user.update({
         where: { id: userId },
         data: {
           xpTotal: { increment: mission.xp },
           xpMonth: { increment: mission.xp },
           xpToday: { increment: mission.xp },
+        },
+        select: { streakCurrent: true },
+      })
+      streakSnapshot = updatedUser?.streakCurrent ?? null
+    } else if (shouldLogCompletion) {
+      const existingUser = await tx.user.findUnique({
+        where: { id: userId },
+        select: { streakCurrent: true },
+      })
+      streakSnapshot = existingUser?.streakCurrent ?? null
+    }
+
+    if (shouldLogCompletion) {
+      const attemptsCount = await tx.quizAttempt.count({ where: { userId, quizId: mission.id } })
+
+      await tx.analyticsLog.create({
+        data: {
+          event: 'mission_completed',
+          userId,
+          sessionId,
+          missionId: mission.id,
+          missionType: mission.type,
+          xpAwarded: xpAwardedValue,
+          timeSpentSeconds,
+          attemptsCount,
+          streakCurrent: streakSnapshot,
+          payload: {
+            score,
+            total,
+            percent,
+            passPercent,
+            alreadyCompleted: isAlreadyCompleted,
+          },
         },
       })
     }

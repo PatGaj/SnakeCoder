@@ -173,21 +173,23 @@ const executeTask = async (
 
   const data = (await response.json()) as ExecuteResponseRaw
 
-  if ('results' in data && Array.isArray(data.results)) {
-    return {
-      ...data,
-      results: data.results.map((result) => ({
-        expected: normalizeExecuteValue(result.expected),
-        actual: normalizeExecuteValue(result.actual),
-        passed: result.passed,
-        stdout: normalizeExecuteValue(result.stdout),
-        stderr: normalizeExecuteValue(result.stderr),
-        error: normalizeExecuteValue(result.error),
-      })),
-    }
+  if (data.mode === 'completeTask') {
+    return data
   }
 
-  return data
+  const rawResults = Array.isArray(data.results) ? data.results : []
+
+  return {
+    ...data,
+    results: rawResults.map((result) => ({
+      expected: normalizeExecuteValue(result.expected),
+      actual: normalizeExecuteValue(result.actual),
+      passed: result.passed,
+      stdout: normalizeExecuteValue(result.stdout),
+      stderr: normalizeExecuteValue(result.stderr),
+      error: normalizeExecuteValue(result.error),
+    })),
+  }
 }
 
 const reviewTask = async (id: string, source: string, locale: string): Promise<AiReviewResponse> => {
@@ -256,7 +258,22 @@ const useTask = (id: string): UseTaskData => {
   const t = useTranslations('task')
   const locale = useLocale()
   const queryClient = useQueryClient()
-  const taskStartedAtRef = React.useRef<number | null>(null)
+  const activeSinceRef = React.useRef<number | null>(null)
+  const activeSecondsRef = React.useRef<number>(0)
+
+  const pauseActiveTimer = React.useCallback(() => {
+    const startedAt = activeSinceRef.current
+    if (!startedAt) return
+
+    const elapsed = Math.max(0, Math.round((Date.now() - startedAt) / 1000))
+    activeSecondsRef.current += elapsed
+    activeSinceRef.current = null
+  }, [])
+
+  const resumeActiveTimer = React.useCallback(() => {
+    if (activeSinceRef.current !== null) return
+    activeSinceRef.current = Date.now()
+  }, [])
 
   const updateSprintStatus = React.useCallback(
     (nextStatus: SprintTaskStatus) => {
@@ -339,20 +356,36 @@ const useTask = (id: string): UseTaskData => {
   }, [data, id])
 
   React.useEffect(() => {
-    taskStartedAtRef.current = null
-  }, [id])
+    activeSecondsRef.current = 0
+    activeSinceRef.current = null
 
-  React.useEffect(() => {
-    if (!data) return
-    if (data.status === 'DONE') {
-      taskStartedAtRef.current = null
+    if (!data || data.status === 'DONE') {
       return
     }
-    if (taskStartedAtRef.current) return
 
-    const parsed = data.startedAt ? Date.parse(data.startedAt) : Number.NaN
-    taskStartedAtRef.current = Number.isNaN(parsed) ? Date.now() : parsed
-  }, [data])
+    resumeActiveTimer()
+  }, [data, id, resumeActiveTimer])
+
+  React.useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        pauseActiveTimer()
+      } else {
+        resumeActiveTimer()
+      }
+    }
+
+    window.addEventListener('focus', resumeActiveTimer)
+    window.addEventListener('blur', pauseActiveTimer)
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    return () => {
+      pauseActiveTimer()
+      window.removeEventListener('focus', resumeActiveTimer)
+      window.removeEventListener('blur', pauseActiveTimer)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [pauseActiveTimer, resumeActiveTimer])
 
   const runMutation = useMutation({
     mutationKey: ['taskExecute', id, 'run'],
@@ -531,12 +564,14 @@ const useTask = (id: string): UseTaskData => {
   const onSubmit = () => {
     setConsoleValue(t('console.submitting'))
 
-    const startedAt = taskStartedAtRef.current
     const timeSpentSeconds =
-      startedAt && Number.isFinite(startedAt) ? Math.max(1, Math.round((Date.now() - startedAt) / 1000)) : undefined
+      activeSecondsRef.current +
+      (activeSinceRef.current ? Math.max(1, Math.round((Date.now() - activeSinceRef.current) / 1000)) : 0)
+
+    const timeSpentPayload = timeSpentSeconds > 0 ? timeSpentSeconds : undefined
 
     void submitMutation
-      .mutateAsync({ source: code, timeSpentSeconds })
+      .mutateAsync({ source: code, timeSpentSeconds: timeSpentPayload })
       .then((data) => {
       if (data.mode !== 'completeTask') return
 

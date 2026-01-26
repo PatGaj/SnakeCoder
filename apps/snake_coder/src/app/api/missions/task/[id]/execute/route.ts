@@ -70,21 +70,23 @@ const computeAwardedXp = (
 const normalizeTaskTests = (value: unknown): TaskTestCasePayload[] => {
   if (!Array.isArray(value)) return []
 
-  return value
-    .map((entry) => {
-      if (!entry || typeof entry !== 'object') return null
-      const record = entry as Record<string, unknown>
-      const input = record.input
-      const expectedOutput = record.expectedOutput ?? record.output ?? record.expected
+  const normalized: TaskTestCasePayload[] = []
 
-      if (input === undefined && expectedOutput === undefined) return null
+  for (const entry of value) {
+    if (!entry || typeof entry !== 'object') continue
+    const record = entry as Record<string, unknown>
+    const input = record.input
+    const expectedOutput = record.expectedOutput ?? record.output ?? record.expected
 
-      return {
-        input: input ?? '',
-        expectedOutput: expectedOutput ?? '',
-      }
+    if (input === undefined && expectedOutput === undefined) continue
+
+    normalized.push({
+      input: input ?? '',
+      expectedOutput: expectedOutput ?? '',
     })
-    .filter((entry): entry is TaskTestCasePayload => Boolean(entry))
+  }
+
+  return normalized
 }
 
 const clampString = (value: unknown, max = 120) => {

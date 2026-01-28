@@ -8,8 +8,12 @@ import toast from 'react-hot-toast'
 
 import { getSessionId } from '@/lib/analytics'
 import { useRouter } from '@/i18n/navigation'
+import { useCountdownTimer } from '@/hooks/useCountdownTimer'
 
-import type { QuizHeaderData, QuizQuestionData, QuizResultItem } from './components'
+import type { QuizHeaderData, QuizQuestionData } from './components'
+import { fetchQuiz, submitQuiz, type QuizSubmitResponse } from './api'
+import { createAttemptId } from './utils/attempt'
+import { formatCountdown } from './utils/time'
 
 export type UseQuizData = {
   errorLabel: string
@@ -46,59 +50,7 @@ export type UseQuizData = {
   closeResult: () => void
 }
 
-export type QuizSubmitResponse = {
-  score: number
-  total: number
-  passPercent: number
-  items: QuizResultItem[]
-}
-
-type QuizApiResponse = {
-  header: QuizHeaderData
-  questions: QuizQuestionData[]
-  timeLimitSeconds: number
-}
-
 type QuizSubmitPayload = { answers: Record<string, string | null>; timeSpentSeconds: number; sessionId?: string }
-
-const createAttemptId = () => {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID()
-  }
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}`
-}
-
-const fetchQuiz = async (id: string, attemptId: string): Promise<QuizApiResponse> => {
-  const response = await fetch(
-    `/api/missions/quiz/${encodeURIComponent(id)}?attempt=${encodeURIComponent(attemptId)}`,
-    { method: 'GET' }
-  )
-  if (!response.ok) {
-    throw new Error('Failed to fetch quiz')
-  }
-  return response.json() as Promise<QuizApiResponse>
-}
-
-const formatCountdown = (totalSeconds: number) => {
-  const safeSeconds = Math.max(0, totalSeconds)
-  const minutes = Math.floor(safeSeconds / 60)
-  const seconds = safeSeconds % 60
-  return `${minutes}:${String(seconds).padStart(2, '0')}`
-}
-
-const submitQuiz = async (id: string, payload: QuizSubmitPayload) => {
-  const response = await fetch(`/api/missions/quiz/${encodeURIComponent(id)}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to submit quiz')
-  }
-
-  return response.json() as Promise<QuizSubmitResponse>
-}
 
 const useQuiz = (id: string): UseQuizData => {
   const t = useTranslations('quiz')
@@ -124,10 +76,6 @@ const useQuiz = (id: string): UseQuizData => {
   const [resultOpen, setResultOpen] = React.useState(false)
   const [result, setResult] = React.useState<QuizSubmitResponse | null>(null)
 
-  const [timeLeftSeconds, setTimeLeftSeconds] = React.useState(0)
-  const startedAtRef = React.useRef<number | null>(null)
-  const endsAtRef = React.useRef<number | null>(null)
-  const [timerEpoch, setTimerEpoch] = React.useState(0)
   const [timerResetKey, setTimerResetKey] = React.useState(0)
   const submitGuardRef = React.useRef(false)
   const prevTimeLeftSecondsRef = React.useRef<number | null>(null)
@@ -136,6 +84,7 @@ const useQuiz = (id: string): UseQuizData => {
   const currentAnswer = currentQuestion ? (answers[currentQuestion.id] ?? null) : null
   const answeredCount = questions.reduce((acc, q) => acc + (answers[q.id] ? 1 : 0), 0)
 
+  // Submits quiz answers and refreshes relevant caches after success.
   const submitMutation = useMutation({
     mutationFn: (payload: QuizSubmitPayload) => submitQuiz(id, payload),
     onSuccess: async () => {
@@ -156,29 +105,33 @@ const useQuiz = (id: string): UseQuizData => {
 
   const headerTitle = header?.title
 
+  // Resets local state when navigating to a different quiz id.
   React.useEffect(() => {
     setCurrentIndex(0)
     setAnswers({})
     setFinished(false)
     setResultOpen(false)
     setResult(null)
-    setTimeLeftSeconds(0)
-    setTimerEpoch(0)
     setTimerResetKey(0)
-    startedAtRef.current = null
-    endsAtRef.current = null
     submitGuardRef.current = false
     prevTimeLeftSecondsRef.current = null
   }, [id])
 
+  const timerEnabled = Boolean(headerTitle) && timeLimitSeconds > 0 && !locked
+  const { timeLeftSeconds, getElapsedSeconds } = useCountdownTimer({
+    durationSeconds: timeLimitSeconds,
+    enabled: timerEnabled,
+    resetKey: timerResetKey,
+  })
+
+  // Finalizes the quiz: locks UI, submits answers, and shows results.
   const finishQuiz = React.useCallback(async () => {
     if (submitGuardRef.current || locked || !header) return
 
     submitGuardRef.current = true
     setFinished(true)
 
-    const timeSpentSeconds =
-      startedAtRef.current != null ? Math.max(0, Math.round((Date.now() - startedAtRef.current) / 1000)) : 0
+    const timeSpentSeconds = getElapsedSeconds()
 
     try {
       const data = await submitMutation.mutateAsync({
@@ -193,29 +146,9 @@ const useQuiz = (id: string): UseQuizData => {
       setFinished(false)
       toast.error(t('toast.submitError'))
     }
-  }, [answers, header, locked, submitMutation, t])
+  }, [answers, getElapsedSeconds, header, locked, submitMutation, t])
 
-  React.useEffect(() => {
-    if (!headerTitle || timeLimitSeconds <= 0 || locked) return
-    startedAtRef.current = Date.now()
-    endsAtRef.current = startedAtRef.current + timeLimitSeconds * 1000
-    setTimeLeftSeconds(timeLimitSeconds)
-    setTimerEpoch((prev) => prev + 1)
-  }, [headerTitle, locked, timeLimitSeconds, timerResetKey])
-
-  React.useEffect(() => {
-    if (!endsAtRef.current || locked) return
-
-    const interval = window.setInterval(() => {
-      const endMs = endsAtRef.current
-      if (!endMs) return
-      const next = Math.max(0, Math.ceil((endMs - Date.now()) / 1000))
-      setTimeLeftSeconds(next)
-    }, 1000)
-
-    return () => window.clearInterval(interval)
-  }, [locked, timerEpoch])
-
+  // Auto-submits when the timer reaches zero.
   React.useEffect(() => {
     if (!header || locked) return
     if (timeLimitSeconds <= 0) return
@@ -227,6 +160,7 @@ const useQuiz = (id: string): UseQuizData => {
     void finishQuiz()
   }, [finishQuiz, header, locked, timeLeftSeconds, timeLimitSeconds])
 
+  // Track previous time to detect countdown reaching zero.
   React.useEffect(() => {
     prevTimeLeftSecondsRef.current = timeLeftSeconds
   }, [timeLeftSeconds])
@@ -234,11 +168,13 @@ const useQuiz = (id: string): UseQuizData => {
   const goPrev = () => setCurrentIndex((idx) => Math.max(0, idx - 1))
   const goNext = () => setCurrentIndex((idx) => Math.min(total - 1, idx + 1))
 
+  // Records a selected option for the current question.
   const select = (optionId: string) => {
     if (!currentQuestion) return
     setAnswers((prev) => ({ ...prev, [currentQuestion.id]: optionId }))
   }
 
+  // Starts a new attempt with a fresh attempt id and timer state.
   const restart = () => {
     setAttemptId(createAttemptId())
     setAnswers({})
@@ -250,10 +186,11 @@ const useQuiz = (id: string): UseQuizData => {
     setTimerResetKey((prev) => prev + 1)
   }
 
+  // Navigates back to missions after closing results.
   const closeResult = () => router.push('/missions')
   const finish = () => void finishQuiz()
 
-  const timeLeftLabel = timerEpoch > 0 ? formatCountdown(timeLeftSeconds) : undefined
+  const timeLeftLabel = timerEnabled ? formatCountdown(timeLeftSeconds) : undefined
 
   return {
     errorLabel: t('error'),
@@ -273,7 +210,7 @@ const useQuiz = (id: string): UseQuizData => {
     canGoNext,
     isLast,
     timeLeftLabel,
-    isTimeWarning: timerEpoch > 0 && timeLeftSeconds > 0 && timeLeftSeconds <= 60,
+    isTimeWarning: timerEnabled && timeLeftSeconds > 0 && timeLeftSeconds <= 60,
     resultOpen,
     result,
     goPrev,

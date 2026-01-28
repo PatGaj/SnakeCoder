@@ -61,7 +61,7 @@ const SprintTabsCard: React.FC<SprintTabsCardProps> = ({ sprints, onOpen }) => {
                 type="button"
                 onClick={() => setActiveId(tab.id)}
                 className={clsx(
-                  'shrink-0 snap-start select-none rounded-t-lg border px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.14em] transition-colors',
+                  'shrink-0 snap-start select-none rounded-t-lg border px-2 py-1 text-[8px] cursor-pointer font-semibold uppercase tracking-[0.14em] transition-colors',
                   'lg:rounded-t-xl lg:px-4 lg:py-2 lg:text-[11px] lg:tracking-wide',
                   {
                     'opacity-55': tab.isLocked && !tab.isActive,

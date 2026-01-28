@@ -11,7 +11,7 @@ import {
 import { Badge, Box, Button, ItemRow, Progressbar, Separator } from '@/components'
 
 export type SprintBannerData = {
-  module: 'PCEP' | 'PCAP' | 'BASICS'
+  module: string
   sprintNo: number
   etaMinutes: number
   hasActiveTask: boolean

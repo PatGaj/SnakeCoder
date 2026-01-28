@@ -12,8 +12,6 @@ export type UseDashboardData = {
   lastResult: LastResultCardData
   sprint?: SprintBannerData
   isLoading: boolean
-  isError: boolean
-  errorLabel: string
 }
 
 type DashboardApiResponse = {
@@ -61,7 +59,7 @@ const useDashboard = (): UseDashboardData => {
   const t = useTranslations('dashboard')
   const { data: session } = useSession()
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
     queryFn: fetchDashboard,
   })
@@ -79,8 +77,6 @@ const useDashboard = (): UseDashboardData => {
       name,
       lastResult,
       isLoading,
-      isError,
-      errorLabel: t('error'),
     }
   }
 
@@ -150,8 +146,6 @@ const useDashboard = (): UseDashboardData => {
     lastResult,
     sprint,
     isLoading,
-    isError,
-    errorLabel: t('error'),
   }
 }
 

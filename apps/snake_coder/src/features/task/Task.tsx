@@ -5,6 +5,7 @@ import { RiRefreshLine, RiSave2Line } from 'react-icons/ri'
 import { useTranslations } from 'next-intl'
 
 import { Button, Modal } from '@/components'
+import { formatDuration } from '@/lib/utils'
 
 import { CodeEditor, Console, PublicTests, TaskActionBar, TaskDescription, TestResults } from './components'
 import useTask from './useTask'
@@ -15,8 +16,6 @@ export type TaskProps = {
 
 const Task: React.FC<TaskProps> = ({ id }) => {
   const {
-    errorLabel,
-    isError,
     task,
     editor,
     publicTests,
@@ -29,10 +28,10 @@ const Task: React.FC<TaskProps> = ({ id }) => {
     saveLoading,
     submitLoading,
     aiLoading,
-    aiReviewVisible,
-    aiReviewDisabled,
     aiReviewRemaining,
     aiReviewLimit,
+    aiReviewEnabled,
+    missionType,
     submitDisabled,
     onRun,
     onTest,
@@ -45,34 +44,18 @@ const Task: React.FC<TaskProps> = ({ id }) => {
     submitModalMessage,
     submitStats,
     closeSubmitModal,
-    saveLabel,
-    resetLabel,
   } = useTask(id)
   const t = useTranslations('task')
-
-  const formatDuration = (seconds: number | null) => {
-    if (!seconds || seconds <= 0) return t('submitModal.unknown')
-    const minutes = Math.floor(seconds / 60)
-    const remaining = seconds % 60
-    if (!minutes) {
-      return t('submitModal.secondsValue', { seconds: remaining })
-    }
-    return t('submitModal.timeValue', { minutes, seconds: remaining })
-  }
 
   const attemptsValue = submitStats?.attemptsCount ?? null
   const attemptsLabel = attemptsValue === null ? t('submitModal.unknown') : String(attemptsValue)
   const xpAwarded = submitStats?.xpAwarded ?? 0
   const xpLabel = `${xpAwarded > 0 ? '+' : ''}${xpAwarded} XP`
 
+  const aiReviewVisible = Boolean(aiReviewEnabled ?? missionType === 'TASK')
+  const aiReviewDisabled = Boolean(aiReviewVisible && aiReviewRemaining === 0)
+
   if (!task || !editor || !publicTests) {
-    if (isError) {
-      return (
-        <main className="mx-auto max-w-400 px-6 pb-6 pt-20 md:px-12">
-          <div className="text-sm text-snowWhite-300">{errorLabel}</div>
-        </main>
-      )
-    }
     return null
   }
 
@@ -117,7 +100,7 @@ const Task: React.FC<TaskProps> = ({ id }) => {
                       onClick={onReset}
                       type="button"
                     >
-                      {resetLabel}
+                      {t('actions.reset')}
                     </Button>
                     <Button
                       variant="ghost"
@@ -130,7 +113,7 @@ const Task: React.FC<TaskProps> = ({ id }) => {
                       onClick={onSave}
                       type="button"
                     >
-                      {saveLabel}
+                      {t('actions.save')}
                     </Button>
                   </div>
                 }

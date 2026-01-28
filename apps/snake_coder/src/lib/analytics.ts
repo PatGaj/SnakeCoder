@@ -1,6 +1,8 @@
+// Session-scoped keys for analytics tracking in sessionStorage.
 const SESSION_ID_KEY = 'snakecoder.sessionId'
 const SESSION_START_KEY = 'snakecoder.sessionStartLogged'
 
+// Generates a stable session id for the current browser session.
 const createSessionId = () => {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return crypto.randomUUID()
@@ -8,6 +10,7 @@ const createSessionId = () => {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
+// Returns an existing session id or generates a new one, stored in sessionStorage.
 export const getSessionId = (): string | null => {
   if (typeof window === 'undefined') return null
 
@@ -19,10 +22,11 @@ export const getSessionId = (): string | null => {
   return next
 }
 
+// Sends a best-effort analytics event to the server.
 export const logAnalyticsEvent = async (
   event: string,
   payload?: Record<string, unknown>,
-  sessionIdOverride?: string | null
+  sessionIdOverride?: string | null,
 ) => {
   const sessionId = sessionIdOverride ?? getSessionId()
   if (!sessionId) return
@@ -34,11 +38,10 @@ export const logAnalyticsEvent = async (
       body: JSON.stringify({ event, sessionId, payload }),
       keepalive: true,
     })
-  } catch {
-    // Best-effort logging; ignore failures.
-  }
+  } catch {}
 }
 
+// Logs a single "session_start" event once per browser session.
 export const ensureSessionStartLogged = (path: string) => {
   if (typeof window === 'undefined') return null
 

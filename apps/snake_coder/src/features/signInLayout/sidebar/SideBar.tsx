@@ -27,6 +27,7 @@ type UserApiResponse = {
   }
 }
 
+// Fetches minimal user identity data for the sidebar header.
 const fetchUser = async (): Promise<UserApiResponse> => {
   const response = await fetch('/api/user', { method: 'GET', cache: 'no-store' })
   if (!response.ok) {
@@ -35,6 +36,7 @@ const fetchUser = async (): Promise<UserApiResponse> => {
   return response.json() as Promise<UserApiResponse>
 }
 
+// Sidebar navigation with responsive collapse behavior and profile/logout actions.
 const SideBar = () => {
   const [collapsed, setCollapsed] = React.useState<boolean>(false)
   const [isMobile, setIsMobile] = React.useState<boolean>(false)

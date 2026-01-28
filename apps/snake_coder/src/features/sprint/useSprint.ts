@@ -38,6 +38,7 @@ type SprintApiResponse = {
   tasks: TaskCardData[]
 }
 
+// Fetches sprint header and task list for a given module + sprint.
 const fetchSprint = async ({ moduleId, sprintId }: UseSprintArgs): Promise<SprintApiResponse> => {
   const response = await fetch(`/api/modules/${moduleId}/sprints/${sprintId}`, {
     method: 'GET',
@@ -49,9 +50,11 @@ const fetchSprint = async ({ moduleId, sprintId }: UseSprintArgs): Promise<Sprin
   return response.json() as Promise<SprintApiResponse>
 }
 
+// Loads sprint data and maps tasks into Kanban columns with translated labels.
 const useSprint = ({ moduleId, sprintId }: UseSprintArgs): UseSprintData => {
   const t = useTranslations('sprint')
 
+  // Used when API data is not available yet, to keep UI stable.
   const fallbackHeader: SprintHeaderData = {
     moduleId,
     sprintId,
@@ -68,6 +71,7 @@ const useSprint = ({ moduleId, sprintId }: UseSprintArgs): UseSprintData => {
 
   const header = data?.header ?? fallbackHeader
   const tasks = data?.tasks ?? []
+  // Group tasks by status for the Kanban view.
   const tasksByStatus = tasks.reduce<Record<KanbanColumnId, TaskCardData[]>>(
     (acc, task) => {
       acc[task.status].push(task)

@@ -2,6 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query'
 
+import { gradeLabelFromAvg } from '@/lib/grades'
+
 export type StatTopBarUserData = {
   streakDays: number
   xpGained: number
@@ -18,6 +20,7 @@ type StatTopBarApiResponse = {
   gradeAvg: number | null
 }
 
+// Fetches user stats for the top bar counters.
 const fetchStatTopBar = async (): Promise<StatTopBarApiResponse> => {
   const response = await fetch('/api/user/stats', { method: 'GET', cache: 'no-store' })
   if (!response.ok) {
@@ -26,18 +29,7 @@ const fetchStatTopBar = async (): Promise<StatTopBarApiResponse> => {
   return response.json() as Promise<StatTopBarApiResponse>
 }
 
-const gradeLabelFromAvg = (avg: number | null) => {
-  if (avg == null) return ''
-  if (avg >= 4.75) return 'A'
-  if (avg >= 4.25) return 'A-'
-  if (avg >= 4.0) return 'B+'
-  if (avg >= 3.5) return 'B'
-  if (avg >= 3.0) return 'C+'
-  if (avg >= 2.5) return 'C'
-  if (avg >= 2.0) return 'D'
-  return 'E'
-}
-
+// Loads stats for the stat top bar with safe defaults.
 const useStatTopBar = (): StatTopBarUserData => {
   const { data } = useQuery({
     queryKey: ['userStats'],

@@ -1,128 +1,24 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { signIn } from 'next-auth/react'
-import { useTranslations } from 'next-intl'
-import toast from 'react-hot-toast'
 import React from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { RiArrowRightLine } from 'react-icons/ri'
 
 import { Badge, Box, Button, Checkbox, Input } from '@/components'
 import { useRouter } from '@/i18n/navigation'
 
-type RegisterFormValues = {
-  nickName: string
-  firstName?: string
-  lastName?: string
-  email: string
-  password: string
-  confirmPassword: string
-  acceptTerms: boolean
-}
-
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
-const NICKNAME_REGEX = /^[A-Za-z0-9_]+$/
+import { useRegister } from './useRegister'
 
 const Register = () => {
   const router = useRouter()
-  const t = useTranslations('register')
-
-  const registerSchema = React.useMemo(
-    () =>
-      z
-        .object({
-          nickName: z.string().trim().min(1, t('errors.nickNameRequired')).regex(NICKNAME_REGEX, t('errors.nickNameInvalid')),
-          firstName: z.string().trim().optional(),
-          lastName: z.string().trim().optional(),
-          email: z.string().email(t('errors.email')),
-          password: z.string().min(1, t('errors.passwordRequired')).regex(PASSWORD_REGEX, t('errors.passwordComplex')),
-          confirmPassword: z.string().min(1, t('errors.confirmPasswordRequired')),
-          acceptTerms: z.boolean().refine((value) => value, { message: t('errors.termsRequired') }),
-        })
-        .refine((values) => values.password === values.confirmPassword, {
-          message: t('errors.passwordsMismatch'),
-          path: ['confirmPassword'],
-        }),
-    [t]
-  )
-
+  const { t, form, onSubmit } = useRegister()
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      nickName: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      acceptTerms: false,
-    },
-    mode: 'onTouched',
-  })
-
-  const onSubmit = async ({ nickName, firstName, lastName, email, password }: RegisterFormValues) => {
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nickName,
-          firstName: firstName?.trim() || undefined,
-          lastName: lastName?.trim() || undefined,
-          email,
-          password,
-        }),
-      })
-      if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as { error?: string } | null
-        const errorMessage = payload?.error ?? ''
-
-        if (response.status === 400 && errorMessage === 'Weak password') {
-          toast.error(t('errors.passwordComplex'))
-          setError('password', { message: t('errors.passwordComplex') })
-          return
-        }
-        if (response.status === 400 && errorMessage === 'Invalid nickname') {
-          toast.error(t('errors.nickNameInvalid'))
-          setError('nickName', { message: t('errors.nickNameInvalid') })
-          return
-        }
-        if (response.status === 409 && errorMessage === 'User already exists') {
-          toast.error(t('errors.emailTaken'))
-          setError('email', { message: t('errors.emailTaken') })
-          return
-        }
-        if (response.status === 409 && errorMessage === 'Nickname already exists') {
-          toast.error(t('errors.nickNameTaken'))
-          setError('nickName', { message: t('errors.nickNameTaken') })
-          return
-        }
-        toast.error(t('errors.generic'))
-        setError('root', { message: t('errors.generic') })
-        return
-      }
-      toast.success(t('toast.success'))
-      const signInResult = await signIn('credentials', { redirect: false, email, password })
-      if (signInResult?.error) {
-        router.push('/login')
-        return
-      }
-      router.push('/dashboard')
-    } catch {
-      toast.error(t('errors.generic'))
-      setError('root', { message: t('errors.generic') })
-    }
-  }
+  } = form
 
   return (
-    <main className="mx-auto max-w-[1920px] px-6 py-12 md:px-12">
+    <main className="mx-auto max-w-480 px-6 py-12 md:px-12">
       <Box variant="glass" size="lg" round="2xl" className="mx-auto w-full max-w-lg border-primary-800/70">
         <div className="flex items-center gap-3">
           <Badge variant="secondary" className="px-3 py-1 text-nightBlack-900">

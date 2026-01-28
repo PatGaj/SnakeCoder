@@ -1,77 +1,18 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { signIn } from 'next-auth/react'
-import { useLocale, useTranslations } from 'next-intl'
-import toast from 'react-hot-toast'
 import React from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { useSearchParams } from 'next/navigation'
 
 import { Badge, Box, Button, Input } from '@/components'
-import { useRouter } from '@/i18n/navigation'
 import { RiArrowRightLine, RiGithubFill, RiGoogleFill } from 'react-icons/ri'
-
-type LoginFormValues = {
-  email: string
-  password: string
-}
+import { useLogin } from './useLogin'
 
 const Login = () => {
-  const router = useRouter()
-  const t = useTranslations('login')
-  const locale = useLocale()
-  const searchParams = useSearchParams()
-
-  const loginSchema = React.useMemo(
-    () =>
-      z.object({
-        email: z.string().email(t('errors.email')),
-        password: z.string().min(1, t('errors.passwordRequired')),
-      }),
-    [t]
-  )
-
-  React.useEffect(() => {
-    const error = searchParams.get('error')
-    if (!error) return
-    toast.error(t('errors.oauth'))
-  }, [searchParams, t])
-
+  const { t, router, form, onSubmit, oauthLoading, handleOAuth } = useLogin()
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
-    mode: 'onTouched',
-  })
-
-  const onSubmit = async ({ email, password }: LoginFormValues) => {
-    try {
-      const result = await signIn('credentials', { redirect: false, email, password })
-      if (result?.error) {
-        toast.error(t('errors.invalidCredentials'))
-        return
-      }
-      toast.success(t('toast.success'))
-      router.push('/dashboard')
-    } catch {
-      toast.error(t('errors.generic'))
-    }
-  }
-
-  const [oauthLoading, setOauthLoading] = React.useState<'google' | 'github' | null>(null)
-
-  const handleOAuth = (provider: 'google' | 'github') => {
-    setOauthLoading(provider)
-    signIn(provider, { callbackUrl: `/${locale}/dashboard` }).catch(() => {
-      setOauthLoading(null)
-      toast.error(t('errors.oauth'))
-    })
-  }
+  } = form
 
   return (
     <main className="mx-auto max-w-[1920px] px-6 py-12 md:px-12">

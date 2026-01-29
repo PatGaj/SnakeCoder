@@ -1,3 +1,5 @@
+"""Pydantic schemas for the code execution API."""
+
 from enum import Enum
 from typing import Any, List, Optional
 

@@ -1,3 +1,5 @@
+"""Helpers for loading task definitions from the database."""
+
 import ast
 from typing import Any, Dict, List, Optional
 
@@ -10,6 +12,7 @@ TaskDefinition = Dict[str, Any]
 
 
 def _extract_entry_point(starter_code: str) -> Optional[str]:
+    """Extract the first function name from starter code (entry point)."""
     try:
         module = ast.parse(starter_code)
     except SyntaxError:
@@ -22,6 +25,7 @@ def _extract_entry_point(starter_code: str) -> Optional[str]:
 
 
 def _normalize_stdin(value: Any) -> str:
+    """Normalize test input into a stdin-friendly string."""
     if value is None:
         return ""
     if isinstance(value, list):
@@ -30,7 +34,7 @@ def _normalize_stdin(value: Any) -> str:
 
 
 def load_task_by_id(task_id: str, mode: ExecutionMode) -> Optional[TaskDefinition]:
-    """Loads task test cases from the SnakeCoder database (Task.tests JSON)."""
+    """Load task test cases from the DB and map them to executor format."""
 
     with get_db_session() as session:
         task_row = session.get(Task, task_id)

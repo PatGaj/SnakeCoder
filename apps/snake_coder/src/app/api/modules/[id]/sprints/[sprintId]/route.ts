@@ -12,12 +12,14 @@ type Params = {
   }>;
 };
 
+// Maps mission progress status to sprint UI status.
 const mapSprintStatus = (status?: string): "todo" | "inProgress" | "done" => {
   if (status === "DONE") return "done";
   if (status === "IN_PROGRESS") return "inProgress";
   return "todo";
 };
 
+// Maps DB mission type to UI mission type.
 const mapMissionType = (type: string): "code" | "bugfix" | "quiz" | "article" => {
   if (type === "BUGFIX") return "bugfix";
   if (type === "QUIZ") return "quiz";
@@ -25,12 +27,14 @@ const mapMissionType = (type: string): "code" | "bugfix" | "quiz" | "article" =>
   return "code";
 };
 
+// Builds mission route based on its type.
 const missionRoute = (type: string, id: string) => {
   if (type === "QUIZ") return `/missions/quiz/${id}`;
   if (type === "ARTICLE") return `/missions/article/${id}`;
   return `/missions/task/${id}`;
 };
 
+// Returns sprint header and missions available to the user.
 export async function GET(_: Request, { params }: Params) {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;

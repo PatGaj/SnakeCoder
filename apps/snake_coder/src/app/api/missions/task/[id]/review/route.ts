@@ -37,18 +37,21 @@ const OPENAI_MODEL = process.env.OPENAI_REVIEW_MODEL
 const ALLOWED_GRADES = ['A', 'A-', 'B+', 'B', 'C+', 'C', 'D', 'E'] as const
 const SUPPORTED_LOCALES = ['pl', 'en'] as const
 
+// Returns today's midnight for per-day quotas.
 const startOfToday = () => {
   const now = new Date()
   now.setHours(0, 0, 0, 0)
   return now
 }
 
+// Ensures the locale is one of the supported languages.
 const normalizeLocale = (value?: string | null) => {
   if (!value) return null
   const lower = value.toLowerCase()
   return (SUPPORTED_LOCALES as readonly string[]).includes(lower) ? lower : null
 }
 
+// Infers locale from the Accept-Language header.
 const localeFromHeaders = (req: Request) => {
   const header = req.headers.get('accept-language') || ''
   const lower = header.toLowerCase()
@@ -57,6 +60,7 @@ const localeFromHeaders = (req: Request) => {
   return null
 }
 
+// Extracts model output text from OpenAI Responses API payloads.
 const extractOutputText = (payload: unknown) => {
   if (!payload || typeof payload !== 'object') return ''
 
@@ -80,6 +84,7 @@ const extractOutputText = (payload: unknown) => {
   return ''
 }
 
+// Logs OpenAI errors with useful context for debugging.
 const logOpenAiError = (error: unknown) => {
   if (error instanceof APIError) {
     console.error('[ai-review] OpenAI API error', {
@@ -106,6 +111,7 @@ const logOpenAiError = (error: unknown) => {
   console.error('[ai-review] OpenAI error', error)
 }
 
+// Safely parses JSON-like text returned by the model.
 const parseJsonFromText = (text: string) => {
   const trimmed = text.trim()
   if (!trimmed) return null
@@ -121,6 +127,7 @@ const parseJsonFromText = (text: string) => {
   }
 }
 
+// Normalizes whitespace and ensures a string output.
 const normalizeText = (value: unknown) => {
   if (typeof value !== 'string') return ''
   return value
@@ -130,6 +137,7 @@ const normalizeText = (value: unknown) => {
     .trim()
 }
 
+// Normalizes string lists, trimming empty entries and limiting length.
 const normalizeList = (value: unknown, maxItems = 5) => {
   if (!Array.isArray(value)) return []
   return value
@@ -138,6 +146,7 @@ const normalizeList = (value: unknown, maxItems = 5) => {
     .slice(0, maxItems)
 }
 
+// Validates and normalizes the JSON review returned by the model.
 const normalizeReview = (payload: Record<string, unknown> | null): ReviewResult | null => {
   if (!payload) return null
 
@@ -160,6 +169,7 @@ const normalizeReview = (payload: Record<string, unknown> | null): ReviewResult 
   }
 }
 
+// Builds a plain-text feedback summary stored in the DB.
 const buildFeedback = (review: ReviewResult) => {
   const blocks: string[] = [`Grade: ${review.grade}`]
 
@@ -182,6 +192,7 @@ const buildFeedback = (review: ReviewResult) => {
   return blocks.join('\n\n')
 }
 
+// Converts letter grades into numeric values for averages.
 const gradeValue = (grade: string): number | null => {
   switch (grade) {
     case 'A':
@@ -205,6 +216,7 @@ const gradeValue = (grade: string): number | null => {
   }
 }
 
+// Computes the average grade across all reviewed tasks.
 const computeGradeAvg = (grades: string[]) => {
   const values = grades.map(gradeValue).filter((value): value is number => typeof value === 'number')
   if (!values.length) return null
@@ -213,6 +225,7 @@ const computeGradeAvg = (grades: string[]) => {
   return Math.round((sum / values.length) * 100) / 100
 }
 
+// Builds the prompt sent to the model using mission context + user code.
 const buildPrompt = (params: {
   title: string
   description: string
@@ -234,6 +247,7 @@ const buildPrompt = (params: {
   ].join('\n')
 }
 
+// Requests a structured review from the OpenAI model.
 const requestReview = async (params: {
   title: string
   description: string
@@ -296,6 +310,7 @@ const requestReview = async (params: {
   return normalizeReview(parsed)
 }
 
+// Generates and stores an AI review, enforcing daily limits.
 export async function POST(req: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id

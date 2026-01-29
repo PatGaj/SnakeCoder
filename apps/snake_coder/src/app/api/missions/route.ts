@@ -5,18 +5,21 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { PUBLIC_MODULE_CODES_LIST } from "@/lib/moduleAccess";
 
+// Maps DB difficulty enum to API-friendly label.
 const mapDifficulty = (difficulty: string): "beginner" | "intermediate" | "advanced" => {
   if (difficulty === "INTERMEDIATE") return "intermediate";
   if (difficulty === "ADVANCED") return "advanced";
   return "beginner";
 };
 
+// Maps mission progress status to UI status.
 const mapProgressStatus = (status?: string): "todo" | "inProgress" | "done" => {
   if (status === "DONE") return "done";
   if (status === "IN_PROGRESS") return "inProgress";
   return "todo";
 };
 
+// Maps DB mission type to UI type.
 const mapMissionType = (type: string): "task" | "bugfix" | "quiz" | "article" => {
   if (type === "BUGFIX") return "bugfix";
   if (type === "QUIZ") return "quiz";
@@ -24,12 +27,14 @@ const mapMissionType = (type: string): "task" | "bugfix" | "quiz" | "article" =>
   return "task";
 };
 
+// Builds the client route for a mission by type.
 const missionRoute = (type: string, id: string) => {
   if (type === "QUIZ") return `/missions/quiz/${id}`;
   if (type === "ARTICLE") return `/missions/article/${id}`;
   return `/missions/task/${id}`;
 };
 
+// Returns all missions available to the user with module/sprint metadata and progress.
 export async function GET() {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;

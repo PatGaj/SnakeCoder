@@ -22,6 +22,7 @@ type TaskTestCasePayload = {
   expectedOutput: unknown
 }
 
+// Normalizes task test payloads stored as JSON.
 const normalizeTaskTests = (value: unknown): TaskTestCasePayload[] => {
   if (!Array.isArray(value)) return []
 
@@ -44,6 +45,7 @@ const normalizeTaskTests = (value: unknown): TaskTestCasePayload[] => {
   return normalized
 }
 
+// Returns task content, progress, and limited public tests.
 export async function GET(_: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
@@ -151,6 +153,7 @@ export async function GET(_: Request, { params }: Params) {
   })
 }
 
+// Persists user code draft and ensures the mission is in-progress.
 export async function PATCH(req: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id

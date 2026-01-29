@@ -29,6 +29,7 @@ type QuizQuestionPayload = {
   options: QuizOptionPayload[]
 }
 
+// Sanitizes optional string input for logs/analytics payloads.
 const clampString = (value: unknown, max = 120) => {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -36,6 +37,7 @@ const clampString = (value: unknown, max = 120) => {
   return trimmed.length > max ? trimmed.slice(0, max) : trimmed
 }
 
+// Generates a stable numeric hash for deterministic shuffling per user/attempt.
 const hashString = (value: string) => {
   let hash = 2166136261
   for (let i = 0; i < value.length; i += 1) {
@@ -45,6 +47,7 @@ const hashString = (value: string) => {
   return hash >>> 0
 }
 
+// Creates a seeded pseudo-random generator (LCG).
 const createRng = (seed: number) => {
   let state = seed >>> 0
   return () => {
@@ -53,6 +56,7 @@ const createRng = (seed: number) => {
   }
 }
 
+// Shuffles items deterministically using the provided seed.
 const shuffleWithSeed = <T,>(items: T[], seed: number) => {
   const result = [...items]
   const rand = createRng(seed)
@@ -63,6 +67,7 @@ const shuffleWithSeed = <T,>(items: T[], seed: number) => {
   return result
 }
 
+// Normalizes quiz options stored as JSON into a typed, ordered list.
 const normalizeQuizOptions = (value: unknown): QuizOptionPayload[] => {
   if (!Array.isArray(value)) return []
   const options: QuizOptionPayload[] = []
@@ -85,6 +90,7 @@ const normalizeQuizOptions = (value: unknown): QuizOptionPayload[] => {
   return options.sort((a, b) => a.order - b.order)
 }
 
+// Normalizes quiz questions stored as JSON into a typed, ordered list.
 const normalizeQuizQuestions = (value: unknown): QuizQuestionPayload[] => {
   if (!Array.isArray(value)) return []
   const questions: QuizQuestionPayload[] = []
@@ -108,6 +114,7 @@ const normalizeQuizQuestions = (value: unknown): QuizQuestionPayload[] => {
   return questions.sort((a, b) => a.order - b.order)
 }
 
+// Returns quiz metadata and shuffled answers (per user/attempt).
 export async function GET(req: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
@@ -199,6 +206,7 @@ export async function GET(req: Request, { params }: Params) {
   })
 }
 
+// Grades quiz answers, awards XP (once), and logs completion analytics.
 export async function POST(req: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id

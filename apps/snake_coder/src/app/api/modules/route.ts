@@ -5,17 +5,20 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { isPublicModuleCode } from "@/lib/moduleAccess";
 
+// Maps DB category enum to API-friendly label.
 const mapCategory = (category: string): "certifications" | "libraries" => {
   if (category === "CERTIFICATIONS") return "certifications";
   return "libraries";
 };
 
+// Maps DB difficulty enum to API-friendly label.
 const mapDifficulty = (difficulty: string): "beginner" | "intermediate" | "advanced" => {
   if (difficulty === "INTERMEDIATE") return "intermediate";
   if (difficulty === "ADVANCED") return "advanced";
   return "beginner";
 };
 
+// Returns modules with access state and aggregated progress.
 export async function GET() {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;

@@ -8,6 +8,7 @@ import { ModuleCategory } from '@/generated/prisma/client'
 
 const PLAN_BONUS_XP = 120
 
+// Normalizes a date to the start of the day (local time).
 const startOfDay = (value: Date) => {
   const date = new Date(value)
   date.setHours(0, 0, 0, 0)
@@ -16,6 +17,7 @@ const startOfDay = (value: Date) => {
 
 const MISSION_TYPES: Array<'TASK' | 'BUGFIX' | 'QUIZ' | 'ARTICLE'> = ['TASK', 'BUGFIX', 'QUIZ', 'ARTICLE']
 
+// Builds module filter to include public or unlocked modules.
 const moduleAccessFilter = (userId: string) => ({
   isBuilding: false,
   category: ModuleCategory.CERTIFICATIONS,
@@ -37,6 +39,7 @@ type ProgressRef = {
   sprint: { id: string; name: string } | null
 }
 
+// Finds the latest progress item (in-progress or done) to anchor plan validation.
 const fetchLastProgressRef = async (userId: string, status: ProgressRef['status']): Promise<ProgressRef | null> => {
   const progress = await prisma.userMissionProgress.findFirst({
     where: {
@@ -96,6 +99,7 @@ type NextMissionSelection = {
   mission: MissionWithProgress
 }
 
+// Picks the next mission to decide which sprint should be validated for plan completion.
 const pickNextMission = ({
   sprints,
   startSprintId,
@@ -149,6 +153,7 @@ const pickNextMission = ({
   return null
 }
 
+// Verifies whether the current sprint plan requirements are satisfied.
 const isPlanComplete = (sprint: SprintWithMissions) => {
   const tasks = sprint.missions.filter((m) => m.type === 'TASK' || m.type === 'BUGFIX')
   const tasksTotal = tasks.length
@@ -189,6 +194,7 @@ export async function POST() {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
 
+  // Require authentication for claiming the daily plan bonus.
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -205,6 +211,7 @@ export async function POST() {
   const now = new Date()
   const todayStart = startOfDay(now)
 
+  // Ensure the bonus can be claimed once per day.
   if (user.planBonusClaimedAt && user.planBonusClaimedAt >= todayStart) {
     return NextResponse.json({ error: 'Already claimed' }, { status: 409 })
   }
@@ -219,6 +226,7 @@ export async function POST() {
     return NextResponse.json({ error: 'No modules' }, { status: 400 })
   }
 
+  // Find the latest progress to decide which sprint should be checked.
   const baseProgress =
     (await fetchLastProgressRef(userId, 'IN_PROGRESS')) ?? (await fetchLastProgressRef(userId, 'DONE'))
 
@@ -227,6 +235,7 @@ export async function POST() {
 
   let selection: { sprint: SprintWithMissions; mission: MissionWithProgress } | null = null
 
+  // Iterate modules and sprints in order to find the next sprint to validate.
   for (let i = firstModuleIndex; i < modules.length; i += 1) {
     const moduleItem = modules[i]
     const sprints = await prisma.sprint.findMany({
@@ -277,6 +286,7 @@ export async function POST() {
     return NextResponse.json({ error: 'Plan incomplete' }, { status: 400 })
   }
 
+  // Apply bonus XP and mark the claim timestamp.
   await prisma.user.update({
     where: { id: userId },
     data: {

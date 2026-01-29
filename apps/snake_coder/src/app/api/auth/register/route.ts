@@ -6,6 +6,7 @@ import prisma from "@/lib/prisma";
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 const NICKNAME_REGEX = /^[A-Za-z0-9_]+$/;
 
+// Registers a new user with basic validation and uniqueness checks.
 export async function POST(req: Request) {
   try {
     const { email, password, nickName, firstName, lastName } = await req.json();
@@ -24,11 +25,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Weak password" }, { status: 400 });
     }
 
+    // Reject duplicate email.
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return NextResponse.json({ error: "User already exists" }, { status: 409 });
     }
 
+    // Reject duplicate nickname (case-insensitive).
     const existingNick = await prisma.user.findFirst({
       where: {
         nickName: { equals: safeNickName, mode: "insensitive" },
@@ -45,6 +48,7 @@ export async function POST(req: Request) {
     const safeLastName = typeof lastName === "string" && lastName.trim().length ? lastName.trim() : undefined;
     const displayName = [safeFirstName, safeLastName].filter(Boolean).join(" ").trim() || safeNickName;
 
+    // Create the user with normalized fields and hashed password.
     const user = await prisma.user.create({
       data: {
         email,

@@ -41,12 +41,14 @@ type DashboardResponse = {
   }
 }
 
+// Returns the correct client route for a mission type + id.
 const missionRoute = (type: string, id: string) => {
   if (type === 'QUIZ') return `/missions/quiz/${id}`
   if (type === 'ARTICLE') return `/missions/article/${id}`
   return `/missions/task/${id}`
 }
 
+// Normalizes module codes into the dashboard union type.
 const mapModuleCode = (code: string): DashboardModuleCode => {
   if (code === 'PCAP') return 'PCAP'
   if (code === 'BASICS') return 'BASICS'
@@ -57,6 +59,7 @@ const PLAN_BONUS_XP = 120
 
 const MISSION_TYPES: Array<'TASK' | 'BUGFIX' | 'QUIZ' | 'ARTICLE'> = ['TASK', 'BUGFIX', 'QUIZ', 'ARTICLE']
 
+// Builds module filter to include public or explicitly unlocked modules.
 const moduleAccessFilter = (userId: string) => ({
   isBuilding: false,
   category: ModuleCategory.CERTIFICATIONS,
@@ -78,6 +81,7 @@ type ProgressRef = {
   sprint: { id: string; name: string } | null
 }
 
+// Finds the latest progress item (in-progress or done) to anchor "next mission" selection.
 const fetchLastProgressRef = async (userId: string, status: ProgressRef['status']): Promise<ProgressRef | null> => {
   const progress = await prisma.userMissionProgress.findFirst({
     where: {
@@ -141,6 +145,7 @@ type NextMissionSelection = {
   mission: MissionWithProgress
 }
 
+// Picks the next mission to recommend based on progress and current module/sprint.
 const pickNextMission = ({
   sprints,
   startSprintId,
@@ -198,6 +203,7 @@ export async function GET() {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
 
+  // Require authentication for dashboard data.
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -214,6 +220,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
+  // Latest graded mission to show in "last result".
   const lastGraded = await prisma.userMissionProgress.findFirst({
     where: { userId, grade: { not: null } },
     orderBy: [{ lastOpenedAt: 'desc' }, { completedAt: 'desc' }],
@@ -226,6 +233,7 @@ export async function GET() {
   const yesterdayStart = new Date(todayStart)
   yesterdayStart.setDate(todayStart.getDate() - 1)
 
+  // Calculate plan bonus and daily XP aggregates.
   const planBonusClaimed = Boolean(user.planBonusClaimedAt && user.planBonusClaimedAt >= todayStart)
   const planBonusToday = planBonusClaimed ? PLAN_BONUS_XP : 0
   const planBonusYesterday =
@@ -247,6 +255,7 @@ export async function GET() {
   const todayXp = (todayAgg._sum.xpEarned ?? 0) + planBonusToday
   const yesterdayXp = (yesterdayAgg._sum.xpEarned ?? 0) + planBonusYesterday
 
+  // Load accessible modules for the user.
   const modules = await prisma.module.findMany({
     where: moduleAccessFilter(userId),
     orderBy: { createdAt: 'asc' },
@@ -267,6 +276,7 @@ export async function GET() {
     return NextResponse.json(payload)
   }
 
+  // Find the latest in-progress or recently completed mission as a starting point.
   const baseProgress =
     (await fetchLastProgressRef(userId, 'IN_PROGRESS')) ?? (await fetchLastProgressRef(userId, 'DONE'))
 
@@ -276,6 +286,7 @@ export async function GET() {
   let selection: { module: (typeof modules)[number]; sprint: SprintWithMissions; mission: MissionWithProgress } | null =
     null
 
+  // Iterate modules in order to find the next available mission.
   for (let i = firstModuleIndex; i < modules.length; i += 1) {
     const moduleItem = modules[i]
     const sprints = await prisma.sprint.findMany({
@@ -338,6 +349,7 @@ export async function GET() {
 
   const { module: moduleItem, sprint, mission: nextMission } = selection
 
+  // Compute sprint progress breakdowns for tasks/articles/quizzes.
   const tasks = sprint.missions.filter((m) => m.type === 'TASK' || m.type === 'BUGFIX')
   const tasksTotal = tasks.length
   const tasksDone = tasks.reduce((acc, m) => acc + (m.progress[0]?.status === 'DONE' ? 1 : 0), 0)

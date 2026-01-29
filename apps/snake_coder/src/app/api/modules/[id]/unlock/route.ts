@@ -10,6 +10,7 @@ type Params = {
   }>;
 };
 
+// Grants user access to a module if it is not marked as building.
 export async function POST(_: Request, { params }: Params) {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;

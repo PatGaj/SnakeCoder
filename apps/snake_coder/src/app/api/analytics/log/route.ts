@@ -12,6 +12,7 @@ type AnalyticsPayload = {
   payload?: unknown
 }
 
+// Normalizes a string input with length limit; returns null for empty/invalid values.
 const clampString = (value: unknown, max = 200) => {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -19,6 +20,7 @@ const clampString = (value: unknown, max = 200) => {
   return trimmed.length > max ? trimmed.slice(0, max) : trimmed
 }
 
+// Logs a single analytics event for the authenticated user.
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
@@ -27,6 +29,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // Parse payload defensively to avoid failing the request on malformed JSON.
   const body = (await req.json().catch(() => null)) as AnalyticsPayload | null
   const event = clampString(body?.event, 80)
 
@@ -35,6 +38,7 @@ export async function POST(req: Request) {
   }
 
   const sessionId = clampString(body?.sessionId, 120)
+  // Store JSON null explicitly to satisfy Prisma JSON input typing.
   const payload =
     body?.payload === null || body?.payload === undefined
       ? Prisma.JsonNull

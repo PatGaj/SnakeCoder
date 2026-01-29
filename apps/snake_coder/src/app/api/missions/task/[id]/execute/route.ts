@@ -26,6 +26,7 @@ type TaskTestCasePayload = {
   expectedOutput: unknown
 }
 
+// Resolves the code-executor base URL and trims trailing slashes.
 const executorBaseUrl = () => (process.env.EXECUTOR_BASE_URL || 'http://localhost:8000').replace(/\/$/, '')
 
 const EXECUTOR_HEALTH_TTL_MS = 10_000
@@ -34,12 +35,14 @@ const EXECUTOR_EXECUTE_TIMEOUT_MS = 15_000
 
 let lastHealthyAt = 0
 
+// Adds an optional prefix for executor-side task identifiers.
 const executorTaskId = (id: string) => {
   const prefix = process.env.EXECUTOR_TASK_ID_PREFIX
   if (!prefix) return id
   return id.startsWith(prefix) ? id : `${prefix}${id}`
 }
 
+// Computes time-based XP bonus against the mission ETA.
 const computeTimeBonusMultiplier = (etaMinutes: number, timeSpentSeconds?: number) => {
   if (!timeSpentSeconds || timeSpentSeconds <= 0 || !Number.isFinite(etaMinutes) || etaMinutes <= 0) {
     return 1
@@ -50,12 +53,14 @@ const computeTimeBonusMultiplier = (etaMinutes: number, timeSpentSeconds?: numbe
   return timeSpentSeconds <= fastThreshold ? 1.2 : timeSpentSeconds <= etaSeconds ? 1.1 : 1
 }
 
+// Computes XP penalty based on number of test attempts.
 const computeAttemptsMultiplier = (testAttemptsCount: number) => {
   if (testAttemptsCount <= 2) return 1
   if (testAttemptsCount <= 4) return 0.9
   return 0.75
 }
 
+// Applies time + attempts multipliers to base XP.
 const computeAwardedXp = (
   baseXp: number,
   etaMinutes: number,
@@ -67,6 +72,7 @@ const computeAwardedXp = (
   return Math.round(baseXp * timeMultiplier * attemptsMultiplier)
 }
 
+// Normalizes task test payloads stored as JSON.
 const normalizeTaskTests = (value: unknown): TaskTestCasePayload[] => {
   if (!Array.isArray(value)) return []
 
@@ -89,6 +95,7 @@ const normalizeTaskTests = (value: unknown): TaskTestCasePayload[] => {
   return normalized
 }
 
+// Sanitizes optional string input for logs/analytics payloads.
 const clampString = (value: unknown, max = 120) => {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -96,6 +103,7 @@ const clampString = (value: unknown, max = 120) => {
   return trimmed.length > max ? trimmed.slice(0, max) : trimmed
 }
 
+// Signs a short-lived JWT for the executor service.
 const signExecutorJwt = (userId: string) => {
   const secret = process.env.EXECUTOR_JWT_SECRET || process.env.NEXTAUTH_SECRET
   if (!secret) {
@@ -109,6 +117,7 @@ const signExecutorJwt = (userId: string) => {
   })
 }
 
+// Parses JSON defensively so executor errors don't crash the route.
 const parseJson = async <T,>(response: Response): Promise<T | null> => {
   const text = await response.text().catch(() => '')
   if (!text) return null
@@ -120,6 +129,7 @@ const parseJson = async <T,>(response: Response): Promise<T | null> => {
   }
 }
 
+// Wraps fetch with a hard timeout.
 const fetchWithTimeout = async (url: string, init: RequestInit, timeoutMs: number) => {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
@@ -131,6 +141,7 @@ const fetchWithTimeout = async (url: string, init: RequestInit, timeoutMs: numbe
   }
 }
 
+// Cached health check for the executor service.
 const isExecutorHealthy = async () => {
   const now = Date.now()
   if (lastHealthyAt && now - lastHealthyAt < EXECUTOR_HEALTH_TTL_MS) {
@@ -157,6 +168,7 @@ const isExecutorHealthy = async () => {
   }
 }
 
+// Executes code/tests via executor, updates progress, awards XP, and logs analytics.
 export async function POST(req: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id

@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { isPublicModuleCode } from "@/lib/moduleAccess";
 
+// Maps DB difficulty enum to API-friendly label.
 const mapDifficulty = (difficulty: string): "beginner" | "intermediate" | "advanced" => {
   if (difficulty === "INTERMEDIATE") return "intermediate";
   if (difficulty === "ADVANCED") return "advanced";
@@ -17,6 +18,7 @@ type Params = {
   }>;
 };
 
+// Returns module details with per-sprint progress and status.
 export async function GET(_: Request, { params }: Params) {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;

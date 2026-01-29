@@ -16,6 +16,7 @@ type MarkReadPayload = {
   sessionId?: string
 }
 
+// Sanitizes optional string input for logs/analytics payloads.
 const clampString = (value: unknown, max = 120) => {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -23,6 +24,7 @@ const clampString = (value: unknown, max = 120) => {
   return trimmed.length > max ? trimmed.slice(0, max) : trimmed
 }
 
+// Loads article mission data and marks it as in-progress for the user.
 export async function GET(_: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
@@ -98,6 +100,7 @@ export async function GET(_: Request, { params }: Params) {
   })
 }
 
+// Marks an article as read, awards XP once, and logs completion analytics.
 export async function POST(req: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id

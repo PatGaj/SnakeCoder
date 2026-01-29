@@ -1,3 +1,5 @@
+"""SQLAlchemy models for executor-side task metadata."""
+
 from sqlalchemy import JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -5,6 +7,7 @@ from .db import Base
 
 
 class Task(Base):
+    """Represents task metadata stored in the executor database."""
     __tablename__ = "Task"
 
     mission_id: Mapped[str] = mapped_column("missionId", String, primary_key=True)

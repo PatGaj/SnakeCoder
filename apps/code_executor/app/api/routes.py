@@ -1,3 +1,5 @@
+"""API routes for code execution endpoints."""
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from ..schemas import CodeExecutionRequest, CodeExecutionResponse, ExecutionMode

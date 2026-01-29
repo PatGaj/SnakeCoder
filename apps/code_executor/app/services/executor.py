@@ -1,4 +1,7 @@
+"""Execution orchestration for user code within sandboxed containers."""
+
 from typing import Any, Dict, List, Optional
+
 from ..schemas import ExecutionMode
 from ..services.container_runner import ContainerExecutionError, run_code_in_container
 from tests.test_tasks import TaskDefinition
@@ -10,7 +13,7 @@ def run_user_code(
     entry_point: Optional[str],
     mode: ExecutionMode,
 ) -> List[Dict[str, Any]]:
-    """Runs user code against task test cases or ad-hoc in runCode mode."""
+    """Run user code against task test cases or ad-hoc in runCode mode."""
 
     if mode == ExecutionMode.run_code:
         test_cases: List[Dict[str, Any]] = [{"data": {}, "expected": None}]

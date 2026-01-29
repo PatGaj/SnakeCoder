@@ -19,7 +19,6 @@ import contextlib
 
 
 def build_env(source: str, data=None, run_as_main=False):
-    """Compile and execute user code into an isolated namespace."""
     if data is None:
         data = {}
 
@@ -43,7 +42,6 @@ def execute_user_code(
     run_as_main=False,
     env=None,
 ):
-    """Execute user code with prepared args/kwargs and return the result."""
     if env is None:
         env = build_env(source, data=data, run_as_main=run_as_main)
 
@@ -61,7 +59,6 @@ def execute_user_code(
 
 
 def sanitize_output(text, limit=8192):
-    """Normalize output text and enforce a hard size limit."""
     if text is None:
         return ""
     lines = str(text).splitlines()
@@ -71,7 +68,6 @@ def sanitize_output(text, limit=8192):
     return cleaned[:limit] + f"... [truncated {len(cleaned) - limit} chars]"
 
 def parse_value(text, annotation):
-    """Parse stdin tokens into typed values based on annotations."""
     if annotation is inspect._empty or annotation is None or annotation is str:
         return text
 
@@ -100,7 +96,6 @@ def parse_value(text, annotation):
     return text
 
 def resolve_call_args(func, env, entry_args, entry_kwargs, stdin_text_for_entry):
-    """Resolve call args either from explicit values, stdin, or env variables."""
     if not callable(func):
         raise ValueError("Error: function not found")
     if entry_args is not None or entry_kwargs is not None:
@@ -133,7 +128,6 @@ def resolve_call_args(func, env, entry_args, entry_kwargs, stdin_text_for_entry)
     return args_to_use, kwargs_to_use
 
 def build_args_from_stdin(stdin_text, signature):
-    """Build positional args from stdin text for a given function signature."""
     params = [
         p
         for p in signature.parameters.values()
@@ -161,7 +155,6 @@ def build_args_from_stdin(stdin_text, signature):
     return args, {}
 
 def run_single_case(source, entry_point, data, expected, stdin_text=None):
-    """Run a single test case and capture stdout/stderr/result."""
     buf_out = io.StringIO()
     buf_err = io.StringIO()
 
@@ -225,7 +218,6 @@ def run_single_case(source, entry_point, data, expected, stdin_text=None):
 
 
 def main():
-    """Entrypoint for the container script: run all test cases and emit JSON."""
     payload = json.load(sys.stdin)
     source = payload.get("source") or ""
     entry_point = payload.get("entry_point")

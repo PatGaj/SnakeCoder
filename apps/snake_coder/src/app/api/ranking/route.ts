@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 
 import prisma from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
+import { gradeLabelFromAvg } from '@/lib/grades'
 
 type RankingUser = {
   id: string
@@ -14,18 +15,7 @@ type RankingUser = {
   grade: string
 }
 
-const gradeLabelFromAvg = (avg: number | null) => {
-  if (avg == null) return ''
-  if (avg >= 4.75) return 'A'
-  if (avg >= 4.25) return 'A-'
-  if (avg >= 4.0) return 'B+'
-  if (avg >= 3.5) return 'B'
-  if (avg >= 3.0) return 'C+'
-  if (avg >= 2.5) return 'C'
-  if (avg >= 2.0) return 'D'
-  return 'E'
-}
-
+// Returns monthly ranking data split into champions (top 3) and the rest.
 export async function GET() {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id

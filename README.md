@@ -6,9 +6,9 @@ Monorepo aplikacji do nauki Pythona przygotowanej na potrzeby pracy dyplomowej. 
 - `apps/snake_coder` – frontend Next.js (App Router), interfejs do interakcji z API.
 
 ## Wymagania wstępne
-- Python 3.11+
-- Node.js 20+ oraz `pnpm` (np. `corepack enable` lub `npm install -g pnpm`)
-- bash (do uruchamiania skryptów pomocniczych)
+- Python v3.11+
+- Node.js v20+ oraz `pnpm` (np. `corepack enable` lub `npm install -g pnpm`)
+- Docker engine v29+
 
 ## Pierwsze uruchomienie krok po kroku
 Użyj dwóch terminali: jednego dla backendu i jednego dla frontendu.
@@ -17,11 +17,11 @@ Użyj dwóch terminali: jednego dla backendu i jednego dla frontendu.
 ```bash
 cd apps/code_executor
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate.bat
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload      # API na http://127.0.0.1:8000
 ```
-Szybki test: sprawdź zdrowie serwera pod `http://127.0.0.1:8000/health`. Endpointy API zaczynają się od `/api`.
+Szybki test: sprawdź zdrowie serwera pod `http://127.0.0.1:8000/health`.
 
 ### Frontend (Next.js)
 ```bash
@@ -31,5 +31,5 @@ pnpm dev                           # UI na http://127.0.0.1:3000
 ```
 
 ## Dodatkowe zadania
-- Testy backendu: `cd apps/code_executor && bash ./tests/run_all.sh`
+- Testy backendu: `cd apps/code_executor && pytest tests`
 - Aktualizacja locka Pythona: `cd apps/code_executor && pip freeze > requirements.txt`

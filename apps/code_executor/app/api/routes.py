@@ -1,5 +1,7 @@
 """API routes for code execution endpoints."""
 
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from ..schemas import CodeExecutionRequest, CodeExecutionResponse, ExecutionMode
@@ -17,6 +19,8 @@ def execute_code(payload: CodeExecutionRequest, _auth: dict = Depends(require_ap
 
     task = None
     entry_point = None
+    request_id = uuid.uuid4().hex
+    user_id = _auth.get("sub") if isinstance(_auth, dict) else None
 
     if payload.mode != ExecutionMode.run_code:
         if not payload.task_id:
@@ -43,6 +47,12 @@ def execute_code(payload: CodeExecutionRequest, _auth: dict = Depends(require_ap
         task=task or {},
         entry_point=entry_point,
         mode=payload.mode,
+        meta={
+            "request_id": request_id,
+            "user_id": user_id,
+            "task_id": payload.task_id,
+            "mode": payload.mode.value,
+        },
     )
 
     mapped_results = [CodeExecutionResponse(**result) for result in execution_results]

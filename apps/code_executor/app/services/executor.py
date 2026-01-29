@@ -12,6 +12,7 @@ def run_user_code(
     task: TaskDefinition,
     entry_point: Optional[str],
     mode: ExecutionMode,
+    meta: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, Any]]:
     """Run user code against task test cases or ad-hoc in runCode mode."""
 
@@ -24,7 +25,7 @@ def run_user_code(
 
     try:
         results = run_code_in_container(
-            source=source, test_cases=test_cases, entry_point=entry_point_to_use
+            source=source, test_cases=test_cases, entry_point=entry_point_to_use, meta=meta
         )
     except (ContainerExecutionError, Exception) as exc:
         results = [

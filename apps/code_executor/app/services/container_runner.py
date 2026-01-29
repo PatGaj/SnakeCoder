@@ -1,9 +1,12 @@
 """Docker-backed sandbox runner for user code execution."""
 
 import json
+import os
 import subprocess
 import threading
 import time
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 
@@ -16,6 +19,7 @@ import contextlib
 
 
 def build_env(source: str, data=None, run_as_main=False):
+    """Compile and execute user code into an isolated namespace."""
     if data is None:
         data = {}
 
@@ -39,6 +43,7 @@ def execute_user_code(
     run_as_main=False,
     env=None,
 ):
+    """Execute user code with prepared args/kwargs and return the result."""
     if env is None:
         env = build_env(source, data=data, run_as_main=run_as_main)
 
@@ -56,6 +61,7 @@ def execute_user_code(
 
 
 def sanitize_output(text, limit=8192):
+    """Normalize output text and enforce a hard size limit."""
     if text is None:
         return ""
     lines = str(text).splitlines()
@@ -65,6 +71,7 @@ def sanitize_output(text, limit=8192):
     return cleaned[:limit] + f"... [truncated {len(cleaned) - limit} chars]"
 
 def parse_value(text, annotation):
+    """Parse stdin tokens into typed values based on annotations."""
     if annotation is inspect._empty or annotation is None or annotation is str:
         return text
 
@@ -93,6 +100,9 @@ def parse_value(text, annotation):
     return text
 
 def resolve_call_args(func, env, entry_args, entry_kwargs, stdin_text_for_entry):
+    """Resolve call args either from explicit values, stdin, or env variables."""
+    if not callable(func):
+        raise ValueError("Error: function not found")
     if entry_args is not None or entry_kwargs is not None:
         return entry_args or [], entry_kwargs or {}
 
@@ -123,6 +133,7 @@ def resolve_call_args(func, env, entry_args, entry_kwargs, stdin_text_for_entry)
     return args_to_use, kwargs_to_use
 
 def build_args_from_stdin(stdin_text, signature):
+    """Build positional args from stdin text for a given function signature."""
     params = [
         p
         for p in signature.parameters.values()
@@ -150,6 +161,7 @@ def build_args_from_stdin(stdin_text, signature):
     return args, {}
 
 def run_single_case(source, entry_point, data, expected, stdin_text=None):
+    """Run a single test case and capture stdout/stderr/result."""
     buf_out = io.StringIO()
     buf_err = io.StringIO()
 
@@ -166,8 +178,11 @@ def run_single_case(source, entry_point, data, expected, stdin_text=None):
             entry_args = None
             entry_kwargs = None
             if entry_point is not None:
+                func = env.get(entry_point)
+                if not callable(func):
+                    raise ValueError(f"Error: function '{entry_point}' not found")
                 entry_args, entry_kwargs = resolve_call_args(
-                    func=env.get(entry_point),
+                    func=func,
                     env=env,
                     entry_args=None,
                     entry_kwargs=None,
@@ -210,6 +225,7 @@ def run_single_case(source, entry_point, data, expected, stdin_text=None):
 
 
 def main():
+    """Entrypoint for the container script: run all test cases and emit JSON."""
     payload = json.load(sys.stdin)
     source = payload.get("source") or ""
     entry_point = payload.get("entry_point")
@@ -263,11 +279,31 @@ def _force_remove_container(name: Optional[str]) -> None:
     )
 
 
+_LOG_DIR = Path(os.getenv("EXECUTOR_LOG_DIR", Path(__file__).resolve().parents[3] / "logs"))
+_LOG_PATH = _LOG_DIR / "executor.jsonl"
+
+
+def _write_log(entry: Dict[str, Any]) -> None:
+    try:
+        _LOG_DIR.mkdir(parents=True, exist_ok=True)
+        with _LOG_PATH.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception:
+        return
+
+
+def _add_metrics(entry: Dict[str, Any], stdout: str, stderr: str, timeout_seconds: Optional[int] = None) -> None:
+    entry["stdout_bytes"] = len(stdout.encode("utf-8")) if stdout is not None else 0
+    entry["stderr_bytes"] = len(stderr.encode("utf-8")) if stderr is not None else 0
+    entry["timeout_seconds"] = timeout_seconds
+
+
 def run_code_in_container(
     source: str,
     test_cases: List[Dict[str, Any]],
     entry_point: Optional[str],
     timeout: int = 10,
+    meta: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, Any]]:
     """Executes user code in a fresh container and returns test results."""
     payload = {
@@ -308,6 +344,8 @@ def run_code_in_container(
 
     container_name = None
     proc = None
+    started_at = time.time()
+    started_at_iso = datetime.fromtimestamp(started_at, tz=timezone.utc).isoformat()
 
     try:
         with _CONCURRENCY_GUARD:
@@ -329,9 +367,34 @@ def run_code_in_container(
                 check=False,
             )
     except FileNotFoundError as exc:
+        finished_at = time.time()
+        entry = {
+            "event": "executor_run",
+            "status": "error",
+            "error": "docker_not_found",
+            "started_at": started_at_iso,
+            "finished_at": datetime.fromtimestamp(finished_at, tz=timezone.utc).isoformat(),
+            "duration_ms": int((finished_at - started_at) * 1000),
+            "container_name": container_name,
+            **(meta or {}),
+        }
+        _add_metrics(entry, "", "", timeout_seconds=timeout)
+        _write_log(entry)
         raise ContainerExecutionError("Docker not found. Ensure it is installed and on PATH.") from exc
     except subprocess.TimeoutExpired as exc:
         _force_remove_container(container_name)
+        finished_at = time.time()
+        entry = {
+            "event": "executor_run",
+            "status": "timeout",
+            "started_at": started_at_iso,
+            "finished_at": datetime.fromtimestamp(finished_at, tz=timezone.utc).isoformat(),
+            "duration_ms": int((finished_at - started_at) * 1000),
+            "container_name": container_name,
+            **(meta or {}),
+        }
+        _add_metrics(entry, "", "", timeout_seconds=timeout)
+        _write_log(entry)
         raise ContainerExecutionError(f"Container execution exceeded timeout ({timeout}s).") from exc
     finally:
         if container_name:
@@ -342,6 +405,21 @@ def run_code_in_container(
 
     if proc.returncode != 0:
         stderr = proc.stderr.strip()
+        finished_at = time.time()
+        entry = {
+            "event": "executor_run",
+            "status": "error",
+            "started_at": started_at_iso,
+            "finished_at": datetime.fromtimestamp(finished_at, tz=timezone.utc).isoformat(),
+            "duration_ms": int((finished_at - started_at) * 1000),
+            "container_name": container_name,
+            "exit_code": proc.returncode,
+            "stdout": proc.stdout,
+            "stderr": proc.stderr,
+            **(meta or {}),
+        }
+        _add_metrics(entry, proc.stdout, proc.stderr, timeout_seconds=timeout)
+        _write_log(entry)
         raise ContainerExecutionError(
             f"Container exited with code {proc.returncode}: {stderr or 'no stderr'}"
         )
@@ -349,10 +427,61 @@ def run_code_in_container(
     try:
         parsed = json.loads(proc.stdout)
     except json.JSONDecodeError as exc:
+        finished_at = time.time()
+        entry = {
+            "event": "executor_run",
+            "status": "error",
+            "started_at": started_at_iso,
+            "finished_at": datetime.fromtimestamp(finished_at, tz=timezone.utc).isoformat(),
+            "duration_ms": int((finished_at - started_at) * 1000),
+            "container_name": container_name,
+            "exit_code": proc.returncode,
+            "stdout": proc.stdout,
+            "stderr": proc.stderr,
+            "error": "invalid_json",
+            **(meta or {}),
+        }
+        _add_metrics(entry, proc.stdout, proc.stderr, timeout_seconds=timeout)
+        _write_log(entry)
         raise ContainerExecutionError(f"Invalid JSON from container: {exc}") from exc
 
     results = parsed.get("results")
     if not isinstance(results, list):
+        finished_at = time.time()
+        entry = {
+            "event": "executor_run",
+            "status": "error",
+            "started_at": started_at_iso,
+            "finished_at": datetime.fromtimestamp(finished_at, tz=timezone.utc).isoformat(),
+            "duration_ms": int((finished_at - started_at) * 1000),
+            "container_name": container_name,
+            "exit_code": proc.returncode,
+            "stdout": proc.stdout,
+            "stderr": proc.stderr,
+            "error": "unexpected_payload",
+            **(meta or {}),
+        }
+        _add_metrics(entry, proc.stdout, proc.stderr, timeout_seconds=timeout)
+        _write_log(entry)
         raise ContainerExecutionError("Container returned unexpected payload")
+
+    passed_count = sum(1 for item in results if item.get("passed") is True)
+    finished_at = time.time()
+    entry = {
+        "event": "executor_run",
+        "status": "ok",
+        "started_at": started_at_iso,
+        "finished_at": datetime.fromtimestamp(finished_at, tz=timezone.utc).isoformat(),
+        "duration_ms": int((finished_at - started_at) * 1000),
+        "container_name": container_name,
+        "exit_code": proc.returncode,
+        "stdout": proc.stdout,
+        "stderr": proc.stderr,
+        "tests_total": len(results),
+        "tests_passed": passed_count,
+        **(meta or {}),
+    }
+    _add_metrics(entry, proc.stdout, proc.stderr, timeout_seconds=timeout)
+    _write_log(entry)
 
     return results

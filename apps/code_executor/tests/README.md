@@ -1,6 +1,21 @@
 ### Testing the correct operation of the API and code executor
 
-Run all helper test scripts with one command:
+### Pytest functional tests
+The pytest suite calls the live FastAPI service and exercises `/health` and `/api/execute`.
+
+Requirements:
+- API server running (default `http://127.0.0.1:8000`, override with `BASE_URL`)
+- Auth token configured via `AUTH_TOKEN` or `EXECUTOR_JWT_SECRET` / `NEXTAUTH_SECRET`
+
+Run all tests:
+```bash
+pytest tests
+```
+
+Run only the queue test (marked slow):
+```bash
+pytest tests -m slow
+```
 
 ```bash
 bash tests/run_all.sh

@@ -84,13 +84,9 @@ const useDashboard = (): UseDashboardData => {
       (data.sprint.quizTotal > 0 ? (data.sprint.quizScore / data.sprint.quizTotal) * 15 : 15),
   )
 
-  const tasksRemaining = data.sprint.tasksTotal - data.sprint.tasksDone
-  const articleRemaining = data.sprint.articleTotal - data.sprint.articleDoneCount
-  const quizRemaining = data.sprint.quizTotal - data.sprint.quizScore
-
-  const showTasks = tasksRemaining > 0
-  const showArticle = articleRemaining > 0
-  const showQuiz = quizRemaining > 0
+  const showTasks = data.sprint.tasksTotal > 0
+  const showArticle = data.sprint.articleTotal > 0
+  const showQuiz = data.sprint.quizTotal > 0
 
   const hasPlanItems = showTasks || showArticle || showQuiz
 

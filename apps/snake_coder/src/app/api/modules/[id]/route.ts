@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { isPublicModuleCode } from "@/lib/moduleAccess";
 
+// Maps DB difficulty enum to API-friendly label.
 const mapDifficulty = (difficulty: string): "beginner" | "intermediate" | "advanced" => {
   if (difficulty === "INTERMEDIATE") return "intermediate";
   if (difficulty === "ADVANCED") return "advanced";
@@ -17,6 +18,7 @@ type Params = {
   }>;
 };
 
+// Returns module details with per-sprint progress and status.
 export async function GET(_: Request, { params }: Params) {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
@@ -45,7 +47,6 @@ export async function GET(_: Request, { params }: Params) {
               },
               quiz: {
                 include: {
-                  questions: { select: { id: true } },
                   attempts: {
                     where: { userId },
                     orderBy: { score: "desc" },
@@ -74,7 +75,7 @@ export async function GET(_: Request, { params }: Params) {
   const sprints = moduleRecord.sprints.map((sprint) => {
     const etaMinutes = sprint.missions.reduce((acc, mission) => acc + mission.etaMinutes, 0);
 
-    const tasks = sprint.missions.filter((m) => m.type === "TASK" || m.type === "BUGFIX" || m.type === "SKILL_TEST");
+    const tasks = sprint.missions.filter((m) => m.type === "TASK" || m.type === "BUGFIX");
     const tasksDone = tasks.reduce((acc, m) => acc + (m.progress[0]?.status === "DONE" ? 1 : 0), 0);
 
     const articles = sprint.missions.filter((m) => m.type === "ARTICLE");

@@ -9,6 +9,7 @@ import { routing } from './i18n/routing'
 
 const intlMiddleware = createMiddleware(routing)
 
+// Extracts a locale prefix (e.g. "/pl") from the path when it matches supported locales.
 function getLocalePrefix(pathname: string) {
   const m = pathname.match(/^\/([\w-]+)(\/|$)/)
   if (!m) return ''
@@ -16,6 +17,7 @@ function getLocalePrefix(pathname: string) {
   return routing.locales.some((supported) => supported === locale) ? `/${locale}` : ''
 }
 
+// Removes the locale prefix from a path, returning "/" when the remainder is empty.
 function stripLocale(pathname: string) {
   const localePrefix = getLocalePrefix(pathname)
   if (!localePrefix) return pathname || '/'
@@ -23,6 +25,7 @@ function stripLocale(pathname: string) {
   return stripped || '/'
 }
 
+// Builds a redirect response to a path that already includes the locale prefix.
 function redirect(req: NextRequest, targetPathWithLocale: string) {
   const url = req.nextUrl.clone()
   url.pathname = targetPathWithLocale
@@ -30,6 +33,10 @@ function redirect(req: NextRequest, targetPathWithLocale: string) {
   return NextResponse.redirect(url)
 }
 
+// Enforces auth and locale-aware routing:
+// - redirects authed users away from landing/login/register to dashboard
+// - redirects unauthenticated users to landing/login with callbackUrl
+// - otherwise delegates to next-intl middleware
 export default async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 

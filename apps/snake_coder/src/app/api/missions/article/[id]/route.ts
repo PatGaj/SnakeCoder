@@ -13,8 +13,18 @@ type Params = {
 
 type MarkReadPayload = {
   timeSpentSeconds?: number
+  sessionId?: string
 }
 
+// Sanitizes optional string input for logs/analytics payloads.
+const clampString = (value: unknown, max = 120) => {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  return trimmed.length > max ? trimmed.slice(0, max) : trimmed
+}
+
+// Loads article mission data and marks it as in-progress for the user.
 export async function GET(_: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
@@ -90,6 +100,7 @@ export async function GET(_: Request, { params }: Params) {
   })
 }
 
+// Marks an article as read, awards XP once, and logs completion analytics.
 export async function POST(req: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
@@ -102,6 +113,7 @@ export async function POST(req: Request, { params }: Params) {
 
   const body = (await req.json().catch(() => null)) as MarkReadPayload | null
   const timeSpentSeconds = typeof body?.timeSpentSeconds === 'number' ? body.timeSpentSeconds : undefined
+  const sessionId = clampString(body?.sessionId)
 
   const mission = await prisma.mission.findFirst({
     where: {
@@ -136,6 +148,8 @@ export async function POST(req: Request, { params }: Params) {
   const startedAt = mission.progress[0]?.startedAt ?? now
 
   await prisma.$transaction(async (tx) => {
+    let streakSnapshot: number | null = null
+    const xpAwardedValue = !isAlreadyCompleted ? mission.xp : 0
     await tx.userMissionProgress.upsert({
       where: { userId_missionId: { userId, missionId: mission.id } },
       update: {
@@ -163,15 +177,41 @@ export async function POST(req: Request, { params }: Params) {
     })
 
     if (!isAlreadyCompleted) {
-      await tx.user.update({
+      const updatedUser = await tx.user.update({
         where: { id: userId },
         data: {
           xpTotal: { increment: mission.xp },
           xpMonth: { increment: mission.xp },
           xpToday: { increment: mission.xp },
         },
+        select: { streakCurrent: true },
       })
+      streakSnapshot = updatedUser?.streakCurrent ?? null
+    } else {
+      const existingUser = await tx.user.findUnique({
+        where: { id: userId },
+        select: { streakCurrent: true },
+      })
+      streakSnapshot = existingUser?.streakCurrent ?? null
     }
+
+    await tx.analyticsLog.create({
+      data: {
+        event: 'mission_completed',
+        userId,
+        sessionId,
+        missionId: mission.id,
+        missionType: mission.type,
+        xpAwarded: xpAwardedValue,
+        timeSpentSeconds,
+        attemptsCount: 1,
+        streakCurrent: streakSnapshot,
+        payload: {
+          readTimeMinutes: mission.etaMinutes,
+          alreadyCompleted: isAlreadyCompleted,
+        },
+      },
+    })
   })
 
   return NextResponse.json({ ok: true })

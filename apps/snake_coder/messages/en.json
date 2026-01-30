@@ -568,7 +568,15 @@
       "aiReviewNotAvailable": "AI review is available only for task missions."
     },
     "submitModal": {
-      "message": "{status, select, passed {Congratulations!} failed {Sorry, try again.} other {}}"
+      "message": "{status, select, passed {Congratulations!} failed {Sorry, try again.} other {}}",
+      "labels": {
+        "time": "Time",
+        "attempts": "Attempts",
+        "xp": "XP earned"
+      },
+      "timeValue": "{minutes} min {seconds} s",
+      "secondsValue": "{seconds} s",
+      "unknown": "-"
     }
   },
   "article": {

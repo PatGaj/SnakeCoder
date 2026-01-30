@@ -36,7 +36,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --env-file .env
 
 ## Environment
 
-- `DATABASE_URL` (optional): SnakeCoder Postgres URL used to load task test cases by `task_id` (table `"TaskTestCase"`). Works with Prisma-style `postgresql://...` URLs.
+- `DATABASE_URL` (optional): SnakeCoder Postgres URL used to load task test cases by `task_id` (column `Task.tests`). Works with Prisma-style `postgresql://...` URLs.
 - `EXECUTOR_JWT_SECRET` (or `NEXTAUTH_SECRET`): HS256 secret for Bearer JWT required by `/api/execute`.
 
 ## Update requirements lock

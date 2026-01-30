@@ -14,6 +14,7 @@ type Params = {
 
 type ReviewPayload = {
   source?: string
+  locale?: string
 }
 
 type ReviewResult = {
@@ -34,13 +35,32 @@ const OPENAI_TIMEOUT_MS = 120_000
 const OPENAI_MODEL = process.env.OPENAI_REVIEW_MODEL
 
 const ALLOWED_GRADES = ['A', 'A-', 'B+', 'B', 'C+', 'C', 'D', 'E'] as const
+const SUPPORTED_LOCALES = ['pl', 'en'] as const
 
+// Returns today's midnight for per-day quotas.
 const startOfToday = () => {
   const now = new Date()
   now.setHours(0, 0, 0, 0)
   return now
 }
 
+// Ensures the locale is one of the supported languages.
+const normalizeLocale = (value?: string | null) => {
+  if (!value) return null
+  const lower = value.toLowerCase()
+  return (SUPPORTED_LOCALES as readonly string[]).includes(lower) ? lower : null
+}
+
+// Infers locale from the Accept-Language header.
+const localeFromHeaders = (req: Request) => {
+  const header = req.headers.get('accept-language') || ''
+  const lower = header.toLowerCase()
+  if (lower.includes('pl')) return 'pl'
+  if (lower.includes('en')) return 'en'
+  return null
+}
+
+// Extracts model output text from OpenAI Responses API payloads.
 const extractOutputText = (payload: unknown) => {
   if (!payload || typeof payload !== 'object') return ''
 
@@ -64,6 +84,7 @@ const extractOutputText = (payload: unknown) => {
   return ''
 }
 
+// Logs OpenAI errors with useful context for debugging.
 const logOpenAiError = (error: unknown) => {
   if (error instanceof APIError) {
     console.error('[ai-review] OpenAI API error', {
@@ -90,6 +111,7 @@ const logOpenAiError = (error: unknown) => {
   console.error('[ai-review] OpenAI error', error)
 }
 
+// Safely parses JSON-like text returned by the model.
 const parseJsonFromText = (text: string) => {
   const trimmed = text.trim()
   if (!trimmed) return null
@@ -105,6 +127,7 @@ const parseJsonFromText = (text: string) => {
   }
 }
 
+// Normalizes whitespace and ensures a string output.
 const normalizeText = (value: unknown) => {
   if (typeof value !== 'string') return ''
   return value
@@ -114,6 +137,7 @@ const normalizeText = (value: unknown) => {
     .trim()
 }
 
+// Normalizes string lists, trimming empty entries and limiting length.
 const normalizeList = (value: unknown, maxItems = 5) => {
   if (!Array.isArray(value)) return []
   return value
@@ -122,6 +146,7 @@ const normalizeList = (value: unknown, maxItems = 5) => {
     .slice(0, maxItems)
 }
 
+// Validates and normalizes the JSON review returned by the model.
 const normalizeReview = (payload: Record<string, unknown> | null): ReviewResult | null => {
   if (!payload) return null
 
@@ -144,6 +169,7 @@ const normalizeReview = (payload: Record<string, unknown> | null): ReviewResult 
   }
 }
 
+// Builds a plain-text feedback summary stored in the DB.
 const buildFeedback = (review: ReviewResult) => {
   const blocks: string[] = [`Grade: ${review.grade}`]
 
@@ -166,6 +192,7 @@ const buildFeedback = (review: ReviewResult) => {
   return blocks.join('\n\n')
 }
 
+// Converts letter grades into numeric values for averages.
 const gradeValue = (grade: string): number | null => {
   switch (grade) {
     case 'A':
@@ -189,6 +216,7 @@ const gradeValue = (grade: string): number | null => {
   }
 }
 
+// Computes the average grade across all reviewed tasks.
 const computeGradeAvg = (grades: string[]) => {
   const values = grades.map(gradeValue).filter((value): value is number => typeof value === 'number')
   if (!values.length) return null
@@ -197,6 +225,7 @@ const computeGradeAvg = (grades: string[]) => {
   return Math.round((sum / values.length) * 100) / 100
 }
 
+// Builds the prompt sent to the model using mission context + user code.
 const buildPrompt = (params: {
   title: string
   description: string
@@ -218,6 +247,7 @@ const buildPrompt = (params: {
   ].join('\n')
 }
 
+// Requests a structured review from the OpenAI model.
 const requestReview = async (params: {
   title: string
   description: string
@@ -225,6 +255,7 @@ const requestReview = async (params: {
   hints: string[]
   language: string
   code: string
+  locale: string
 }): Promise<ReviewResult | null> => {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
@@ -236,9 +267,19 @@ const requestReview = async (params: {
     timeout: OPENAI_TIMEOUT_MS,
   })
 
-  const systemPrompt =
-    'You are an expert Python code reviewer for basic Python tasks. Provide detailed, structured, actionable feedback. Respond in Polish.'
-  const userPrompt = ['Return JSON.', buildPrompt(params)].join('\n')
+  const responseLanguage = params.locale === 'pl' ? 'Polish' : 'English'
+  const systemPrompt = [
+    'You are a senior Python code reviewer.',
+    `Respond in ${responseLanguage}.`,
+    'Focus on correctness vs task requirements, code style, readability, naming, structure, formatting, and Python idioms.',
+    'Do not provide step-by-step guidance, hints, or solutions.',
+    'Do not include code snippets.',
+    'Do not suggest writing unit tests or unrelated best practices.',
+    'If the task description/requirements mention a required function name (e.g., solve), do not suggest renaming it.',
+    'Only describe what the user did well, what is incorrect, and what could be improved in general terms.',
+    'Be friendly and beginner-friendly.',
+  ].join(' ')
+  const userPrompt = ['Return JSON only.', buildPrompt(params)].join('\n')
 
   let response: Awaited<ReturnType<typeof openai.responses.create>> | null = null
 
@@ -251,12 +292,11 @@ const requestReview = async (params: {
         systemPrompt +
         '\nReturn ONLY JSON with keys: grade, summary, strengths, improvements, nextSteps. The grade must be one of A, A-, B+, B, C+, C, D, E.' +
           '\nGuidelines:' +
-          '\n- summary: 2-4 sentences (what is correct/incorrect and overall quality), keep it on a single line.' +
-          '\n- strengths: 3-5 items, each 1-2 sentences with concrete positives.' +
-          '\n- improvements: 3-5 items, each 1-2 sentences with concrete fixes. If the solution is correct, still suggest robustness/readability improvements.' +
-          '\n- nextSteps: 2-4 items with what to change next.' +
-          '\nDo not include newline characters in any string; keep every item as single-line text.' +
-          '\nMention correctness, edge cases, input handling, readability, and Python specifics if relevant.',
+          `\n- summary: 2-3 sentences (what is correct/incorrect and overall quality). End with "${params.locale === 'pl' ? 'Dobra robota.' : 'Good job.'}" if there is at least one strength. Keep it on a single line.` +
+          '\n- strengths: 2-4 items, each 1-2 sentences highlighting concrete positives found in the code.' +
+          '\n- improvements: 2-4 items describing concrete issues or gaps relative to the task (no instructions or code).' +
+          '\n- nextSteps: always return an empty array.' +
+          '\nDo not include newline characters in any string; keep every item as single-line text.',
       input: userPrompt,
       text: { format: { type: 'json_object' }, verbosity: 'medium' },
     })
@@ -270,6 +310,7 @@ const requestReview = async (params: {
   return normalizeReview(parsed)
 }
 
+// Generates and stores an AI review, enforcing daily limits.
 export async function POST(req: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
@@ -281,6 +322,7 @@ export async function POST(req: Request, { params }: Params) {
   const { id } = await params
   const body = (await req.json().catch(() => null)) as ReviewPayload | null
   const source = typeof body?.source === 'string' ? body.source.trim() : ''
+  const locale = normalizeLocale(body?.locale) ?? localeFromHeaders(req) ?? 'pl'
 
   if (!source) {
     return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
@@ -350,6 +392,7 @@ export async function POST(req: Request, { params }: Params) {
       hints: mission.hints,
       language: mission.task.language,
       code: source,
+      locale,
     })
   } catch {
     review = null

@@ -29,17 +29,10 @@ const itemVariants = {
 
 const Dashboard = () => {
   const router = useRouter()
-  const { name, plan, lastResult, sprint, isLoading, isError, errorLabel } = useDashboard()
+  const { name, plan, lastResult, sprint, isLoading } = useDashboard()
   const showPlan = Boolean(plan)
   const showNoSprint = !sprint
 
-  if (isError) {
-    return (
-      <main className="mx-auto max-w-400 px-6 py-10 md:px-12">
-        <div className="text-sm text-snowWhite-300">{errorLabel}</div>
-      </main>
-    )
-  }
 
   if (isLoading && !sprint) {
     return null

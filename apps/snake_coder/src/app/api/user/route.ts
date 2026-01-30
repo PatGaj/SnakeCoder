@@ -5,8 +5,10 @@ import prisma from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import { PUBLIC_MODULE_CODES_LIST } from '@/lib/moduleAccess'
 
+// Enforces basic nickname format rules.
 const NICKNAME_REGEX = /^[A-Za-z0-9_]+$/
 
+// Returns user profile data and unlocked modules (including public modules).
 export async function GET() {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
@@ -104,6 +106,7 @@ export async function GET() {
   })
 }
 
+// Updates nickname and display name after validating uniqueness.
 export async function PATCH(req: Request) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id

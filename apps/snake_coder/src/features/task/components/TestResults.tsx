@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { RiArrowDownSLine, RiCheckLine, RiCloseLine, RiLoader4Line, RiTestTubeLine } from 'react-icons/ri'
 
 import { Badge, Box, Separator } from '@/components'
+import formatTestValue from '../utils/formatTestValue'
 
 export type TaskTestStatus = 'pending' | 'passed' | 'failed'
 
@@ -11,9 +12,9 @@ export type TestResult = {
   id: string
   title: string
   status: Exclude<TaskTestStatus, 'pending'>
-  input: string
-  expected: string
-  output?: string
+  input: unknown
+  expected: unknown
+  output?: unknown
 }
 
 export type TestResultsData = {
@@ -108,7 +109,7 @@ const TestResults: React.FC<TestResultsProps> = ({ results, isRunning, className
                         {t('results.fields.input')}
                       </p>
                       <pre className="whitespace-pre-wrap wrap-break-words rounded-xl bg-primary-950/40 px-3 py-2 text-xs text-snowWhite-50">
-                        {test.input}
+                        {formatTestValue(test.input)}
                       </pre>
                     </div>
                     <div className="space-y-1">
@@ -116,7 +117,7 @@ const TestResults: React.FC<TestResultsProps> = ({ results, isRunning, className
                         {t('results.fields.expected')}
                       </p>
                       <pre className="whitespace-nowrap overflow-x-auto rounded-xl bg-primary-950/40 px-3 py-2 text-xs text-snowWhite-50">
-                        {test.expected}
+                        {formatTestValue(test.expected)}
                       </pre>
                     </div>
                   </div>
@@ -127,7 +128,7 @@ const TestResults: React.FC<TestResultsProps> = ({ results, isRunning, className
                         {t('results.fields.output')}
                       </p>
                       <pre className="whitespace-pre-wrap wrap-break-words rounded-xl bg-primary-950/40 px-3 py-2 text-xs text-snowWhite-50">
-                        {test.output || t('results.emptyOutput')}
+                        {formatTestValue(test.output) || t('results.emptyOutput')}
                       </pre>
                     </div>
                   )}

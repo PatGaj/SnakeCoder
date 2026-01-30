@@ -3,6 +3,8 @@
 import { useTranslations } from 'next-intl'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
+import { gradeLabelFromAvg } from '@/lib/grades'
+
 import type { ProfileAccountData, ProfileAccountSaveResult, ProfileStatsData, ProfileUnlockedModuleData } from './components'
 
 export type UseProfileData = {
@@ -30,6 +32,7 @@ type ProfileApiResponse = {
   unlockedModules: ProfileUnlockedModuleData[]
 }
 
+// Fetches account, stats, and unlocked modules for the profile view.
 const fetchProfile = async (): Promise<ProfileApiResponse> => {
   const response = await fetch('/api/user', { method: 'GET', cache: 'no-store' })
   if (!response.ok) {
@@ -38,18 +41,7 @@ const fetchProfile = async (): Promise<ProfileApiResponse> => {
   return response.json() as Promise<ProfileApiResponse>
 }
 
-const gradeLabelFromAvg = (avg: number | null) => {
-  if (avg == null) return ''
-  if (avg >= 4.75) return 'A'
-  if (avg >= 4.25) return 'A-'
-  if (avg >= 4.0) return 'B+'
-  if (avg >= 3.5) return 'B'
-  if (avg >= 3.0) return 'C+'
-  if (avg >= 2.5) return 'C'
-  if (avg >= 2.0) return 'D'
-  return 'E'
-}
-
+// Loads profile data and exposes account update handler.
 const useProfile = (): UseProfileData => {
   const t = useTranslations('profile')
   const queryClient = useQueryClient()
@@ -59,6 +51,7 @@ const useProfile = (): UseProfileData => {
     queryFn: fetchProfile,
   })
 
+  // Updates account profile fields and keeps local cache in sync.
   const saveAccount = async (values: {
     nickName: string
     firstName?: string

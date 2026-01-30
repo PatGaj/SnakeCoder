@@ -12,35 +12,31 @@ export type UseDashboardData = {
   lastResult: LastResultCardData
   sprint?: SprintBannerData
   isLoading: boolean
-  isError: boolean
-  errorLabel: string
 }
 
 type DashboardApiResponse = {
   name: string | null
-  sprint:
-    | {
-        module: 'PCEP' | 'PCAP' | 'BASICS'
-        moduleId: string
-        sprintId: string
-        sprintNo: number
-        etaMinutes: number
-        hasActiveTask: boolean
-        tasksDone: number
-        tasksTotal: number
-        articleDone: boolean
-        articleDoneCount: number
-        articleTotal: number
-        quizScore: number
-        quizTotal: number
-        nextTaskTitle: string
-        nextTaskDesc: string
-        title: string
-        desc: string
-        taskRoute: string
-        route: string
-      }
-    | null
+  sprint: {
+    module: string
+    moduleId: string
+    sprintId: string
+    sprintNo: number
+    etaMinutes: number
+    hasActiveTask: boolean
+    tasksDone: number
+    tasksTotal: number
+    articleDone: boolean
+    articleDoneCount: number
+    articleTotal: number
+    quizScore: number
+    quizTotal: number
+    nextTaskTitle: string
+    nextTaskDesc: string
+    title: string
+    desc: string
+    taskRoute: string
+    route: string
+  } | null
   planBonusClaimed: boolean
   lastResult: {
     todayXp: number
@@ -61,7 +57,7 @@ const useDashboard = (): UseDashboardData => {
   const t = useTranslations('dashboard')
   const { data: session } = useSession()
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
     queryFn: fetchDashboard,
   })
@@ -79,15 +75,13 @@ const useDashboard = (): UseDashboardData => {
       name,
       lastResult,
       isLoading,
-      isError,
-      errorLabel: t('error'),
     }
   }
 
   const sprintProgress = Math.round(
     (data.sprint.tasksDone / Math.max(data.sprint.tasksTotal, 1)) * 70 +
       (data.sprint.articleDone ? 15 : 0) +
-      (data.sprint.quizTotal > 0 ? (data.sprint.quizScore / data.sprint.quizTotal) * 15 : 15)
+      (data.sprint.quizTotal > 0 ? (data.sprint.quizScore / data.sprint.quizTotal) * 15 : 15),
   )
 
   const tasksRemaining = data.sprint.tasksTotal - data.sprint.tasksDone
@@ -150,8 +144,6 @@ const useDashboard = (): UseDashboardData => {
     lastResult,
     sprint,
     isLoading,
-    isError,
-    errorLabel: t('error'),
   }
 }
 

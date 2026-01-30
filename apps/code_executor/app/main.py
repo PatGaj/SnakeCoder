@@ -1,3 +1,5 @@
+"""FastAPI application entrypoint for the code executor service."""
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from app.api import router as api_router
@@ -8,7 +10,7 @@ MAX_BODY_BYTES = 128 * 1024  # 128 KiB
 
 @app.middleware("http")
 async def limit_request_size(request: Request, call_next):
-    """Protect the backend from oversized payloads (API-level limit)."""
+    """Reject oversized payloads before they reach the executor."""
     content_length = request.headers.get("content-length")
     if content_length:
         try:
@@ -36,7 +38,7 @@ async def limit_request_size(request: Request, call_next):
 
 @app.get("/health")
 def health() -> dict:
-    """Simple endpoint to confirm the server is alive."""
+    """Return a minimal health response for readiness checks."""
     return {"status": "ok"}
 
 

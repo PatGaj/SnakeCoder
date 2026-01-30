@@ -30,7 +30,6 @@ enum MissionType {
   BUGFIX
   QUIZ
   ARTICLE
-  SKILL_TEST
 }
 
 enum MissionProgressStatus {
@@ -56,8 +55,6 @@ model User {
   emailVerified DateTime?
   image         String?
   passwordHash  String?
-  opinion       Opinion[]
-
   accounts      Account[]
   sessions      Session[]
 
@@ -75,6 +72,7 @@ model User {
   taskSubmissions TaskSubmission[]
   taskReviews  TaskReview[]
   quizAttempts  QuizAttempt[]
+  dailyLogins  UserDailyLogin[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -114,18 +112,6 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-model Opinion {
-  id        String     @id @default(cuid())
-  rate      Int
-  title     String
-  content   String?
-  authorId  String
-  author    User    @relation(fields: [authorId], references: [id])
-
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
 }
 
 model Module {
@@ -204,30 +190,14 @@ model Task {
   missionId  String   @id
   starterCode String
   language   String   @default("python")
+  tests      Json?
 
   mission    Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
-  tests      TaskTestCase[]
   submissions TaskSubmission[]
   reviews     TaskReview[]
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-}
-
-model TaskTestCase {
-  id             String   @id @default(cuid())
-  taskId         String
-  order          Int
-  input          String
-  expectedOutput String
-  isPublic       Boolean  @default(true)
-
-  task           Task     @relation(fields: [taskId], references: [missionId], onDelete: Cascade)
-
-  createdAt      DateTime @default(now())
-
-  @@unique([taskId, order])
-  @@index([taskId, isPublic])
 }
 
 model TaskSubmission {
@@ -272,43 +242,13 @@ model TaskReview {
 
 model Quiz {
   missionId  String   @id
+  questions  Json     @default("[]")
 
   mission    Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
-  questions  QuizQuestion[]
   attempts   QuizAttempt[]
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-}
-
-model QuizQuestion {
-  id        String   @id @default(cuid())
-  quizId    String
-  order     Int
-  title     String
-  prompt    String
-
-  quiz      Quiz     @relation(fields: [quizId], references: [missionId], onDelete: Cascade)
-  options   QuizOption[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([quizId, order])
-  @@index([quizId])
-}
-
-model QuizOption {
-  id         String   @id @default(cuid())
-  questionId String
-  order      Int
-  label      String
-  isCorrect  Boolean  @default(false)
-
-  question   QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  @@unique([questionId, order])
-  @@index([questionId])
 }
 
 model QuizAttempt {
@@ -353,6 +293,7 @@ model UserMissionProgress {
   xpEarned        Int?
   grade           String?
   timeSpentSeconds Int?
+  testAttemptsCount Int              @default(0)
   userCode        String? @db.Text @map("user_code")
 
   user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -375,4 +316,34 @@ model UserModuleAccess {
 
   @@id([userId, moduleId])
   @@index([moduleId])
+}
+
+model AnalyticsLog {
+  id               String   @id @default(cuid())
+  event            String
+  userId           String?
+  sessionId        String?
+  missionId        String?
+  missionType      String?
+  xpAwarded        Int?
+  timeSpentSeconds Int?
+  attemptsCount    Int?
+  streakCurrent    Int?
+  payload          Json?
+  createdAt        DateTime @default(now())
+
+  @@index([event, createdAt])
+  @@index([userId, createdAt])
+}
+
+model UserDailyLogin {
+  id        String   @id @default(cuid())
+  userId    String
+  loginDate DateTime
+  loggedAt  DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, loginDate])
+  @@index([loginDate])
 }

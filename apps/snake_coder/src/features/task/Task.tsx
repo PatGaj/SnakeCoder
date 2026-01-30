@@ -2,8 +2,10 @@
 
 import React from 'react'
 import { RiRefreshLine, RiSave2Line } from 'react-icons/ri'
+import { useTranslations } from 'next-intl'
 
 import { Button, Modal } from '@/components'
+import { formatDuration } from '@/lib/utils'
 
 import { CodeEditor, Console, PublicTests, TaskActionBar, TaskDescription, TestResults } from './components'
 import useTask from './useTask'
@@ -14,8 +16,6 @@ export type TaskProps = {
 
 const Task: React.FC<TaskProps> = ({ id }) => {
   const {
-    errorLabel,
-    isError,
     task,
     editor,
     publicTests,
@@ -28,10 +28,10 @@ const Task: React.FC<TaskProps> = ({ id }) => {
     saveLoading,
     submitLoading,
     aiLoading,
-    aiReviewVisible,
-    aiReviewDisabled,
     aiReviewRemaining,
     aiReviewLimit,
+    aiReviewEnabled,
+    missionType,
     submitDisabled,
     onRun,
     onTest,
@@ -42,19 +42,20 @@ const Task: React.FC<TaskProps> = ({ id }) => {
     submitModalOpen,
     submitPercent,
     submitModalMessage,
+    submitStats,
     closeSubmitModal,
-    saveLabel,
-    resetLabel,
   } = useTask(id)
+  const t = useTranslations('task')
+
+  const attemptsValue = submitStats?.attemptsCount ?? null
+  const attemptsLabel = attemptsValue === null ? t('submitModal.unknown') : String(attemptsValue)
+  const xpAwarded = submitStats?.xpAwarded ?? 0
+  const xpLabel = `${xpAwarded > 0 ? '+' : ''}${xpAwarded} XP`
+
+  const aiReviewVisible = Boolean(aiReviewEnabled ?? missionType === 'TASK')
+  const aiReviewDisabled = Boolean(aiReviewVisible && aiReviewRemaining === 0)
 
   if (!task || !editor || !publicTests) {
-    if (isError) {
-      return (
-        <main className="mx-auto max-w-400 px-6 pb-6 pt-20 md:px-12">
-          <div className="text-sm text-snowWhite-300">{errorLabel}</div>
-        </main>
-      )
-    }
     return null
   }
 
@@ -99,7 +100,7 @@ const Task: React.FC<TaskProps> = ({ id }) => {
                       onClick={onReset}
                       type="button"
                     >
-                      {resetLabel}
+                      {t('actions.reset')}
                     </Button>
                     <Button
                       variant="ghost"
@@ -112,7 +113,7 @@ const Task: React.FC<TaskProps> = ({ id }) => {
                       onClick={onSave}
                       type="button"
                     >
-                      {saveLabel}
+                      {t('actions.save')}
                     </Button>
                   </div>
                 }
@@ -138,9 +139,33 @@ const Task: React.FC<TaskProps> = ({ id }) => {
 
       <Modal open={submitModalOpen} onClose={closeSubmitModal}>
         {submitModalOpen && (
-          <div className="space-y-2 text-center">
-            <p className="text-5xl font-bold text-snowWhite-50">{submitPercent}%</p>
-            <p className="text-sm text-snowWhite-200">{submitModalMessage}</p>
+          <div className="space-y-4 text-center">
+            <div className="space-y-2">
+              <p className="text-5xl font-bold text-snowWhite-50">{submitPercent}%</p>
+              <p className="text-sm text-snowWhite-200">{submitModalMessage}</p>
+            </div>
+            <div className="grid gap-3 text-left sm:grid-cols-3">
+              <div className="rounded-xl border border-primary-800/70 bg-primary-950/60 px-3 py-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary-300">
+                  {t('submitModal.labels.time')}
+                </p>
+                <p className="text-sm font-semibold text-snowWhite-50">
+                  {formatDuration(submitStats?.timeSpentSeconds ?? null)}
+                </p>
+              </div>
+              <div className="rounded-xl border border-primary-800/70 bg-primary-950/60 px-3 py-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary-300">
+                  {t('submitModal.labels.attempts')}
+                </p>
+                <p className="text-sm font-semibold text-snowWhite-50">{attemptsLabel}</p>
+              </div>
+              <div className="rounded-xl border border-primary-800/70 bg-primary-950/60 px-3 py-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary-300">
+                  {t('submitModal.labels.xp')}
+                </p>
+                <p className="text-sm font-semibold text-snowWhite-50">{xpLabel}</p>
+              </div>
+            </div>
           </div>
         )}
       </Modal>

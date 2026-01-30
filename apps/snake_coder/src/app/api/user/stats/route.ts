@@ -6,17 +6,20 @@ import { authOptions } from '@/lib/auth'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
+// Normalizes a date to midnight to compare calendar days.
 const startOfDay = (value: Date) => {
   const date = new Date(value)
   date.setHours(0, 0, 0, 0)
   return date
 }
 
+// Computes day difference between two dates (calendar-based).
 const diffDays = (from: Date, to: Date) => {
   const diffMs = startOfDay(to).getTime() - startOfDay(from).getTime()
   return Math.round(diffMs / DAY_MS)
 }
 
+// Maps rank to the user-facing league label.
 const leagueNameForRank = (rank: number) => {
   if (rank >= 1 && rank <= 3) return 'Champions'
   if (rank >= 4 && rank <= 10) return 'Gold'
@@ -24,6 +27,7 @@ const leagueNameForRank = (rank: number) => {
   return 'Bronze'
 }
 
+// Returns current user stats and updates streak if a new day has started.
 export async function GET() {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id

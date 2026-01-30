@@ -20,7 +20,7 @@ const LastResultCard: React.FC<LastResultCardProps> = ({ lastResult }) => {
   const gradeValue = lastResult.grade ? lastResult.grade : '-'
 
   return (
-    <Box variant="glass" size="lg" round="2xl" className="relative w-full overflow-hidden border-primary-800/70">
+    <Box variant="glass" size="lg" round="2xl" className="relative z-0 w-full overflow-hidden border-primary-800/70">
       <div className="pointer-events-none absolute -left-10 -top-16 h-56 w-56 rounded-full bg-aquaBlue-500/10 blur-3xl" />
       <div className="pointer-events-none absolute -right-10 -bottom-14 h-56 w-56 rounded-full bg-secondary-500/14 blur-3xl" />
 

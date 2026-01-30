@@ -9,18 +9,44 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 
 import prisma from '@/lib/prisma'
 
+// Derives a deterministic nickname for OAuth users from a provider seed.
 const oauthNickName = (seed: string) => {
   const hex = createHash('sha256').update(seed).digest('hex')
   const digits = (parseInt(hex.slice(0, 8), 16) % 1_000_000_000).toString().padStart(9, '0')
   return `USER_${digits}`
 }
 
+// Records a user's login once per day (UTC), updating the timestamp if it already exists.
+const recordDailyLogin = async (userId: string) => {
+  const now = new Date()
+  const loginDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+
+  await prisma.userDailyLogin.upsert({
+    where: {
+      userId_loginDate: {
+        userId,
+        loginDate,
+      },
+    },
+    update: {
+      loggedAt: now,
+    },
+    create: {
+      userId,
+      loginDate,
+      loggedAt: now,
+    },
+  })
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt',
+    maxAge: 60 * 60 * 48,
   },
   jwt: {
+    // Custom JWT encode/decode to keep compatibility with session strategy.
     async encode({ token, secret }) {
       return jwt.sign(token as object, secret, {
         algorithm: 'HS256',
@@ -100,12 +126,21 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    // Persist the user id in the token.
     async jwt({ token, user }) {
       if (user?.id) token.id = user.id
       return token
     },
+    // Attach user id to session and log daily login without blocking auth.
     async session({ session, token }) {
-      if (session.user && token.id) session.user.id = token.id
+      if (session.user && token.id) {
+        session.user.id = token.id
+        try {
+          await recordDailyLogin(token.id)
+        } catch {
+          // no-op: login tracking should not block sessions
+        }
+      }
       return session
     },
   },

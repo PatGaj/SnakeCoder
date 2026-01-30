@@ -17,6 +17,35 @@ type SaveTaskPayload = {
   userCode?: string
 }
 
+type TaskTestCasePayload = {
+  input: unknown
+  expectedOutput: unknown
+}
+
+// Normalizes task test payloads stored as JSON.
+const normalizeTaskTests = (value: unknown): TaskTestCasePayload[] => {
+  if (!Array.isArray(value)) return []
+
+  const normalized: TaskTestCasePayload[] = []
+
+  for (const entry of value) {
+    if (!entry || typeof entry !== 'object') continue
+    const record = entry as Record<string, unknown>
+    const input = record.input
+    const expectedOutput = record.expectedOutput ?? record.output ?? record.expected
+
+    if (input === undefined && expectedOutput === undefined) continue
+
+    normalized.push({
+      input: input ?? '',
+      expectedOutput: expectedOutput ?? '',
+    })
+  }
+
+  return normalized
+}
+
+// Returns task content, progress, and limited public tests.
 export async function GET(_: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id
@@ -48,11 +77,7 @@ export async function GET(_: Request, { params }: Params) {
         select: {
           language: true,
           starterCode: true,
-          tests: {
-            where: { isPublic: true },
-            orderBy: { order: 'asc' },
-            select: { id: true, input: true, expectedOutput: true },
-          },
+          tests: true,
         },
       },
       progress: {
@@ -66,13 +91,17 @@ export async function GET(_: Request, { params }: Params) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  const totalTestsCount = await prisma.taskTestCase.count({ where: { taskId: mission.id } })
+  const taskTests = normalizeTaskTests(mission.task.tests)
+  const publicTests = taskTests.slice(0, 3)
+  const totalTestsCount = taskTests.length
   const progress = mission.progress[0]
 
   let aiReviewRemaining: number | null = null
   let aiReviewLimit: number | null = null
+  let aiReviewEnabled = false
 
   if (mission.type === 'TASK') {
+    aiReviewEnabled = true
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
 
@@ -107,21 +136,24 @@ export async function GET(_: Request, { params }: Params) {
     patternCode: mission.task.starterCode,
     userCode: progress?.userCode ?? null,
     publicTests: {
-      cases: mission.task.tests.map((test) => ({
-        id: test.id,
-        input: test.input,
-        output: test.expectedOutput,
+      cases: publicTests.map((testCase, index) => ({
+        id: `public-${index + 1}`,
+        input: testCase.input,
+        output: testCase.expectedOutput,
       })),
     },
     totalTestsCount,
     timeLimitSeconds: mission.timeLimitSeconds ?? mission.etaMinutes * 60,
     status: progress?.status ?? 'TODO',
+    startedAt: progress?.startedAt ? progress.startedAt.toISOString() : null,
     missionType: mission.type,
+    aiReviewEnabled,
     aiReviewRemaining,
     aiReviewLimit,
   })
 }
 
+// Persists user code draft and ensures the mission is in-progress.
 export async function PATCH(req: Request, { params }: Params) {
   const session = await getServerSession(authOptions)
   const userId = session?.user?.id

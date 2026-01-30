@@ -11,7 +11,7 @@ import {
 import { Badge, Box, Button, ItemRow, Progressbar, Separator } from '@/components'
 
 export type SprintBannerData = {
-  module: 'PCEP' | 'PCAP' | 'BASICS'
+  module: string
   sprintNo: number
   etaMinutes: number
   hasActiveTask: boolean
@@ -49,10 +49,7 @@ const SprintBanner: React.FC<SprintBannerProps> = ({ sprint, onContinue, onGoToS
         : sprint.module
 
   return (
-    <Box variant="glass" size="xl" round="3xl" className="relative w-full overflow-hidden border-primary-800/70">
-      <div className="pointer-events-none absolute -left-10 -top-16 h-64 w-64 rounded-full bg-secondary-500/15 blur-3xl" />
-      <div className="pointer-events-none absolute -right-10 -bottom-16 h-64 w-64 rounded-full bg-aquaBlue-500/10 blur-3xl" />
-
+    <Box variant="glass" size="xl" round="3xl" className=" w-full overflow-hidden border-primary-800/70">
       <div className="flex flex-col items-center gap-4 text-center lg:flex-row lg:items-start lg:justify-between lg:text-left">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">

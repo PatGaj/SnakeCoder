@@ -4,7 +4,7 @@ import { RiFileCodeLine } from 'react-icons/ri'
 
 import { Box, Separator } from '@/components'
 
-import { defineSnakeCoderMonacoThemes, SNAKE_CODER_EDITOR_THEME } from '../monacoTheme'
+import { defineSnakeCoderMonacoThemes, SNAKE_CODER_EDITOR_THEME } from '../utils/monacoTheme'
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
 
